@@ -145,6 +145,20 @@
             border: 3px solid #38ef7d;
             border-radius: 10px;
             box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .scanner-instructions {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+            pointer-events: none;
         }
         
         .scanner-line {
@@ -406,6 +420,9 @@
         </div>
 
         <div id="scanner" class="scanner">
+            <div class="scanner-instructions">
+                📷 Centrez le code-barres
+            </div>
             <div id="scanner-container"></div>
             <div class="scanner-overlay">
                 <div class="scanner-line"></div>
@@ -445,6 +462,9 @@
         var currentFilter = 'all';
         var currentBarcode = null;
         var currentProductData = null;
+        var lastScannedCode = null;
+        var scanConfidenceCount = {};
+        var scanningActive = false;
 
         // Charger les données
         try {
@@ -558,18 +578,32 @@
             scannerEl.classList.add('active');
             document.getElementById('actions').style.display = 'none';
             
+            // Réinitialiser les variables de scan
+            lastScannedCode = null;
+            scanConfidenceCount = {};
+            scanningActive = true;
+            
             Quagga.init({
                 inputStream: {
                     name: "Live",
                     type: "LiveStream",
                     target: document.querySelector('#scanner-container'),
                     constraints: {
-                        facingMode: "environment"
+                        facingMode: "environment",
+                        width: { min: 640, ideal: 1280, max: 1920 },
+                        height: { min: 480, ideal: 720, max: 1080 }
                     }
                 },
+                locator: {
+                    patchSize: "medium",
+                    halfSample: true
+                },
+                numOfWorkers: 2,
+                frequency: 10,
                 decoder: {
                     readers: ["ean_reader", "ean_8_reader", "upc_reader", "upc_e_reader"]
-                }
+                },
+                locate: true
             }, function(err) {
                 if (err) {
                     console.error(err);
@@ -581,17 +615,74 @@
             });
 
             Quagga.onDetected(function(result) {
+                if (!scanningActive) return;
+                
                 var code = result.codeResult.code;
-                console.log("Code-barres détecté:", code);
-                stopScanner();
-                searchProduct(code);
+                var quality = result.codeResult.quality;
+                
+                // Valider le format du code-barres
+                if (!code || code.length < 8 || code.length > 13) return;
+                if (!/^\d+$/.test(code)) return; // Seulement des chiffres
+                
+                // Système de confiance : détecter 3 fois le même code
+                if (!scanConfidenceCount[code]) {
+                    scanConfidenceCount[code] = 0;
+                }
+                scanConfidenceCount[code]++;
+                
+                console.log("Code détecté:", code, "Confiance:", scanConfidenceCount[code], "Qualité:", quality);
+                
+                // Si détecté 3 fois avec bonne qualité
+                if (scanConfidenceCount[code] >= 3 && quality > 70) {
+                    scanningActive = false;
+                    
+                    // Feedback visuel
+                    var overlay = document.querySelector('.scanner-overlay');
+                    overlay.style.borderColor = '#38ef7d';
+                    overlay.style.boxShadow = '0 0 0 9999px rgba(0,0,0,0.8), 0 0 30px #38ef7d';
+                    
+                    // Vibration si disponible
+                    if (navigator.vibrate) {
+                        navigator.vibrate(200);
+                    }
+                    
+                    setTimeout(function() {
+                        stopScanner();
+                        confirmBarcode(code);
+                    }, 500);
+                }
             });
+        }
+        
+        function confirmBarcode(code) {
+            var message = "Code-barres détecté :\n\n" + code + "\n\nRechercher ce produit ?";
+            if (confirm(message)) {
+                searchProduct(code);
+            } else {
+                // Rescanner
+                document.getElementById('actions').style.display = 'grid';
+            }
         }
 
         function stopScanner() {
-            Quagga.stop();
+            try {
+                Quagga.stop();
+            } catch (e) {
+                console.log("Quagga déjà arrêté");
+            }
             document.getElementById('scanner').classList.remove('active');
             document.getElementById('actions').style.display = 'grid';
+            
+            // Réinitialiser le style de l'overlay
+            var overlay = document.querySelector('.scanner-overlay');
+            if (overlay) {
+                overlay.style.borderColor = '#38ef7d';
+                overlay.style.boxShadow = '0 0 0 9999px rgba(0,0,0,0.5)';
+            }
+            
+            scanningActive = false;
+            lastScannedCode = null;
+            scanConfidenceCount = {};
         }
 
         function searchProduct(barcode) {
