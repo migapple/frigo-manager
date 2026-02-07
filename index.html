@@ -618,22 +618,21 @@
                 if (!scanningActive) return;
                 
                 var code = result.codeResult.code;
-                var quality = result.codeResult.quality;
                 
                 // Valider le format du code-barres
                 if (!code || code.length < 8 || code.length > 13) return;
                 if (!/^\d+$/.test(code)) return; // Seulement des chiffres
                 
-                // Système de confiance : détecter 3 fois le même code
+                // Système de confiance : détecter 2 fois le même code
                 if (!scanConfidenceCount[code]) {
                     scanConfidenceCount[code] = 0;
                 }
                 scanConfidenceCount[code]++;
                 
-                console.log("Code détecté:", code, "Confiance:", scanConfidenceCount[code], "Qualité:", quality);
+                console.log("Code détecté:", code, "Confiance:", scanConfidenceCount[code]);
                 
-                // Si détecté 3 fois avec bonne qualité
-                if (scanConfidenceCount[code] >= 3 && quality > 70) {
+                // Si détecté 2 fois (réduit de 3 à 2)
+                if (scanConfidenceCount[code] >= 2) {
                     scanningActive = false;
                     
                     // Feedback visuel
