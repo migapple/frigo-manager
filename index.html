@@ -319,20 +319,39 @@
             margin-bottom: 15px;
         }
         
+        .form-group {
+            margin: 15px 0;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        
         .form input,
         .form select {
             width: 100%;
             padding: 15px;
-            margin: 10px 0;
             border: 2px solid #ddd;
             border-radius: 10px;
             font-size: 16px;
+            background: white;
         }
         
         .form input:focus,
         .form select:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .date-suggestion {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
         }
         
         .preview-img {
@@ -380,7 +399,7 @@
         
         <div id="actions" class="actions">
             <button class="btn btn-scan" id="btnScan">📷 Scanner un code-barres</button>
-            <button class="btn btn-manual" id="btnManual">✍️ Ajouter manuellement</button>
+            <button class="btn btn-manual" id="btnManual">✍️ Saisie manuelle (sans code-barres)</button>
         </div>
 
         <div id="scanner" class="scanner">
@@ -622,6 +641,11 @@
             productData = productData || {};
             var form = document.getElementById('form');
             
+            // Date suggérée : dans 7 jours
+            var suggestedDate = new Date();
+            suggestedDate.setDate(suggestedDate.getDate() + 7);
+            var suggestedDateStr = suggestedDate.toISOString().split('T')[0];
+            
             var html = '<h3>➕ Ajouter au frigo</h3>';
             
             if (productData.barcode) {
@@ -632,9 +656,18 @@
                 html += '<img src="' + productData.image + '" class="preview-img">';
             }
             
-            html += '<input type="text" id="formNom" placeholder="Nom du produit *" value="' + (productData.nom || '') + '" style="font-size:16px">' +
-                    '<input type="date" id="formDate" placeholder="Date de péremption" style="font-size:16px">' +
-                    '<select id="formCategorie" style="font-size:16px">' +
+            html += '<div class="form-group">' +
+                    '<label for="formNom">Nom du produit *</label>' +
+                    '<input type="text" id="formNom" placeholder="Ex: Lait, Yaourt, Pommes..." value="' + (productData.nom || '') + '">' +
+                    '</div>' +
+                    '<div class="form-group">' +
+                    '<label for="formDate">Date de péremption</label>' +
+                    '<input type="date" id="formDate" value="' + suggestedDateStr + '">' +
+                    '<div class="date-suggestion">💡 Date suggérée : +7 jours (modifiable)</div>' +
+                    '</div>' +
+                    '<div class="form-group">' +
+                    '<label for="formCategorie">Catégorie</label>' +
+                    '<select id="formCategorie">' +
                     '<option value="fruit"' + (productData.categorie === 'fruit' ? ' selected' : '') + '>🍎 Fruit</option>' +
                     '<option value="legume"' + (productData.categorie === 'legume' ? ' selected' : '') + '>🥕 Légume</option>' +
                     '<option value="viande"' + (productData.categorie === 'viande' ? ' selected' : '') + '>🥩 Viande</option>' +
@@ -643,6 +676,7 @@
                     '<option value="boisson"' + (productData.categorie === 'boisson' ? ' selected' : '') + '>🥤 Boisson</option>' +
                     '<option value="autre"' + (productData.categorie === 'autre' || !productData.categorie ? ' selected' : '') + '>📦 Autre</option>' +
                     '</select>' +
+                    '</div>' +
                     '<button class="btn" id="btnAdd" style="background:#667eea;font-size:18px;padding:15px;margin-top:10px">✓ Ajouter au frigo</button>' +
                     '<button class="btn" id="btnCancel" style="background:#ccc;color:#333;font-size:18px;padding:15px">✕ Annuler</button>';
             
@@ -657,10 +691,12 @@
                     return;
                 }
                 
+                var dateValue = document.getElementById('formDate').value;
+                
                 var newItem = {
                     id: Date.now(),
                     nom: nom,
-                    datePeremption: document.getElementById('formDate').value || null,
+                    datePeremption: dateValue || null,
                     categorie: document.getElementById('formCategorie').value,
                     dateAjout: new Date().toISOString().split('T')[0],
                     image: productData.image || null,
