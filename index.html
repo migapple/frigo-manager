@@ -249,6 +249,32 @@
             color: white;
         }
         
+        .filters-emplacement {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 0;
+        }
+        
+        .filter-empl-btn {
+            padding: 10px 8px;
+            border: none;
+            border-radius: 10px;
+            background: white;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 0.85em;
+            text-align: center;
+        }
+        
+        .filter-empl-btn.active {
+            background: #f59e0b;
+            color: white;
+        }
+        
         .items {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -406,6 +432,17 @@
             font-weight: 600;
             margin: 10px 0;
         }
+        
+        .emplacement-badge {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 5px 5px 5px 0;
+        }
     </style>
 </head>
 <body>
@@ -464,6 +501,13 @@
             <button class="filter-btn" data-f="expired">❌ Périmés</button>
         </div>
 
+        <div id="filtersEmplacement" class="filters-emplacement">
+            <button class="filter-empl-btn active" data-empl="all">📍 Tous</button>
+            <button class="filter-empl-btn" data-empl="frigo">🧊 Frigo</button>
+            <button class="filter-empl-btn" data-empl="congelateur">❄️ Congélo</button>
+            <button class="filter-empl-btn" data-empl="placard">🚪 Placard</button>
+        </div>
+
         <div id="items" class="items"></div>
 
         <div id="empty" class="empty">
@@ -476,6 +520,7 @@
     <script>
         var items = [];
         var currentFilter = 'all';
+        var currentEmplacement = 'all';
         var currentBarcode = null;
         var currentProductData = null;
         var lastScannedCode = null;
@@ -512,6 +557,18 @@
             return { cls: 'fresh', text: '✓ ' + days + ' jours restants' };
         }
 
+        function getEmplacementInfo(emplacement) {
+            var emplacements = {
+                'frigo': { emoji: '🧊', text: 'Frigo' },
+                'congelateur': { emoji: '❄️', text: 'Congélateur' },
+                'placard': { emoji: '🚪', text: 'Placard' },
+                'cave': { emoji: '🍷', text: 'Cave' },
+                'corbeille': { emoji: '🧺', text: 'Corbeille' },
+                'autre_emplacement': { emoji: '📍', text: 'Autre' }
+            };
+            return emplacements[emplacement] || emplacements['frigo'];
+        }
+
         function renderStats() {
             var total = items.length;
             var exp = 0, soon = 0;
@@ -531,10 +588,15 @@
         function renderItems() {
             var filtered = items.filter(function(item) {
                 var d = getDays(item.datePeremption);
-                if (currentFilter === 'all') return true;
-                if (currentFilter === 'expired') return d !== null && d < 0;
-                if (currentFilter === 'soon') return d !== null && d >= 0 && d <= 3;
-                if (currentFilter === 'fresh') return d === null || d > 3;
+                var statusMatch = false;
+                if (currentFilter === 'all') statusMatch = true;
+                if (currentFilter === 'expired') statusMatch = d !== null && d < 0;
+                if (currentFilter === 'soon') statusMatch = d !== null && d >= 0 && d <= 3;
+                if (currentFilter === 'fresh') statusMatch = d === null || d > 3;
+                
+                var emplacementMatch = currentEmplacement === 'all' || (item.emplacement || 'frigo') === currentEmplacement;
+                
+                return statusMatch && emplacementMatch;
             });
             
             var itemsEl = document.getElementById('items');
@@ -561,6 +623,10 @@
                             '<div class="item-name">' + item.nom + '</div>';
                     if (item.barcode) {
                         html += '<div class="barcode-badge">📊 ' + item.barcode + '</div>';
+                    }
+                    if (item.emplacement) {
+                        var empl = getEmplacementInfo(item.emplacement);
+                        html += '<div class="emplacement-badge">' + empl.emoji + ' ' + empl.text + '</div>';
                     }
                     html += '<div class="item-info">📅 Ajouté: ' + new Date(item.dateAjout).toLocaleDateString('fr-FR') + '</div>' +
                             '<div class="item-info">⏰ Expire: ' + (item.datePeremption ? new Date(item.datePeremption).toLocaleDateString('fr-FR') : 'Non indiqué') + '</div>' +
@@ -792,6 +858,17 @@
                     '<option value="autre"' + (productData.categorie === 'autre' || !productData.categorie ? ' selected' : '') + '>📦 Autre</option>' +
                     '</select>' +
                     '</div>' +
+                    '<div class="form-group">' +
+                    '<label for="formEmplacement">Emplacement</label>' +
+                    '<select id="formEmplacement">' +
+                    '<option value="frigo"' + (productData.emplacement === 'frigo' || !productData.emplacement ? ' selected' : '') + '>🧊 Frigo</option>' +
+                    '<option value="congelateur"' + (productData.emplacement === 'congelateur' ? ' selected' : '') + '>❄️ Congélateur</option>' +
+                    '<option value="placard"' + (productData.emplacement === 'placard' ? ' selected' : '') + '>🚪 Placard</option>' +
+                    '<option value="cave"' + (productData.emplacement === 'cave' ? ' selected' : '') + '>🍷 Cave</option>' +
+                    '<option value="corbeille"' + (productData.emplacement === 'corbeille' ? ' selected' : '') + '>🧺 Corbeille</option>' +
+                    '<option value="autre_emplacement"' + (productData.emplacement === 'autre_emplacement' ? ' selected' : '') + '>📍 Autre</option>' +
+                    '</select>' +
+                    '</div>' +
                     '<button class="btn" id="btnAdd" style="background:#667eea;font-size:18px;padding:15px;margin-top:10px">✓ Ajouter au frigo</button>' +
                     '<button class="btn" id="btnCancel" style="background:#ccc;color:#333;font-size:18px;padding:15px">✕ Annuler</button>';
             
@@ -835,6 +912,7 @@
                     nom: nom,
                     datePeremption: dateValue || null,
                     categorie: document.getElementById('formCategorie').value,
+                    emplacement: document.getElementById('formEmplacement').value,
                     dateAjout: new Date().toISOString().split('T')[0],
                     image: customImageData,
                     barcode: productData.barcode || null
@@ -868,6 +946,19 @@
                 currentFilter = this.getAttribute('data-f');
                 for (var j = 0; j < filterBtns.length; j++) {
                     filterBtns[j].classList.remove('active');
+                }
+                this.classList.add('active');
+                renderItems();
+            };
+        }
+        
+        // Filtres d'emplacement
+        var filterEmplBtns = document.querySelectorAll('.filter-empl-btn');
+        for (var i = 0; i < filterEmplBtns.length; i++) {
+            filterEmplBtns[i].onclick = function() {
+                currentEmplacement = this.getAttribute('data-empl');
+                for (var j = 0; j < filterEmplBtns.length; j++) {
+                    filterEmplBtns[j].classList.remove('active');
                 }
                 this.classList.add('active');
                 renderItems();
