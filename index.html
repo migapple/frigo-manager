@@ -839,6 +839,313 @@
             flex: 1;
             min-width: 120px;
         }
+        
+        /* Suggestions de recettes */
+        .recipes-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 20px;
+        }
+        
+        .recipes-modal.active {
+            display: flex;
+        }
+        
+        .recipes-content {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .recipes-header {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .recipes-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        
+        .btn-close-recipes {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .recipes-stats {
+            padding: 15px 20px;
+            text-align: center;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .recipes-stat-label {
+            font-size: 0.95em;
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .recipes-list-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .recipe-card {
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid #e9d5ff;
+        }
+        
+        .recipe-card:active {
+            transform: scale(0.98);
+            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+        }
+        
+        .recipe-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .recipe-icon {
+            font-size: 3em;
+            flex-shrink: 0;
+        }
+        
+        .recipe-card-title {
+            flex: 1;
+        }
+        
+        .recipe-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #7c3aed;
+            margin-bottom: 5px;
+        }
+        
+        .recipe-time {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .recipe-ingredients-preview {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .recipe-match {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .recipes-actions {
+            padding: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        /* Détail de recette */
+        .recipe-detail-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            z-index: 4000;
+        }
+        
+        .recipe-detail-modal.active {
+            display: block;
+        }
+        
+        .recipe-detail-content {
+            background: white;
+            height: 100%;
+            overflow-y: auto;
+        }
+        
+        .recipe-detail-header {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        .btn-back {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .btn-close-recipe-detail {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .recipe-detail-body {
+            padding: 30px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .recipe-detail-title {
+            font-size: 2em;
+            color: #7c3aed;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .recipe-detail-icon {
+            font-size: 4em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .recipe-detail-meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .recipe-meta-item {
+            text-align: center;
+        }
+        
+        .recipe-meta-label {
+            font-size: 0.85em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .recipe-meta-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .recipe-section {
+            margin-bottom: 30px;
+        }
+        
+        .recipe-section-title {
+            font-size: 1.5em;
+            color: #7c3aed;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #e9d5ff;
+        }
+        
+        .recipe-ingredients-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .recipe-ingredient-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #faf5ff;
+            border-radius: 8px;
+            border-left: 4px solid #8b5cf6;
+        }
+        
+        .recipe-ingredient-available {
+            background: #d1fae5;
+            border-left-color: #10b981;
+        }
+        
+        .recipe-steps-list {
+            list-style: none;
+            padding: 0;
+            counter-reset: step-counter;
+        }
+        
+        .recipe-step-item {
+            padding: 20px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            position: relative;
+            padding-left: 70px;
+            counter-increment: step-counter;
+        }
+        
+        .recipe-step-item::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            width: 35px;
+            height: 35px;
+            background: #8b5cf6;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
     </style>
     <!-- Bibliothèque SheetJS pour Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -907,6 +1214,42 @@
             <button class="btn btn-scan" id="btnScan">📷 Scanner un code-barres</button>
             <button class="btn btn-manual" id="btnManual">✍️ Saisie manuelle</button>
             <button class="btn" id="btnShoppingList" onclick="openShoppingList()" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">🛒 Liste de courses</button>
+            <button class="btn" id="btnRecipes" onclick="openRecipes()" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">👨‍🍳 Suggestions de recettes</button>
+        </div>
+
+        <div id="recipesModal" class="recipes-modal">
+            <div class="recipes-content">
+                <div class="recipes-header">
+                    <h2>👨‍🍳 Suggestions de recettes</h2>
+                    <button class="btn-close-recipes" onclick="closeRecipes()">✕</button>
+                </div>
+                
+                <div class="recipes-stats">
+                    <div class="recipes-stat">
+                        <span class="recipes-stat-label">Avec vos ingrédients disponibles</span>
+                    </div>
+                </div>
+                
+                <div id="recipesListItems" class="recipes-list-items">
+                    <!-- Les recettes seront ajoutées ici -->
+                </div>
+                
+                <div class="recipes-actions">
+                    <button class="btn" onclick="closeRecipes()" style="background: #6b7280;">✕ Fermer</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="recipeDetailModal" class="recipe-detail-modal">
+            <div class="recipe-detail-content">
+                <div class="recipe-detail-header">
+                    <button class="btn-back" onclick="closeRecipeDetail()">← Retour</button>
+                    <button class="btn-close-recipe-detail" onclick="closeRecipeDetail(); closeRecipes();">✕</button>
+                </div>
+                <div id="recipeDetailBody" class="recipe-detail-body">
+                    <!-- Le détail de la recette sera ajouté ici -->
+                </div>
+            </div>
         </div>
 
         <div id="shoppingListModal" class="shopping-list-modal">
@@ -2204,6 +2547,338 @@
             setTimeout(function() {
                 printWindow.print();
             }, 250);
+        }
+        
+        // === SUGGESTIONS DE RECETTES ===
+        
+        var recipesDatabase = [
+            {
+                id: 1,
+                name: "Omelette nature",
+                icon: "🍳",
+                time: "10 min",
+                difficulty: "Facile",
+                servings: 2,
+                ingredients: ["œufs", "oeufs", "beurre", "sel", "poivre"],
+                steps: [
+                    "Cassez 4 œufs dans un bol et battez-les avec une fourchette",
+                    "Ajoutez une pincée de sel et de poivre",
+                    "Faites chauffer une poêle avec une noix de beurre",
+                    "Versez les œufs et laissez cuire 3-4 minutes",
+                    "Pliez l'omelette en deux et servez chaud"
+                ]
+            },
+            {
+                id: 2,
+                name: "Salade de tomates",
+                icon: "🥗",
+                time: "5 min",
+                difficulty: "Très facile",
+                servings: 2,
+                ingredients: ["tomates", "tomate", "oignon", "huile d'olive", "huile", "vinaigre", "basilic"],
+                steps: [
+                    "Lavez et coupez les tomates en rondelles",
+                    "Émincez finement l'oignon",
+                    "Disposez les tomates dans un plat",
+                    "Ajoutez l'oignon émincé",
+                    "Assaisonnez avec huile d'olive, vinaigre, sel et poivre",
+                    "Décorez avec du basilic frais"
+                ]
+            },
+            {
+                id: 3,
+                name: "Pâtes au beurre",
+                icon: "🍝",
+                time: "15 min",
+                difficulty: "Très facile",
+                servings: 2,
+                ingredients: ["pâtes", "pates", "spaghetti", "beurre", "parmesan", "fromage"],
+                steps: [
+                    "Faites cuire les pâtes dans une grande casserole d'eau salée",
+                    "Égouttez les pâtes en gardant un peu d'eau de cuisson",
+                    "Ajoutez une grosse noix de beurre",
+                    "Mélangez bien pour faire fondre le beurre",
+                    "Ajoutez le parmesan râpé",
+                    "Servez immédiatement"
+                ]
+            },
+            {
+                id: 4,
+                name: "Croque-monsieur",
+                icon: "🥪",
+                time: "10 min",
+                difficulty: "Facile",
+                servings: 2,
+                ingredients: ["pain de mie", "pain", "jambon", "fromage", "gruyère", "beurre"],
+                steps: [
+                    "Beurrez les tranches de pain de mie",
+                    "Disposez une tranche de jambon sur une tranche de pain",
+                    "Ajoutez le fromage râpé",
+                    "Recouvrez avec une autre tranche de pain",
+                    "Faites griller au four ou à la poêle jusqu'à ce que le fromage soit fondu"
+                ]
+            },
+            {
+                id: 5,
+                name: "Smoothie aux fruits",
+                icon: "🥤",
+                time: "5 min",
+                difficulty: "Très facile",
+                servings: 2,
+                ingredients: ["banane", "fraises", "fraise", "lait", "yaourt", "miel"],
+                steps: [
+                    "Épluchez la banane et coupez-la en morceaux",
+                    "Lavez les fraises",
+                    "Mettez tous les fruits dans un blender",
+                    "Ajoutez le lait et le yaourt",
+                    "Ajoutez une cuillère de miel",
+                    "Mixez jusqu'à obtenir une texture lisse",
+                    "Servez frais"
+                ]
+            },
+            {
+                id: 6,
+                name: "Riz sauté aux légumes",
+                icon: "🍚",
+                time: "20 min",
+                difficulty: "Facile",
+                servings: 3,
+                ingredients: ["riz", "carotte", "carottes", "poivron", "oignon", "œufs", "oeufs", "sauce soja"],
+                steps: [
+                    "Faites cuire le riz et laissez-le refroidir",
+                    "Coupez les légumes en petits dés",
+                    "Faites sauter les légumes dans un wok avec de l'huile",
+                    "Ajoutez le riz froid et mélangez",
+                    "Faites un trou au centre et ajoutez les œufs battus",
+                    "Mélangez le tout et ajoutez la sauce soja",
+                    "Servez chaud"
+                ]
+            },
+            {
+                id: 7,
+                name: "Poulet rôti aux herbes",
+                icon: "🍗",
+                time: "60 min",
+                difficulty: "Moyen",
+                servings: 4,
+                ingredients: ["poulet", "thym", "romarin", "ail", "citron", "huile d'olive", "huile"],
+                steps: [
+                    "Préchauffez le four à 200°C",
+                    "Rincez et séchez le poulet",
+                    "Frottez-le avec de l'huile d'olive, du sel et du poivre",
+                    "Ajoutez le thym, le romarin et l'ail émincé",
+                    "Mettez des tranches de citron à l'intérieur",
+                    "Enfournez pour 1 heure en arrosant régulièrement",
+                    "Laissez reposer 10 minutes avant de découper"
+                ]
+            },
+            {
+                id: 8,
+                name: "Soupe de légumes",
+                icon: "🍲",
+                time: "30 min",
+                difficulty: "Facile",
+                servings: 4,
+                ingredients: ["carotte", "carottes", "pomme de terre", "pommes de terre", "poireau", "poireaux", "oignon", "bouillon"],
+                steps: [
+                    "Épluchez et coupez tous les légumes en morceaux",
+                    "Faites revenir l'oignon dans une casserole",
+                    "Ajoutez les autres légumes et mélangez",
+                    "Couvrez d'eau ou de bouillon",
+                    "Laissez mijoter 25 minutes",
+                    "Mixez si vous souhaitez une soupe lisse",
+                    "Ajustez l'assaisonnement et servez chaud"
+                ]
+            },
+            {
+                id: 9,
+                name: "Sandwich jambon fromage",
+                icon: "🥖",
+                time: "5 min",
+                difficulty: "Très facile",
+                servings: 1,
+                ingredients: ["pain", "baguette", "jambon", "fromage", "beurre", "salade"],
+                steps: [
+                    "Coupez le pain en deux dans la longueur",
+                    "Beurrez légèrement les deux faces",
+                    "Ajoutez des feuilles de salade",
+                    "Disposez les tranches de jambon",
+                    "Ajoutez le fromage",
+                    "Refermez et dégustez"
+                ]
+            },
+            {
+                id: 10,
+                name: "Yaourt aux fruits",
+                icon: "🥄",
+                time: "2 min",
+                difficulty: "Très facile",
+                servings: 1,
+                ingredients: ["yaourt", "fraises", "fraise", "banane", "miel", "céréales", "muesli"],
+                steps: [
+                    "Versez le yaourt dans un bol",
+                    "Coupez les fruits en morceaux",
+                    "Ajoutez les fruits sur le yaourt",
+                    "Versez un filet de miel",
+                    "Ajoutez des céréales ou du muesli",
+                    "Dégustez immédiatement"
+                ]
+            }
+        ];
+        
+        function openRecipes() {
+            // Récupérer les produits disponibles
+            var availableProducts = items.filter(function(item) {
+                var qty = getQuantity(item.quantite);
+                // Produit disponible si quantité > 0 et pas périmé
+                if (qty === 0) return false;
+                if (item.datePeremption) {
+                    var daysLeft = Math.ceil((new Date(item.datePeremption) - new Date()) / (1000 * 60 * 60 * 24));
+                    if (daysLeft < 0) return false;
+                }
+                return true;
+            });
+            
+            // Extraire les noms de produits disponibles
+            var availableIngredients = availableProducts.map(function(p) {
+                return p.nom.toLowerCase();
+            });
+            
+            // Calculer le match pour chaque recette
+            var recipesWithMatch = recipesDatabase.map(function(recipe) {
+                var matchCount = 0;
+                var totalIngredients = recipe.ingredients.length;
+                
+                recipe.ingredients.forEach(function(ingredient) {
+                    var found = availableIngredients.some(function(available) {
+                        return available.includes(ingredient) || ingredient.includes(available);
+                    });
+                    if (found) matchCount++;
+                });
+                
+                var matchPercent = Math.round((matchCount / totalIngredients) * 100);
+                
+                return {
+                    recipe: recipe,
+                    matchCount: matchCount,
+                    matchPercent: matchPercent,
+                    totalIngredients: totalIngredients
+                };
+            });
+            
+            // Trier par pourcentage de match
+            recipesWithMatch.sort(function(a, b) {
+                return b.matchPercent - a.matchPercent;
+            });
+            
+            // Afficher le modal
+            document.getElementById('recipesModal').classList.add('active');
+            
+            // Générer la liste
+            var html = '';
+            if (recipesWithMatch.length === 0 || recipesWithMatch[0].matchPercent === 0) {
+                html = '<div style="text-align: center; padding: 40px; color: #666;">' +
+                       '<div style="font-size: 3em; margin-bottom: 20px;">🍳</div>' +
+                       '<h3>Aucune recette disponible</h3>' +
+                       '<p>Ajoutez des produits dans votre frigo pour voir des suggestions de recettes !</p>' +
+                       '</div>';
+            } else {
+                recipesWithMatch.forEach(function(item) {
+                    if (item.matchPercent > 0) {
+                        var matchColor = item.matchPercent >= 80 ? '#10b981' : 
+                                        item.matchPercent >= 50 ? '#f59e0b' : '#6b7280';
+                        
+                        html += '<div class="recipe-card" onclick="showRecipeDetail(' + item.recipe.id + ')">' +
+                               '<div class="recipe-card-header">' +
+                               '<div class="recipe-icon">' + item.recipe.icon + '</div>' +
+                               '<div class="recipe-card-title">' +
+                               '<div class="recipe-name">' + item.recipe.name + '</div>' +
+                               '<div class="recipe-time">⏱️ ' + item.recipe.time + ' • ' + item.recipe.difficulty + '</div>' +
+                               '</div>' +
+                               '</div>' +
+                               '<div class="recipe-ingredients-preview">' +
+                               'Pour ' + item.recipe.servings + ' personne' + (item.recipe.servings > 1 ? 's' : '') +
+                               '</div>' +
+                               '<span class="recipe-match" style="background: ' + matchColor + ';">' +
+                               '✓ ' + item.matchCount + '/' + item.totalIngredients + ' ingrédients disponibles (' + item.matchPercent + '%)' +
+                               '</span>' +
+                               '</div>';
+                    }
+                });
+            }
+            
+            document.getElementById('recipesListItems').innerHTML = html;
+        }
+        
+        function closeRecipes() {
+            document.getElementById('recipesModal').classList.remove('active');
+        }
+        
+        function showRecipeDetail(recipeId) {
+            var recipe = recipesDatabase.find(function(r) { return r.id === recipeId; });
+            if (!recipe) return;
+            
+            // Récupérer les produits disponibles
+            var availableProducts = items.filter(function(item) {
+                var qty = getQuantity(item.quantite);
+                if (qty === 0) return false;
+                if (item.datePeremption) {
+                    var daysLeft = Math.ceil((new Date(item.datePeremption) - new Date()) / (1000 * 60 * 60 * 24));
+                    if (daysLeft < 0) return false;
+                }
+                return true;
+            });
+            
+            var availableIngredients = availableProducts.map(function(p) {
+                return p.nom.toLowerCase();
+            });
+            
+            var html = '<div class="recipe-detail-icon">' + recipe.icon + '</div>' +
+                      '<h1 class="recipe-detail-title">' + recipe.name + '</h1>' +
+                      '<div class="recipe-detail-meta">' +
+                      '<div class="recipe-meta-item">' +
+                      '<div class="recipe-meta-label">Temps</div>' +
+                      '<div class="recipe-meta-value">' + recipe.time + '</div>' +
+                      '</div>' +
+                      '<div class="recipe-meta-item">' +
+                      '<div class="recipe-meta-label">Difficulté</div>' +
+                      '<div class="recipe-meta-value">' + recipe.difficulty + '</div>' +
+                      '</div>' +
+                      '<div class="recipe-meta-item">' +
+                      '<div class="recipe-meta-label">Portions</div>' +
+                      '<div class="recipe-meta-value">' + recipe.servings + '</div>' +
+                      '</div>' +
+                      '</div>' +
+                      '<div class="recipe-section">' +
+                      '<h3 class="recipe-section-title">🛒 Ingrédients</h3>' +
+                      '<ul class="recipe-ingredients-list">';
+            
+            recipe.ingredients.forEach(function(ingredient) {
+                var available = availableIngredients.some(function(avail) {
+                    return avail.includes(ingredient) || ingredient.includes(avail);
+                });
+                var className = available ? 'recipe-ingredient-available' : '';
+                var icon = available ? '✓ ' : '○ ';
+                html += '<li class="recipe-ingredient-item ' + className + '">' + icon + ingredient.charAt(0).toUpperCase() + ingredient.slice(1) + '</li>';
+            });
+            
+            html += '</ul></div>' +
+                   '<div class="recipe-section">' +
+                   '<h3 class="recipe-section-title">👨‍🍳 Préparation</h3>' +
+                   '<ol class="recipe-steps-list">';
+            
+            recipe.steps.forEach(function(step) {
+                html += '<li class="recipe-step-item">' + step + '</li>';
+            });
+            
+            html += '</ol></div>';
+            
+            document.getElementById('recipeDetailBody').innerHTML = html;
+            document.getElementById('recipeDetailModal').classList.add('active');
+        }
+        
+        function closeRecipeDetail() {
+            document.getElementById('recipeDetailModal').classList.remove('active');
         }
         
         function confirmDeleteAll() {
