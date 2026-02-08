@@ -690,6 +690,155 @@
             font-size: 0.9em;
             margin: 10px 0;
         }
+        
+        /* Liste de courses */
+        .shopping-list-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 20px;
+        }
+        
+        .shopping-list-modal.active {
+            display: flex;
+        }
+        
+        .shopping-list-content {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .shopping-list-header {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .shopping-list-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        
+        .btn-close-shopping {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .shopping-list-stats {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .shopping-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .shopping-stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #f97316;
+        }
+        
+        .shopping-stat-label {
+            font-size: 1em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .shopping-list-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .shopping-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .shopping-item:active {
+            background: #e9ecef;
+            transform: scale(0.98);
+        }
+        
+        .shopping-item.checked {
+            background: #d1fae5;
+            opacity: 0.6;
+        }
+        
+        .shopping-checkbox {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        
+        .shopping-item-content {
+            flex: 1;
+        }
+        
+        .shopping-item-name {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+        
+        .shopping-item.checked .shopping-item-name {
+            text-decoration: line-through;
+        }
+        
+        .shopping-item-reason {
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .shopping-list-actions {
+            padding: 20px;
+            border-top: 2px solid #f0f0f0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .shopping-list-actions .btn {
+            flex: 1;
+            min-width: 120px;
+        }
     </style>
     <!-- Bibliothèque SheetJS pour Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -757,6 +906,33 @@
         <div id="actions" class="actions">
             <button class="btn btn-scan" id="btnScan">📷 Scanner un code-barres</button>
             <button class="btn btn-manual" id="btnManual">✍️ Saisie manuelle</button>
+            <button class="btn" id="btnShoppingList" onclick="openShoppingList()" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">🛒 Liste de courses</button>
+        </div>
+
+        <div id="shoppingListModal" class="shopping-list-modal">
+            <div class="shopping-list-content">
+                <div class="shopping-list-header">
+                    <h2>🛒 Liste de courses</h2>
+                    <button class="btn-close-shopping" onclick="closeShoppingList()">✕</button>
+                </div>
+                
+                <div class="shopping-list-stats">
+                    <div class="shopping-stat">
+                        <span class="shopping-stat-number" id="shoppingCount">0</span>
+                        <span class="shopping-stat-label">produits</span>
+                    </div>
+                </div>
+                
+                <div id="shoppingListItems" class="shopping-list-items">
+                    <!-- Les produits seront ajoutés ici -->
+                </div>
+                
+                <div class="shopping-list-actions">
+                    <button class="btn" onclick="exportShoppingListText()" style="background: #10b981;">📋 Copier la liste</button>
+                    <button class="btn" onclick="printShoppingList()" style="background: #3b82f6;">🖨️ Imprimer</button>
+                    <button class="btn" onclick="closeShoppingList()" style="background: #6b7280;">✕ Fermer</button>
+                </div>
+            </div>
         </div>
 
         <div id="scanner" class="scanner">
@@ -1856,6 +2032,178 @@
             
             // Reset l'input
             event.target.value = '';
+        }
+        
+        // === LISTE DE COURSES ===
+        
+        var shoppingListState = {}; // Pour mémoriser les items cochés
+        
+        function openShoppingList() {
+            // Filtrer les produits à acheter
+            var toShop = items.filter(function(item) {
+                var qty = getQuantity(item.quantite);
+                return qty === 0 || item.aRenouveler || qty === 1;
+            });
+            
+            // Afficher le modal
+            document.getElementById('shoppingListModal').classList.add('active');
+            
+            // Mettre à jour le compteur
+            document.getElementById('shoppingCount').textContent = toShop.length;
+            
+            // Générer la liste
+            var html = '';
+            if (toShop.length === 0) {
+                html = '<div style="text-align: center; padding: 40px; color: #666;">' +
+                       '<div style="font-size: 3em; margin-bottom: 20px;">✅</div>' +
+                       '<h3>Aucun produit à acheter !</h3>' +
+                       '<p>Votre frigo est bien approvisionné.</p>' +
+                       '</div>';
+            } else {
+                toShop.forEach(function(item) {
+                    var qty = getQuantity(item.quantite);
+                    var reason = '';
+                    if (qty === 0) {
+                        reason = '📦 Stock épuisé';
+                    } else if (item.aRenouveler) {
+                        reason = '📝 À renouveler';
+                    } else if (qty === 1) {
+                        reason = '⚠️ Bientôt épuisé (1 restant)';
+                    }
+                    
+                    var isChecked = shoppingListState[item.id] || false;
+                    var checkedClass = isChecked ? ' checked' : '';
+                    var checkIcon = isChecked ? '☑️' : '☐';
+                    
+                    html += '<div class="shopping-item' + checkedClass + '" onclick="toggleShoppingItem(' + item.id + ')">' +
+                            '<span class="shopping-checkbox">' + checkIcon + '</span>' +
+                            '<div class="shopping-item-content">' +
+                            '<div class="shopping-item-name">' + item.nom + '</div>' +
+                            '<div class="shopping-item-reason">' + reason + '</div>' +
+                            '</div>' +
+                            '</div>';
+                });
+            }
+            
+            document.getElementById('shoppingListItems').innerHTML = html;
+        }
+        
+        function closeShoppingList() {
+            document.getElementById('shoppingListModal').classList.remove('active');
+        }
+        
+        function toggleShoppingItem(itemId) {
+            shoppingListState[itemId] = !shoppingListState[itemId];
+            openShoppingList(); // Re-render pour mettre à jour l'affichage
+        }
+        
+        function exportShoppingListText() {
+            var toShop = items.filter(function(item) {
+                var qty = getQuantity(item.quantite);
+                return qty === 0 || item.aRenouveler || qty === 1;
+            });
+            
+            if (toShop.length === 0) {
+                alert('❌ Aucun produit dans la liste de courses');
+                return;
+            }
+            
+            var text = '🛒 LISTE DE COURSES\n';
+            text += '═══════════════════\n\n';
+            
+            toShop.forEach(function(item) {
+                var qty = getQuantity(item.quantite);
+                var reason = '';
+                if (qty === 0) {
+                    reason = ' (épuisé)';
+                } else if (item.aRenouveler) {
+                    reason = ' (à renouveler)';
+                } else if (qty === 1) {
+                    reason = ' (1 restant)';
+                }
+                
+                var checked = shoppingListState[item.id] ? '✓' : '☐';
+                text += checked + ' ' + item.nom + reason + '\n';
+            });
+            
+            text += '\n═══════════════════\n';
+            text += 'Total: ' + toShop.length + ' produits\n';
+            text += 'Généré le ' + new Date().toLocaleString('fr-FR');
+            
+            // Copier dans le presse-papier
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(function() {
+                    alert('✅ Liste copiée dans le presse-papier !\n\nVous pouvez la coller dans Notes, Messages, etc.');
+                }).catch(function() {
+                    // Fallback
+                    showTextModal(text);
+                });
+            } else {
+                showTextModal(text);
+            }
+        }
+        
+        function showTextModal(text) {
+            var modal = prompt('Copiez cette liste :', text);
+        }
+        
+        function printShoppingList() {
+            var toShop = items.filter(function(item) {
+                var qty = getQuantity(item.quantite);
+                return qty === 0 || item.aRenouveler || qty === 1;
+            });
+            
+            if (toShop.length === 0) {
+                alert('❌ Aucun produit dans la liste de courses');
+                return;
+            }
+            
+            var printWindow = window.open('', '', 'width=800,height=600');
+            var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+                      '<title>Liste de courses - Frigo Manager</title>' +
+                      '<style>' +
+                      'body { font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }' +
+                      'h1 { color: #f97316; text-align: center; margin-bottom: 30px; }' +
+                      '.item { padding: 15px; margin: 10px 0; border: 2px solid #ddd; border-radius: 8px; display: flex; align-items: center; }' +
+                      '.checkbox { width: 30px; height: 30px; border: 2px solid #333; border-radius: 4px; margin-right: 15px; }' +
+                      '.name { font-size: 1.2em; font-weight: bold; }' +
+                      '.reason { color: #666; font-size: 0.9em; margin-left: 10px; }' +
+                      '.footer { text-align: center; margin-top: 40px; color: #666; font-size: 0.9em; }' +
+                      '@media print { body { padding: 20px; } }' +
+                      '</style></head><body>' +
+                      '<h1>🛒 LISTE DE COURSES</h1>';
+            
+            toShop.forEach(function(item) {
+                var qty = getQuantity(item.quantite);
+                var reason = '';
+                if (qty === 0) {
+                    reason = '<span class="reason">(épuisé)</span>';
+                } else if (item.aRenouveler) {
+                    reason = '<span class="reason">(à renouveler)</span>';
+                } else if (qty === 1) {
+                    reason = '<span class="reason">(1 restant)</span>';
+                }
+                
+                html += '<div class="item">' +
+                       '<div class="checkbox"></div>' +
+                       '<div><span class="name">' + item.nom + '</span> ' + reason + '</div>' +
+                       '</div>';
+            });
+            
+            html += '<div class="footer">' +
+                   'Total: ' + toShop.length + ' produits<br>' +
+                   'Généré le ' + new Date().toLocaleString('fr-FR') + '<br>' +
+                   'Frigo Manager' +
+                   '</div>' +
+                   '</body></html>';
+            
+            printWindow.document.write(html);
+            printWindow.document.close();
+            
+            // Attendre que le contenu soit chargé puis lancer l'impression
+            setTimeout(function() {
+                printWindow.print();
+            }, 250);
         }
         
         function confirmDeleteAll() {
