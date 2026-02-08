@@ -756,6 +756,11 @@
             };
             return emplacements[emplacement] || emplacements['frigo'];
         }
+        
+        // Helper pour gérer les quantités (0 est valide, undefined/null devient 1)
+        function getQuantity(qty) {
+            return (qty !== undefined && qty !== null) ? qty : 1;
+        }
 
         // === SYSTÈME DE NOTIFICATIONS ===
         
@@ -828,7 +833,7 @@
             
             for (var i = 0; i < items.length; i++) {
                 var days = getDays(items[i].datePeremption);
-                var qty = items[i].quantite || 1;
+                var qty = getQuantity(items[i].quantite);
                 
                 // Vérifier le stock
                 if (qty === 0) {
@@ -939,7 +944,7 @@
             var expiredOrSoon = 0;
             
             for (var i = 0; i < items.length; i++) {
-                var qty = items[i].quantite || 1;
+                var qty = getQuantity(items[i].quantite);
                 var days = getDays(items[i].datePeremption);
                 
                 if (qty === 0) outOfStock++;
@@ -983,7 +988,7 @@
             
             for (var i = 0; i < items.length; i++) {
                 var d = getDays(items[i].datePeremption);
-                var qty = items[i].quantite || 1;
+                var qty = getQuantity(items[i].quantite);
                 
                 if (qty === 0) outOfStock++;
                 if (d !== null && d < 0) exp++;
@@ -999,7 +1004,7 @@
         function renderItems() {
             var filtered = items.filter(function(item) {
                 var d = getDays(item.datePeremption);
-                var qty = item.quantite || 1;
+                var qty = getQuantity(item.quantite);
                 
                 var statusMatch = false;
                 if (currentFilter === 'all') statusMatch = true;
@@ -1044,7 +1049,7 @@
                     }
                     
                     // Afficher la quantité
-                    var qty = item.quantite || 1;
+                    var qty = getQuantity(item.quantite);
                     if (qty === 0) {
                         html += '<div class="stock-alert">⚠️ Stock épuisé</div>';
                     } else {
@@ -1056,7 +1061,7 @@
                             '<div class="item-info" style="font-weight:bold;margin-top:10px;font-size:1.1em">' + s.text + '</div>' +
                             '<div class="quantity-controls">' +
                             '<button class="btn-qty-minus" data-id="' + item.id + '">−</button>' +
-                            '<span class="quantity-value">' + (item.quantite || 1) + '</span>' +
+                            '<span class="quantity-value">' + getQuantity(item.quantite) + '</span>' +
                             '<button class="btn-qty-plus" data-id="' + item.id + '">+</button>' +
                             '</div>' +
                             '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">' +
@@ -1119,7 +1124,9 @@
             var item = items.find(function(it) { return it.id === itemId; });
             if (!item) return;
             
-            var newQty = (item.quantite || 1) + delta;
+            // Important : utiliser !== undefined au lieu de || pour gérer le cas où quantite = 0
+            var currentQty = (item.quantite !== undefined && item.quantite !== null) ? item.quantite : 1;
+            var newQty = currentQty + delta;
             
             // Empêcher de descendre en dessous de 0
             if (newQty < 0) {
@@ -1355,7 +1362,7 @@
                     '<label for="formQuantite">Quantité</label>' +
                     '<div style="display: flex; align-items: center; gap: 10px;">' +
                     '<button type="button" class="btn-quantity" id="btnMinus">−</button>' +
-                    '<input type="number" id="formQuantite" value="' + (productData.quantite || 1) + '" min="1" max="99" style="width: 80px; text-align: center; font-size: 18px; font-weight: bold;">' +
+                    '<input type="number" id="formQuantite" value="' + getQuantity(productData.quantite) + '" min="0" max="99" style="width: 80px; text-align: center; font-size: 18px; font-weight: bold;">' +
                     '<button type="button" class="btn-quantity" id="btnPlus">+</button>' +
                     '</div>' +
                     '<div class="date-suggestion">💡 Nombre d\'unités</div>' +
@@ -1373,12 +1380,14 @@
             // Gestion de la quantité avec boutons +/-
             var quantityInput = document.getElementById('formQuantite');
             document.getElementById('btnPlus').onclick = function() {
-                var val = parseInt(quantityInput.value) || 1;
+                var val = parseInt(quantityInput.value);
+                if (isNaN(val)) val = 0;
                 if (val < 99) quantityInput.value = val + 1;
             };
             document.getElementById('btnMinus').onclick = function() {
-                var val = parseInt(quantityInput.value) || 1;
-                if (val > 1) quantityInput.value = val - 1;
+                var val = parseInt(quantityInput.value);
+                if (isNaN(val)) val = 1;
+                if (val > 0) quantityInput.value = val - 1;
             };
             
             document.getElementById('customPhoto').addEventListener('change', function(e) {
@@ -1500,7 +1509,7 @@
                     '<label for="formQuantite">Quantité</label>' +
                     '<div style="display: flex; align-items: center; gap: 10px;">' +
                     '<button type="button" class="btn-quantity" id="btnMinus">−</button>' +
-                    '<input type="number" id="formQuantite" value="' + (item.quantite || 1) + '" min="0" max="99" style="width: 80px; text-align: center; font-size: 18px; font-weight: bold;">' +
+                    '<input type="number" id="formQuantite" value="' + getQuantity(item.quantite) + '" min="0" max="99" style="width: 80px; text-align: center; font-size: 18px; font-weight: bold;">' +
                     '<button type="button" class="btn-quantity" id="btnPlus">+</button>' +
                     '</div>' +
                     '<div class="date-suggestion">💡 Nombre d\'unités</div>' +
@@ -1518,11 +1527,13 @@
             // Gestion de la quantité avec boutons +/-
             var quantityInput = document.getElementById('formQuantite');
             document.getElementById('btnPlus').onclick = function() {
-                var val = parseInt(quantityInput.value) || 0;
+                var val = parseInt(quantityInput.value);
+                if (isNaN(val)) val = 0;
                 if (val < 99) quantityInput.value = val + 1;
             };
             document.getElementById('btnMinus').onclick = function() {
-                var val = parseInt(quantityInput.value) || 0;
+                var val = parseInt(quantityInput.value);
+                if (isNaN(val)) val = 1;
                 if (val > 0) quantityInput.value = val - 1;
             };
             
