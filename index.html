@@ -641,6 +641,7 @@
             border: 2px solid #e0e0e0;
             transition: all 0.2s;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .checkbox-label:hover {
@@ -648,18 +649,24 @@
             border-color: #667eea;
         }
         
+        .checkbox-label:active {
+            background: #d0e0ff;
+        }
+        
         .checkbox-input {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             cursor: pointer;
             flex-shrink: 0;
             accent-color: #667eea;
+            margin: 0;
         }
         
         .checkbox-text {
             font-weight: 600;
-            font-size: 1em;
+            font-size: 0.95em;
             color: #333;
+            flex: 1;
         }
     </style>
 </head>
@@ -1464,6 +1471,18 @@
                 if (val > 0) quantityInput.value = val - 1;
             };
             
+            // S'assurer que le checkbox "À renouveler" fonctionne sur iOS
+            var checkboxLabel = form.querySelector('.checkbox-label');
+            var checkboxInput = document.getElementById('formRenouveler');
+            if (checkboxLabel && checkboxInput) {
+                checkboxLabel.addEventListener('click', function(e) {
+                    if (e.target !== checkboxInput) {
+                        e.preventDefault();
+                        checkboxInput.checked = !checkboxInput.checked;
+                    }
+                });
+            }
+            
             document.getElementById('customPhoto').addEventListener('change', function(e) {
                 var file = e.target.files[0];
                 if (!file) return;
@@ -1617,6 +1636,18 @@
                 if (isNaN(val)) val = 1;
                 if (val > 0) quantityInput.value = val - 1;
             };
+            
+            // S'assurer que le checkbox "À renouveler" fonctionne sur iOS
+            var checkboxLabel = form.querySelector('.checkbox-label');
+            var checkboxInput = document.getElementById('formRenouveler');
+            if (checkboxLabel && checkboxInput) {
+                checkboxLabel.addEventListener('click', function(e) {
+                    if (e.target !== checkboxInput) {
+                        e.preventDefault();
+                        checkboxInput.checked = !checkboxInput.checked;
+                    }
+                });
+            }
             
             document.getElementById('customPhoto').addEventListener('change', function(e) {
                 var file = e.target.files[0];
