@@ -594,7 +594,7 @@
                 if (currentFilter === 'soon') statusMatch = d !== null && d >= 0 && d <= 3;
                 if (currentFilter === 'fresh') statusMatch = d === null || d > 3;
                 
-                var emplacementMatch = currentEmplacement === 'all' || (item.emplacement || 'frigo') === currentEmplacement;
+                var emplacementMatch = currentEmplacement === 'all' || (item.emplacement || 'congelateur') === currentEmplacement;
                 
                 return statusMatch && emplacementMatch;
             });
@@ -631,20 +631,33 @@
                     html += '<div class="item-info">📅 Ajouté: ' + new Date(item.dateAjout).toLocaleDateString('fr-FR') + '</div>' +
                             '<div class="item-info">⏰ Expire: ' + (item.datePeremption ? new Date(item.datePeremption).toLocaleDateString('fr-FR') : 'Non indiqué') + '</div>' +
                             '<div class="item-info" style="font-weight:bold;margin-top:10px;font-size:1.1em">' + s.text + '</div>' +
-                            '<button class="btn" data-id="' + item.id + '" style="margin-top:15px;background:#ef4444;padding:12px">🗑️ Supprimer</button>' +
+                            '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px;">' +
+                            '<button class="btn btn-edit" data-id="' + item.id + '" style="background:#f59e0b;padding:12px">✏️ Modifier</button>' +
+                            '<button class="btn btn-delete" data-id="' + item.id + '" style="background:#ef4444;padding:12px">🗑️ Supprimer</button>' +
+                            '</div>' +
                             '</div></div>';
                 }
                 itemsEl.innerHTML = html;
                 
-                var btns = itemsEl.querySelectorAll('.btn');
-                for (var i = 0; i < btns.length; i++) {
-                    btns[i].onclick = function() {
+                // Boutons de suppression
+                var deleteBtns = itemsEl.querySelectorAll('.btn-delete');
+                for (var i = 0; i < deleteBtns.length; i++) {
+                    deleteBtns[i].onclick = function() {
                         var id = parseInt(this.getAttribute('data-id'));
                         if (confirm('Supprimer ce produit ?')) {
                             items = items.filter(function(it) { return it.id !== id; });
                             saveItems();
                             renderAll();
                         }
+                    };
+                }
+                
+                // Boutons de modification
+                var editBtns = itemsEl.querySelectorAll('.btn-edit');
+                for (var i = 0; i < editBtns.length; i++) {
+                    editBtns[i].onclick = function() {
+                        var id = parseInt(this.getAttribute('data-id'));
+                        editItem(id);
                     };
                 }
             }
@@ -861,8 +874,8 @@
                     '<div class="form-group">' +
                     '<label for="formEmplacement">Emplacement</label>' +
                     '<select id="formEmplacement">' +
-                    '<option value="frigo"' + (productData.emplacement === 'frigo' || !productData.emplacement ? ' selected' : '') + '>🧊 Frigo</option>' +
-                    '<option value="congelateur"' + (productData.emplacement === 'congelateur' ? ' selected' : '') + '>❄️ Congélateur</option>' +
+                    '<option value="frigo"' + (productData.emplacement === 'frigo' ? ' selected' : '') + '>🧊 Frigo</option>' +
+                    '<option value="congelateur"' + (productData.emplacement === 'congelateur' || !productData.emplacement ? ' selected' : '') + '>❄️ Congélateur</option>' +
                     '<option value="placard"' + (productData.emplacement === 'placard' ? ' selected' : '') + '>🚪 Placard</option>' +
                     '<option value="cave"' + (productData.emplacement === 'cave' ? ' selected' : '') + '>🍷 Cave</option>' +
                     '<option value="corbeille"' + (productData.emplacement === 'corbeille' ? ' selected' : '') + '>🧺 Corbeille</option>' +
@@ -937,6 +950,117 @@
             document.getElementById('actions').style.display = 'grid';
             currentBarcode = null;
             currentProductData = null;
+        }
+        
+        function editItem(itemId) {
+            var item = items.find(function(it) { return it.id === itemId; });
+            if (!item) return;
+            
+            var form = document.getElementById('form');
+            
+            var html = '<h3>✏️ Modifier le produit</h3>';
+            
+            if (item.barcode) {
+                html += '<div class="barcode-badge">📊 ' + item.barcode + '</div>';
+            }
+            
+            html += '<div class="form-group">';
+            if (item.image) {
+                html += '<img src="' + item.image + '" class="preview-img" id="previewImage">';
+            } else {
+                html += '<div id="previewImage" class="preview-placeholder">📷 Aucune photo</div>';
+            }
+            html += '<input type="file" id="customPhoto" accept="image/*" capture="environment" style="display: none;">';
+            html += '<label for="customPhoto" class="btn" style="background:#f59e0b;padding:12px;font-size:16px;margin:10px 0;">📸 ' + (item.image ? 'Changer' : 'Prendre') + ' la photo</label>';
+            html += '</div>';
+            
+            html += '<div class="form-group">' +
+                    '<label for="formNom">Nom du produit *</label>' +
+                    '<input type="text" id="formNom" placeholder="Ex: Lait, Yaourt, Pommes..." value="' + (item.nom || '') + '">' +
+                    '</div>' +
+                    '<div class="form-group">' +
+                    '<label for="formDate">Date de péremption</label>' +
+                    '<input type="date" id="formDate" value="' + (item.datePeremption || '') + '">' +
+                    '<div class="date-suggestion">💡 Modifiable</div>' +
+                    '</div>' +
+                    '<div class="form-group">' +
+                    '<label for="formCategorie">Catégorie</label>' +
+                    '<select id="formCategorie">' +
+                    '<option value="fruit"' + (item.categorie === 'fruit' ? ' selected' : '') + '>🍎 Fruit</option>' +
+                    '<option value="legume"' + (item.categorie === 'legume' ? ' selected' : '') + '>🥕 Légume</option>' +
+                    '<option value="viande"' + (item.categorie === 'viande' ? ' selected' : '') + '>🥩 Viande</option>' +
+                    '<option value="poisson"' + (item.categorie === 'poisson' ? ' selected' : '') + '>🐟 Poisson</option>' +
+                    '<option value="produit_laitier"' + (item.categorie === 'produit_laitier' ? ' selected' : '') + '>🥛 Produit laitier</option>' +
+                    '<option value="boisson"' + (item.categorie === 'boisson' ? ' selected' : '') + '>🥤 Boisson</option>' +
+                    '<option value="autre"' + (item.categorie === 'autre' || !item.categorie ? ' selected' : '') + '>📦 Autre</option>' +
+                    '</select>' +
+                    '</div>' +
+                    '<div class="form-group">' +
+                    '<label for="formEmplacement">Emplacement</label>' +
+                    '<select id="formEmplacement">' +
+                    '<option value="frigo"' + (item.emplacement === 'frigo' ? ' selected' : '') + '>🧊 Frigo</option>' +
+                    '<option value="congelateur"' + (item.emplacement === 'congelateur' || !item.emplacement ? ' selected' : '') + '>❄️ Congélateur</option>' +
+                    '<option value="placard"' + (item.emplacement === 'placard' ? ' selected' : '') + '>🚪 Placard</option>' +
+                    '<option value="cave"' + (item.emplacement === 'cave' ? ' selected' : '') + '>🍷 Cave</option>' +
+                    '<option value="corbeille"' + (item.emplacement === 'corbeille' ? ' selected' : '') + '>🧺 Corbeille</option>' +
+                    '<option value="autre_emplacement"' + (item.emplacement === 'autre_emplacement' ? ' selected' : '') + '>📍 Autre</option>' +
+                    '</select>' +
+                    '</div>' +
+                    '<button class="btn" id="btnUpdate" style="background:#667eea;font-size:18px;padding:15px;margin-top:10px">✓ Enregistrer</button>' +
+                    '<button class="btn" id="btnCancel" style="background:#ccc;color:#333;font-size:18px;padding:15px">✕ Annuler</button>';
+            
+            form.innerHTML = html;
+            form.classList.add('active');
+            document.getElementById('actions').style.display = 'none';
+            
+            // Gestion de la photo personnalisée
+            var customImageData = item.image || null;
+            
+            document.getElementById('customPhoto').addEventListener('change', function(e) {
+                var file = e.target.files[0];
+                if (!file) return;
+                
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    customImageData = event.target.result;
+                    var preview = document.getElementById('previewImage');
+                    if (preview.tagName === 'IMG') {
+                        preview.src = customImageData;
+                    } else {
+                        preview.outerHTML = '<img src="' + customImageData + '" class="preview-img" id="previewImage">';
+                    }
+                    document.querySelector('label[for="customPhoto"]').innerHTML = '📸 Changer la photo';
+                };
+                reader.readAsDataURL(file);
+            });
+            
+            document.getElementById('btnUpdate').onclick = function() {
+                var nom = document.getElementById('formNom').value.trim();
+                if (!nom) {
+                    alert('Veuillez entrer un nom de produit');
+                    return;
+                }
+                
+                // Mettre à jour l'item existant
+                var index = items.findIndex(function(it) { return it.id === itemId; });
+                if (index !== -1) {
+                    items[index].nom = nom;
+                    items[index].datePeremption = document.getElementById('formDate').value || null;
+                    items[index].categorie = document.getElementById('formCategorie').value;
+                    items[index].emplacement = document.getElementById('formEmplacement').value;
+                    items[index].image = customImageData;
+                }
+                
+                saveItems();
+                closeForm();
+                renderAll();
+            };
+            
+            document.getElementById('btnCancel').onclick = closeForm;
+            
+            setTimeout(function() {
+                document.getElementById('formNom').focus();
+            }, 100);
         }
 
         // Filtres
