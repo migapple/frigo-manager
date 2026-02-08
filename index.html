@@ -629,45 +629,6 @@
             font-size: 0.9em;
             margin: 10px 0;
         }
-        
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            border: 2px solid #e0e0e0;
-            transition: all 0.2s;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        .checkbox-label:hover {
-            background: #e8f0fe;
-            border-color: #667eea;
-        }
-        
-        .checkbox-label:active {
-            background: #d0e0ff;
-        }
-        
-        .checkbox-input {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            flex-shrink: 0;
-            accent-color: #667eea;
-            margin: 0;
-        }
-        
-        .checkbox-text {
-            font-weight: 600;
-            font-size: 0.95em;
-            color: #333;
-            flex: 1;
-        }
     </style>
 </head>
 <body>
@@ -1442,11 +1403,9 @@
                     '</div>' +
                     '<div class="date-suggestion">💡 Nombre d\'unités</div>' +
                     '</div>' +
-                    '<div class="form-group" style="margin-top: 15px;">' +
-                    '<label class="checkbox-label">' +
-                    '<input type="checkbox" id="formRenouveler" class="checkbox-input" ' + (productData.aRenouveler ? 'checked' : '') + '>' +
-                    '<span class="checkbox-text">📝 À renouveler (ajouter à la liste de courses)</span>' +
-                    '</label>' +
+                    '<div class="form-group" style="margin-top: 15px; display: flex; align-items: center; gap: 10px;">' +
+                    '<input type="checkbox" id="formRenouveler" ' + (productData.aRenouveler ? 'checked' : '') + ' style="width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;">' +
+                    '<label for="formRenouveler" style="cursor: pointer; margin: 0; font-weight: 600;">📝 À renouveler (ajouter à la liste de courses)</label>' +
                     '</div>' +
                     '<button class="btn" id="btnAdd" style="background:#667eea;font-size:18px;padding:15px;margin-top:10px">✓ Ajouter au frigo</button>' +
                     '<button class="btn" id="btnCancel" style="background:#ccc;color:#333;font-size:18px;padding:15px">✕ Annuler</button>';
@@ -1470,18 +1429,6 @@
                 if (isNaN(val)) val = 1;
                 if (val > 0) quantityInput.value = val - 1;
             };
-            
-            // S'assurer que le checkbox "À renouveler" fonctionne sur iOS
-            var checkboxLabel = form.querySelector('.checkbox-label');
-            var checkboxInput = document.getElementById('formRenouveler');
-            if (checkboxLabel && checkboxInput) {
-                checkboxLabel.addEventListener('click', function(e) {
-                    if (e.target !== checkboxInput) {
-                        e.preventDefault();
-                        checkboxInput.checked = !checkboxInput.checked;
-                    }
-                });
-            }
             
             document.getElementById('customPhoto').addEventListener('change', function(e) {
                 var file = e.target.files[0];
@@ -1608,11 +1555,9 @@
                     '</div>' +
                     '<div class="date-suggestion">💡 Nombre d\'unités</div>' +
                     '</div>' +
-                    '<div class="form-group" style="margin-top: 15px;">' +
-                    '<label class="checkbox-label">' +
-                    '<input type="checkbox" id="formRenouveler" class="checkbox-input" ' + (item.aRenouveler ? 'checked' : '') + '>' +
-                    '<span class="checkbox-text">📝 À renouveler (ajouter à la liste de courses)</span>' +
-                    '</label>' +
+                    '<div class="form-group" style="margin-top: 15px; display: flex; align-items: center; gap: 10px;">' +
+                    '<input type="checkbox" id="formRenouveler" ' + (item.aRenouveler ? 'checked' : '') + ' style="width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;">' +
+                    '<label for="formRenouveler" style="cursor: pointer; margin: 0; font-weight: 600;">📝 À renouveler (ajouter à la liste de courses)</label>' +
                     '</div>' +
                     '<button class="btn" id="btnUpdate" style="background:#667eea;font-size:18px;padding:15px;margin-top:10px">✓ Enregistrer</button>' +
                     '<button class="btn" id="btnCancel" style="background:#ccc;color:#333;font-size:18px;padding:15px">✕ Annuler</button>';
@@ -1636,18 +1581,6 @@
                 if (isNaN(val)) val = 1;
                 if (val > 0) quantityInput.value = val - 1;
             };
-            
-            // S'assurer que le checkbox "À renouveler" fonctionne sur iOS
-            var checkboxLabel = form.querySelector('.checkbox-label');
-            var checkboxInput = document.getElementById('formRenouveler');
-            if (checkboxLabel && checkboxInput) {
-                checkboxLabel.addEventListener('click', function(e) {
-                    if (e.target !== checkboxInput) {
-                        e.preventDefault();
-                        checkboxInput.checked = !checkboxInput.checked;
-                    }
-                });
-            }
             
             document.getElementById('customPhoto').addEventListener('change', function(e) {
                 var file = e.target.files[0];
