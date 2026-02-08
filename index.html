@@ -443,6 +443,54 @@
             font-weight: 600;
             margin: 5px 5px 5px 0;
         }
+        
+        .alert-banner {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .alert-banner.show {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-banner-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .alert-banner-text {
+            font-size: 0.95em;
+            margin-bottom: 12px;
+        }
+        
+        .alert-banner-btn {
+            background: white;
+            color: #f59e0b;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95em;
+        }
     </style>
 </head>
 <body>
@@ -451,6 +499,8 @@
             <h1>🧊 Frigo Manager</h1>
             <p>Scanner de code-barres intelligent</p>
         </div>
+
+        <div id="alertBanner" class="alert-banner"></div>
 
         <div id="stats" class="stats">
             <div class="stat-card">
@@ -569,6 +619,165 @@
             return emplacements[emplacement] || emplacements['frigo'];
         }
 
+        // === SYSTÈME DE NOTIFICATIONS ===
+        
+        function requestNotificationPermission() {
+            if (!("Notification" in window)) {
+                console.log("Ce navigateur ne supporte pas les notifications");
+                return Promise.resolve("denied");
+            }
+            
+            if (Notification.permission === "granted") {
+                return Promise.resolve("granted");
+            }
+            
+            if (Notification.permission !== "denied") {
+                return Notification.requestPermission();
+            }
+            
+            return Promise.resolve(Notification.permission);
+        }
+        
+        function sendNotification(title, body, urgentCount) {
+            if (Notification.permission === "granted") {
+                var notification = new Notification(title, {
+                    body: body,
+                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="75" font-size="75">🧊</text></svg>',
+                    badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="75" font-size="75">⚠️</text></svg>',
+                    tag: 'frigo-alert',
+                    requireInteraction: false,
+                    vibrate: [200, 100, 200]
+                });
+                
+                notification.onclick = function() {
+                    window.focus();
+                    // Activer le filtre "Urgent"
+                    currentFilter = 'soon';
+                    var filterBtns = document.querySelectorAll('.filter-btn');
+                    for (var i = 0; i < filterBtns.length; i++) {
+                        filterBtns[i].classList.remove('active');
+                        if (filterBtns[i].getAttribute('data-f') === 'soon') {
+                            filterBtns[i].classList.add('active');
+                        }
+                    }
+                    renderItems();
+                    notification.close();
+                };
+            }
+        }
+        
+        function updateBadge(count) {
+            if ('setAppBadge' in navigator) {
+                if (count > 0) {
+                    navigator.setAppBadge(count).catch(function(err) {
+                        console.log('Erreur badge:', err);
+                    });
+                } else {
+                    navigator.clearAppBadge().catch(function(err) {
+                        console.log('Erreur badge:', err);
+                    });
+                }
+            }
+        }
+        
+        function checkUrgentProducts() {
+            var today = 0;
+            var tomorrow = 0;
+            var twoDays = 0;
+            var expired = 0;
+            
+            for (var i = 0; i < items.length; i++) {
+                var days = getDays(items[i].datePeremption);
+                if (days !== null) {
+                    if (days < 0) expired++;
+                    else if (days === 0) today++;
+                    else if (days === 1) tomorrow++;
+                    else if (days === 2) twoDays++;
+                }
+            }
+            
+            var total = today + tomorrow + twoDays;
+            
+            // Mettre à jour le badge
+            updateBadge(total + expired);
+            
+            // Afficher la bannière si des produits urgents
+            if (total > 0 || expired > 0) {
+                showAlertBanner(today, tomorrow, twoDays, expired);
+            }
+            
+            // Envoyer une notification si des produits urgents
+            if (total > 0 || expired > 0) {
+                var notifTitle = '⚠️ Frigo Manager';
+                var notifBody = '';
+                
+                if (expired > 0) {
+                    notifBody += expired + ' produit' + (expired > 1 ? 's périmé' + (expired > 1 ? 's' : '') : ' périmé');
+                }
+                if (today > 0) {
+                    if (notifBody) notifBody += ' · ';
+                    notifBody += today + ' expire' + (today > 1 ? 'nt' : '') + ' aujourd\'hui';
+                }
+                if (tomorrow > 0) {
+                    if (notifBody) notifBody += ' · ';
+                    notifBody += tomorrow + ' expire' + (tomorrow > 1 ? 'nt' : '') + ' demain';
+                }
+                if (twoDays > 0 && !today && !tomorrow) {
+                    if (notifBody) notifBody += ' · ';
+                    notifBody += twoDays + ' dans 2 jours';
+                }
+                
+                sendNotification(notifTitle, notifBody, total);
+            } else {
+                // Cacher la bannière s'il n'y a rien d'urgent
+                document.getElementById('alertBanner').classList.remove('show');
+            }
+        }
+        
+        function showAlertBanner(today, tomorrow, twoDays, expired) {
+            var banner = document.getElementById('alertBanner');
+            var messages = [];
+            
+            if (expired > 0) {
+                messages.push('❌ ' + expired + ' produit' + (expired > 1 ? 's périmé' + (expired > 1 ? 's' : '') : ' périmé'));
+            }
+            if (today > 0) {
+                messages.push('🔴 ' + today + ' expire' + (today > 1 ? 'nt' : '') + ' aujourd\'hui');
+            }
+            if (tomorrow > 0) {
+                messages.push('🟠 ' + tomorrow + ' expire' + (tomorrow > 1 ? 'nt' : '') + ' demain');
+            }
+            if (twoDays > 0) {
+                messages.push('🟡 ' + twoDays + ' dans 2 jours');
+            }
+            
+            var html = '<div class="alert-banner-title">⚠️ Alerte Produits !</div>' +
+                       '<div class="alert-banner-text">' + messages.join(' • ') + '</div>' +
+                       '<button class="alert-banner-btn" onclick="viewUrgentProducts()">Voir les produits →</button>';
+            
+            banner.innerHTML = html;
+            banner.classList.add('show');
+        }
+        
+        function viewUrgentProducts() {
+            // Activer le filtre "Urgent"
+            currentFilter = 'soon';
+            var filterBtns = document.querySelectorAll('.filter-btn');
+            for (var i = 0; i < filterBtns.length; i++) {
+                filterBtns[i].classList.remove('active');
+                if (filterBtns[i].getAttribute('data-f') === 'soon') {
+                    filterBtns[i].classList.add('active');
+                }
+            }
+            renderItems();
+            
+            // Scroller vers les produits
+            document.getElementById('items').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Rendre la fonction globale pour l'onclick
+        window.viewUrgentProducts = viewUrgentProducts;
+
         function renderStats() {
             var total = items.length;
             var exp = 0, soon = 0;
@@ -666,6 +875,7 @@
         function renderAll() {
             renderStats();
             renderItems();
+            checkUrgentProducts();
         }
 
         function startScanner() {
@@ -1100,6 +1310,13 @@
 
         // Initialisation
         renderAll();
+        
+        // Demander la permission pour les notifications après un court délai
+        setTimeout(function() {
+            requestNotificationPermission().then(function(permission) {
+                console.log('Permission notifications:', permission);
+            });
+        }, 2000);
     </script>
 </body>
 </html>
