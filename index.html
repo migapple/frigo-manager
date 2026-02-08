@@ -55,6 +55,29 @@
             }
         }
         
+        .language-selector {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .language-selector:active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0.95);
+        }
+        
         .settings-btn {
             position: absolute;
             top: 5px;
@@ -1341,8 +1364,12 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🧊 Frigo Manager</h1>
-            <p>Scanner de code-barres intelligent</p>
+            <button class="language-selector" onclick="toggleLanguage()" id="langBtn">
+                <span id="langFlag">🇫🇷</span>
+                <span id="langCode">FR</span>
+            </button>
+            <h1 data-i18n="app.title">🧊 Frigo Manager</h1>
+            <p data-i18n="app.subtitle">Scanner de code-barres intelligent</p>
             <button class="settings-btn" onclick="toggleSettings()">⚙️</button>
         </div>
 
@@ -1614,6 +1641,568 @@
     </div>
 
     <script>
+        // === SYSTÈME DE TRADUCTION ===
+        var translations = {
+            fr: {
+                app: {
+                    title: "🧊 Frigo Manager",
+                    subtitle: "Scanner de code-barres intelligent"
+                },
+                actions: {
+                    scan: "📷 Scanner un code-barres",
+                    manual: "✍️ Saisie manuelle",
+                    shopping: "🛒 Liste de courses",
+                    recipes: "👨‍🍳 Suggestions de recettes"
+                },
+                filters: {
+                    all: "Tous",
+                    expired: "Périmés",
+                    soon: "Urgents",
+                    fresh: "Frais",
+                    out: "Épuisés",
+                    renew: "À renouveler"
+                },
+                locations: {
+                    all: "Tous",
+                    frigo: "Frigo",
+                    congelateur: "Congélateur",
+                    placard: "Placard",
+                    legumes: "Légumes",
+                    cave: "Cave",
+                    autre: "Autre"
+                },
+                stats: {
+                    products: "Produits",
+                    urgent: "Urgents",
+                    expired: "Périmés"
+                },
+                form: {
+                    name: "Nom du produit",
+                    barcode: "Code-barres",
+                    quantity: "Quantité",
+                    expiry: "Date de péremption",
+                    category: "Catégorie",
+                    location: "Emplacement",
+                    toRenew: "À renouveler",
+                    save: "Enregistrer",
+                    cancel: "Annuler",
+                    delete: "Supprimer"
+                },
+                categories: {
+                    Fruits: "Fruits",
+                    Légumes: "Légumes",
+                    Viande: "Viande",
+                    Poisson: "Poisson",
+                    Produits_laitiers: "Produits laitiers",
+                    Boissons: "Boissons",
+                    Surgelés: "Surgelés",
+                    Conserves: "Conserves",
+                    Pâtes_riz: "Pâtes & riz",
+                    Condiments: "Condiments",
+                    Snacks: "Snacks",
+                    Autre: "Autre"
+                },
+                shopping: {
+                    title: "Liste de courses",
+                    count: "produits à acheter",
+                    empty: "Aucun produit à acheter !",
+                    emptyDesc: "Votre frigo est bien approvisionné.",
+                    exhausted: "Stock épuisé",
+                    toRenew: "À renouveler",
+                    export: "📋 Copier la liste",
+                    print: "🖨️ Imprimer",
+                    close: "✕ Fermer"
+                },
+                recipes: {
+                    title: "Suggestions de recettes",
+                    create: "➕ Créer une recette",
+                    match: "Correspondance",
+                    time: "Temps",
+                    difficulty: "Difficulté",
+                    servings: "portions",
+                    ingredients: "Ingrédients",
+                    steps: "Étapes de préparation",
+                    available: "Disponible",
+                    missing: "Manquant",
+                    userRecipe: "Ma recette",
+                    edit: "✏️ Modifier",
+                    deleteBtn: "🗑️ Supprimer",
+                    exportCSV: "📤 Exporter recettes CSV",
+                    importCSV: "📥 Importer recettes CSV",
+                    close: "✕ Fermer"
+                },
+                settings: {
+                    title: "Paramètres",
+                    backup: "Sauvegarde",
+                    exportExcel: "📊 Exporter Excel",
+                    importExcel: "📊 Importer Excel",
+                    backupDesc: "Sauvegardez vos données ou transférez-les vers un autre appareil",
+                    data: "Données",
+                    deleteAll: "Supprimer toutes les données",
+                    deleteWarning: "Attention : cette action est irréversible",
+                    about: "À propos",
+                    version: "Version 1.0",
+                    developer: "Développé par :",
+                    powered: "Réalisé à l'aide d'",
+                    copyright: "Tous droits réservés",
+                    close: "✕ Fermer"
+                },
+                messages: {
+                    productAdded: "✅ Produit ajouté avec succès !",
+                    productUpdated: "✅ Produit mis à jour !",
+                    productDeleted: "✅ Produit supprimé",
+                    deleteConfirm: "Êtes-vous sûr de vouloir supprimer ce produit ?",
+                    deleteAllConfirm: "⚠️ ATTENTION\n\nÊtes-vous sûr de vouloir TOUT supprimer ?\n\nCette action est IRRÉVERSIBLE !",
+                    allDeleted: "✅ Toutes les données ont été supprimées.",
+                    noProducts: "Aucun produit",
+                    addFirst: "Scannez un code-barres ou ajoutez manuellement",
+                    listCopied: "✅ Liste copiée dans le presse-papier !\n\nVous pouvez la coller dans Notes, Messages, etc.",
+                    noCamera: "Impossible d'accéder à la caméra",
+                    productNotFound: "Produit non trouvé dans la base de données.\nVous pouvez l'ajouter manuellement.",
+                    connectionError: "Erreur de connexion.\nVous pouvez ajouter le produit manuellement.",
+                    enterName: "Veuillez entrer un nom de produit",
+                    noProductToExport: "❌ Aucun produit à exporter",
+                    exportExcelSuccess: "✅ Export Excel réussi !\n\n{count} produits exportés dans {filename}",
+                    importExcelSuccess: "✅ Import Excel réussi !\n\n{count} produits importés.",
+                    importExcelError: "❌ Erreur lors de l'import",
+                    replaceConfirm: "⚠️ ATTENTION\n\nVous avez actuellement {current} produits.\nLe fichier contient {import} produits.\n\nVoulez-vous REMPLACER vos données actuelles ?\n\n(Cliquez \"Annuler\" pour ajouter les produits sans supprimer les actuels)",
+                    invalidFile: "Format de fichier invalide",
+                    noShoppingItems: "❌ Aucun produit dans la liste de courses",
+                    recipesExported: "✅ Recettes exportées avec succès !\n\n{count} recettes sauvegardées en CSV.",
+                    recipesImported: "✅ Import CSV réussi !\n\n{count} recettes importées.",
+                    recipeCreated: "✅ Recette créée avec succès !",
+                    recipeUpdated: "✅ Recette modifiée avec succès !",
+                    recipeDeleted: "✅ Recette supprimée avec succès",
+                    recipeDeleteConfirm: "Êtes-vous sûr de vouloir supprimer cette recette ?",
+                    notificationsEnabled: "✅ Notifications activées ! Vous recevrez des alertes pour vos produits.",
+                    notificationsBlocked: "❌ Notifications bloquées dans les paramètres du navigateur",
+                    recipeNameRequired: "Veuillez entrer un nom pour la recette",
+                    recipeTimeRequired: "Veuillez entrer le temps de préparation",
+                    recipeIngredientsRequired: "Veuillez ajouter au moins un ingrédient",
+                    recipeStepsRequired: "Veuillez ajouter au moins une étape",
+                    noRecipesToExport: "❌ Aucune recette à exporter",
+                    invalidCSV: "Le fichier CSV est vide",
+                    noValidRecipes: "Aucune recette valide trouvée dans le fichier",
+                    replaceRecipesConfirm: "⚠️ ATTENTION\n\nVous avez actuellement {current} recettes personnalisées.\nLe fichier CSV contient {import} recettes.\n\nVoulez-vous REMPLACER vos recettes actuelles ?\n\n(Cliquez \"Annuler\" pour ajouter les recettes sans supprimer les actuelles)"
+                },
+                alerts: {
+                    title: "⚠️ ATTENTION : Action requise !",
+                    viewProducts: "👉 Voir les produits",
+                    outOfStock: "produit{s} ÉPUISÉ{S}",
+                    toRenew: "à renouveler",
+                    expired: "produit{s} périmé{s}",
+                    expiresToday: "expire{nt} AUJOURD'HUI",
+                    expiresTomorrow: "expire{nt} demain",
+                    expiresInTwoDays: "dans 2 jours"
+                },
+                scanner: {
+                    instructions: "📷 Centrez le code-barres",
+                    close: "✕ Fermer",
+                    manualEntry: "✍️ Saisie manuelle",
+                    searching: "Recherche du produit..."
+                },
+                shoppingModal: {
+                    title: "🛒 Liste de courses",
+                    productsLabel: "produits",
+                    copy: "📋 Copier la liste",
+                    print: "🖨️ Imprimer",
+                    close: "✕ Fermer"
+                },
+                recipesModal: {
+                    title: "👨‍🍳 Suggestions de recettes",
+                    subtitle: "Avec vos ingrédients disponibles",
+                    create: "➕ Créer une recette",
+                    back: "← Retour"
+                }
+            },
+            en: {
+                app: {
+                    title: "🧊 Fridge Manager",
+                    subtitle: "Smart barcode scanner"
+                },
+                actions: {
+                    scan: "📷 Scan a barcode",
+                    manual: "✍️ Manual entry",
+                    shopping: "🛒 Shopping list",
+                    recipes: "👨‍🍳 Recipe suggestions"
+                },
+                filters: {
+                    all: "All",
+                    expired: "Expired",
+                    soon: "Urgent",
+                    fresh: "Fresh",
+                    out: "Out of stock",
+                    renew: "To renew"
+                },
+                locations: {
+                    all: "All",
+                    frigo: "Fridge",
+                    congelateur: "Freezer",
+                    placard: "Cupboard",
+                    legumes: "Vegetables",
+                    cave: "Cellar",
+                    autre: "Other"
+                },
+                stats: {
+                    products: "Products",
+                    urgent: "Urgent",
+                    expired: "Expired"
+                },
+                form: {
+                    name: "Product name",
+                    barcode: "Barcode",
+                    quantity: "Quantity",
+                    expiry: "Expiry date",
+                    category: "Category",
+                    location: "Location",
+                    toRenew: "To renew",
+                    save: "Save",
+                    cancel: "Cancel",
+                    delete: "Delete"
+                },
+                categories: {
+                    Fruits: "Fruits",
+                    Légumes: "Vegetables",
+                    Viande: "Meat",
+                    Poisson: "Fish",
+                    Produits_laitiers: "Dairy products",
+                    Boissons: "Beverages",
+                    Surgelés: "Frozen",
+                    Conserves: "Canned goods",
+                    Pâtes_riz: "Pasta & rice",
+                    Condiments: "Condiments",
+                    Snacks: "Snacks",
+                    Autre: "Other"
+                },
+                shopping: {
+                    title: "Shopping List",
+                    count: "items to buy",
+                    empty: "No items to buy!",
+                    emptyDesc: "Your fridge is well stocked.",
+                    exhausted: "Out of stock",
+                    toRenew: "To renew",
+                    export: "📋 Copy list",
+                    print: "🖨️ Print",
+                    close: "✕ Close"
+                },
+                recipes: {
+                    title: "Recipe Suggestions",
+                    create: "➕ Create a recipe",
+                    match: "Match",
+                    time: "Time",
+                    difficulty: "Difficulty",
+                    servings: "servings",
+                    ingredients: "Ingredients",
+                    steps: "Preparation steps",
+                    available: "Available",
+                    missing: "Missing",
+                    userRecipe: "My recipe",
+                    edit: "✏️ Edit",
+                    deleteBtn: "🗑️ Delete",
+                    exportCSV: "📤 Export recipes CSV",
+                    importCSV: "📥 Import recipes CSV",
+                    close: "✕ Close"
+                },
+                settings: {
+                    title: "Settings",
+                    backup: "Backup",
+                    exportExcel: "📊 Export Excel",
+                    importExcel: "📊 Import Excel",
+                    backupDesc: "Back up your data or transfer it to another device",
+                    data: "Data",
+                    deleteAll: "Delete all data",
+                    deleteWarning: "Warning: this action is irreversible",
+                    about: "About",
+                    version: "Version 1.0",
+                    developer: "Developed by:",
+                    powered: "Powered by",
+                    copyright: "All rights reserved",
+                    close: "✕ Close"
+                },
+                messages: {
+                    productAdded: "✅ Product added successfully!",
+                    productUpdated: "✅ Product updated!",
+                    productDeleted: "✅ Product deleted",
+                    deleteConfirm: "Are you sure you want to delete this product?",
+                    deleteAllConfirm: "⚠️ WARNING\n\nAre you sure you want to delete EVERYTHING?\n\nThis action is IRREVERSIBLE!",
+                    allDeleted: "✅ All data has been deleted.",
+                    noProducts: "No products",
+                    addFirst: "Scan a barcode or add manually",
+                    listCopied: "✅ List copied to clipboard!\n\nYou can paste it in Notes, Messages, etc.",
+                    noCamera: "Unable to access camera",
+                    productNotFound: "Product not found in database.\nYou can add it manually.",
+                    connectionError: "Connection error.\nYou can add the product manually.",
+                    enterName: "Please enter a product name",
+                    noProductToExport: "❌ No products to export",
+                    exportExcelSuccess: "✅ Excel export successful!\n\n{count} products exported to {filename}",
+                    importExcelSuccess: "✅ Excel import successful!\n\n{count} products imported.",
+                    importExcelError: "❌ Import error",
+                    replaceConfirm: "⚠️ WARNING\n\nYou currently have {current} products.\nThe file contains {import} products.\n\nDo you want to REPLACE your current data?\n\n(Click \"Cancel\" to add products without deleting current ones)",
+                    invalidFile: "Invalid file format",
+                    noShoppingItems: "❌ No items in shopping list",
+                    recipesExported: "✅ Recipes exported successfully!\n\n{count} recipes saved to CSV.",
+                    recipesImported: "✅ CSV import successful!\n\n{count} recipes imported.",
+                    recipeCreated: "✅ Recipe created successfully!",
+                    recipeUpdated: "✅ Recipe updated successfully!",
+                    recipeDeleted: "✅ Recipe deleted successfully",
+                    recipeDeleteConfirm: "Are you sure you want to delete this recipe?",
+                    notificationsEnabled: "✅ Notifications enabled! You will receive alerts for your products.",
+                    notificationsBlocked: "❌ Notifications blocked in browser settings",
+                    recipeNameRequired: "Please enter a name for the recipe",
+                    recipeTimeRequired: "Please enter preparation time",
+                    recipeIngredientsRequired: "Please add at least one ingredient",
+                    recipeStepsRequired: "Please add at least one step",
+                    noRecipesToExport: "❌ No recipes to export",
+                    invalidCSV: "The CSV file is empty",
+                    noValidRecipes: "No valid recipes found in file",
+                    replaceRecipesConfirm: "⚠️ WARNING\n\nYou currently have {current} custom recipes.\nThe CSV file contains {import} recipes.\n\nDo you want to REPLACE your current recipes?\n\n(Click \"Cancel\" to add recipes without deleting current ones)"
+                },
+                alerts: {
+                    title: "⚠️ WARNING: Action required!",
+                    viewProducts: "👉 View products",
+                    outOfStock: "product{s} OUT OF STOCK",
+                    toRenew: "to renew",
+                    expired: "product{s} expired",
+                    expiresToday: "expire{s} TODAY",
+                    expiresTomorrow: "expire{s} tomorrow",
+                    expiresInTwoDays: "in 2 days"
+                },
+                scanner: {
+                    instructions: "📷 Center the barcode",
+                    close: "✕ Close",
+                    manualEntry: "✍️ Manual entry",
+                    searching: "Searching for product..."
+                },
+                shoppingModal: {
+                    title: "🛒 Shopping List",
+                    productsLabel: "items",
+                    copy: "📋 Copy list",
+                    print: "🖨️ Print",
+                    close: "✕ Close"
+                },
+                recipesModal: {
+                    title: "👨‍🍳 Recipe Suggestions",
+                    subtitle: "With your available ingredients",
+                    create: "➕ Create a recipe",
+                    back: "← Back"
+                }
+            }
+        };
+        
+        var currentLang = localStorage.getItem('language') || 'fr';
+        
+        function t(key) {
+            var keys = key.split('.');
+            var value = translations[currentLang];
+            for (var i = 0; i < keys.length; i++) {
+                value = value[keys[i]];
+                if (!value) return key;
+            }
+            return value;
+        }
+        
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('language', lang);
+            
+            // Update flag and code
+            document.getElementById('langFlag').textContent = lang === 'fr' ? '🇫🇷' : '🇬🇧';
+            document.getElementById('langCode').textContent = lang.toUpperCase();
+            
+            // Update all translatable elements with data-i18n
+            var elements = document.querySelectorAll('[data-i18n]');
+            for (var i = 0; i < elements.length; i++) {
+                var key = elements[i].getAttribute('data-i18n');
+                var translation = t(key);
+                // Keep emoji if present
+                var emoji = elements[i].textContent.match(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u);
+                if (emoji && !translation.includes(emoji[0])) {
+                    elements[i].textContent = emoji[0] + ' ' + translation;
+                } else {
+                    elements[i].textContent = translation;
+                }
+            }
+            
+            // Update dynamic UI elements
+            updateUILanguage();
+            
+            // Re-render everything
+            if (typeof renderAll !== 'undefined') {
+                renderAll();
+            }
+        }
+        
+        function updateUILanguage() {
+            // Update action buttons
+            var btnScan = document.getElementById('btnScan');
+            var btnManual = document.getElementById('btnManual');
+            var btnShoppingList = document.getElementById('btnShoppingList');
+            var btnRecipes = document.getElementById('btnRecipes');
+            
+            if (btnScan) btnScan.textContent = t('actions.scan');
+            if (btnManual) btnManual.textContent = t('actions.manual');
+            if (btnShoppingList) btnShoppingList.textContent = t('actions.shopping');
+            if (btnRecipes) btnRecipes.textContent = t('actions.recipes');
+            
+            // Update stat labels
+            var statLabels = document.querySelectorAll('.stat-card .label');
+            if (statLabels.length >= 3) {
+                statLabels[0].textContent = t('stats.products');
+                statLabels[1].textContent = t('stats.urgent');
+                statLabels[2].textContent = t('stats.expired');
+            }
+            
+            // Update filter buttons (status)
+            var filters = document.querySelectorAll('.filter-btn');
+            var filterData = [
+                {emoji: '🔵', key: 'all'},
+                {emoji: '✅', key: 'fresh'},
+                {emoji: '⚠️', key: 'soon'},
+                {emoji: '❌', key: 'expired'},
+                {emoji: '📦', key: 'out'},
+                {emoji: '📝', key: 'renew'}
+            ];
+            for (var i = 0; i < filters.length && i < filterData.length; i++) {
+                filters[i].textContent = filterData[i].emoji + ' ' + t('filters.' + filterData[i].key);
+            }
+            
+            // Update location filters
+            var locationFilters = document.querySelectorAll('.filter-empl-btn');
+            var locationData = [
+                {emoji: '📍', key: 'all'},
+                {emoji: '🧊', key: 'frigo'},
+                {emoji: '❄️', key: 'congelateur'},
+                {emoji: '🚪', key: 'placard'}
+            ];
+            for (var i = 0; i < locationFilters.length && i < locationData.length; i++) {
+                locationFilters[i].textContent = locationData[i].emoji + ' ' + t('locations.' + locationData[i].key);
+            }
+            
+            // Update empty state
+            var emptyTitle = document.querySelector('#empty h2');
+            var emptyText = document.querySelector('#empty p');
+            if (emptyTitle) emptyTitle.textContent = t('messages.noProducts');
+            if (emptyText) emptyText.textContent = t('messages.addFirst');
+            
+            // Update notification prompt
+            var notifTitle = document.querySelector('.notification-prompt-title');
+            var notifText = document.querySelector('.notification-prompt-text');
+            var notifBtn = document.getElementById('btnEnableNotifications');
+            var notifCancel = document.getElementById('btnCancelNotifications');
+            
+            if (notifTitle) notifTitle.textContent = currentLang === 'fr' ? 'Activer les notifications' : 'Enable notifications';
+            if (notifText) notifText.textContent = currentLang === 'fr' ? 'Recevez des alertes quand vos produits arrivent à expiration' : 'Get alerts when your products are about to expire';
+            if (notifBtn) notifBtn.textContent = currentLang === 'fr' ? '✓ Activer' : '✓ Enable';
+            if (notifCancel) notifCancel.textContent = currentLang === 'fr' ? 'Plus tard' : 'Later';
+            
+            // Update scanner modal
+            var scannerInstructions = document.querySelector('.scanner-instructions');
+            var btnCloseScanner = document.getElementById('btnCloseScanner');
+            var btnManualFromScanner = document.getElementById('btnManualFromScanner');
+            var loadingText = document.querySelector('#loading h2');
+            
+            if (scannerInstructions) scannerInstructions.textContent = t('scanner.instructions');
+            if (btnCloseScanner) btnCloseScanner.textContent = t('scanner.close');
+            if (btnManualFromScanner) btnManualFromScanner.textContent = t('scanner.manualEntry');
+            if (loadingText) loadingText.textContent = t('scanner.searching');
+            
+            // Update shopping list modal
+            var shoppingTitle = document.querySelector('#shoppingListModal h2');
+            var shoppingLabel = document.querySelector('.shopping-stat-label');
+            var btnCopyList = document.querySelector('.shopping-list-actions .btn[onclick="exportShoppingListText()"]');
+            var btnPrintList = document.querySelector('.shopping-list-actions .btn[onclick="printShoppingList()"]');
+            var btnCloseShoppingList = document.querySelector('.shopping-list-actions .btn[onclick="closeShoppingList()"]');
+            
+            if (shoppingTitle) shoppingTitle.textContent = t('shoppingModal.title');
+            if (shoppingLabel) shoppingLabel.textContent = t('shoppingModal.productsLabel');
+            if (btnCopyList) btnCopyList.textContent = t('shoppingModal.copy');
+            if (btnPrintList) btnPrintList.textContent = t('shoppingModal.print');
+            if (btnCloseShoppingList) btnCloseShoppingList.textContent = t('shoppingModal.close');
+            
+            // Update recipes modal
+            var recipesTitle = document.querySelector('#recipesModal h2');
+            var recipesSubtitle = document.querySelector('.recipes-stat-label');
+            var btnCreateRecipe = document.querySelector('.recipes-stats .btn[onclick="openCreateRecipe()"]');
+            var btnExportRecipes = document.querySelector('.recipes-actions .btn[onclick="exportRecipesCSV()"]');
+            var btnImportRecipes = document.querySelectorAll('.recipes-actions .btn')[1];
+            var btnCloseRecipes = document.querySelector('.recipes-actions .btn[onclick="closeRecipes()"]');
+            var btnBackRecipe = document.querySelector('.btn-back');
+            
+            if (recipesTitle) recipesTitle.textContent = t('recipesModal.title');
+            if (recipesSubtitle) recipesSubtitle.textContent = t('recipesModal.subtitle');
+            if (btnCreateRecipe) btnCreateRecipe.textContent = t('recipesModal.create');
+            if (btnExportRecipes) btnExportRecipes.textContent = t('recipes.exportCSV');
+            if (btnImportRecipes) btnImportRecipes.textContent = t('recipes.importCSV');
+            if (btnCloseRecipes) btnCloseRecipes.textContent = t('recipes.close');
+            if (btnBackRecipe) btnBackRecipe.textContent = t('recipesModal.back');
+            
+            // Update create recipe modal
+            var createRecipeLabels = document.querySelectorAll('#createRecipeModal label');
+            if (createRecipeLabels.length >= 5) {
+                createRecipeLabels[0].textContent = currentLang === 'fr' ? 'Nom de la recette *' : 'Recipe name *';
+                createRecipeLabels[1].textContent = currentLang === 'fr' ? 'Icône (emoji)' : 'Icon (emoji)';
+                createRecipeLabels[2].textContent = currentLang === 'fr' ? 'Temps' : 'Time';
+                createRecipeLabels[3].textContent = currentLang === 'fr' ? 'Difficulté' : 'Difficulty';
+                createRecipeLabels[4].textContent = currentLang === 'fr' ? 'Portions' : 'Servings';
+                createRecipeLabels[5].textContent = currentLang === 'fr' ? 'Ingrédients *' : 'Ingredients *';
+                createRecipeLabels[6].textContent = currentLang === 'fr' ? 'Étapes de préparation *' : 'Preparation steps *';
+            }
+            
+            var recipeDifficultySelect = document.getElementById('recipeDifficultyInput');
+            if (recipeDifficultySelect) {
+                var difficulties = currentLang === 'fr' 
+                    ? ['Très facile', 'Facile', 'Moyen', 'Difficile']
+                    : ['Very easy', 'Easy', 'Medium', 'Hard'];
+                var currentValue = recipeDifficultySelect.value;
+                recipeDifficultySelect.innerHTML = difficulties.map(function(d) {
+                    return '<option' + (d === currentValue ? ' selected' : '') + '>' + d + '</option>';
+                }).join('');
+            }
+            
+            var btnAddIngredient = document.querySelector('#createRecipeModal .btn[onclick="addIngredientField()"]');
+            var btnAddStep = document.querySelector('#createRecipeModal .btn[onclick="addStepField()"]');
+            var btnSaveRecipe = document.querySelector('.create-recipe-actions .btn[onclick="saveRecipe()"]');
+            var btnCancelRecipe = document.querySelector('.create-recipe-actions .btn[onclick="closeCreateRecipe()"]');
+            
+            if (btnAddIngredient) btnAddIngredient.textContent = currentLang === 'fr' ? '➕ Ajouter un ingrédient' : '➕ Add ingredient';
+            if (btnAddStep) btnAddStep.textContent = currentLang === 'fr' ? '➕ Ajouter une étape' : '➕ Add step';
+            if (btnSaveRecipe) btnSaveRecipe.textContent = currentLang === 'fr' ? '✓ Enregistrer' : '✓ Save';
+            if (btnCancelRecipe) btnCancelRecipe.textContent = currentLang === 'fr' ? '✕ Annuler' : '✕ Cancel';
+            
+            // Update recipe name placeholder
+            var recipeNameInput = document.getElementById('recipeNameInput');
+            if (recipeNameInput) recipeNameInput.placeholder = currentLang === 'fr' ? 'Ex: Gratin dauphinois' : 'E.g: Mac and cheese';
+            
+            var recipeTimeInput = document.getElementById('recipeTimeInput');
+            if (recipeTimeInput) recipeTimeInput.placeholder = currentLang === 'fr' ? 'Ex: 30 min' : 'E.g: 30 min';
+        }
+        
+        // Helper function for translated alerts
+        function showAlert(message) {
+            alert(message);
+        }
+        
+        function showConfirm(message) {
+            return confirm(message);
+        }
+        
+        // Helper to replace placeholders in messages
+        function tm(key, replacements) {
+            var message = t(key);
+            if (replacements) {
+                for (var placeholder in replacements) {
+                    message = message.replace('{' + placeholder + '}', replacements[placeholder]);
+                }
+            }
+            return message;
+        }
+        
+        function toggleLanguage() {
+            setLanguage(currentLang === 'fr' ? 'en' : 'fr');
+        }
+        
+        // === DONNÉES ===
+        
         var items = [];
         var currentFilter = 'all';
         var currentEmplacement = 'all';
@@ -1781,27 +2370,43 @@
                 
                 // Envoyer une notification si déjà autorisé
                 if (Notification.permission === 'granted') {
-                    var notifTitle = '⚠️ Frigo Manager';
+                    var notifTitle = currentLang === 'fr' ? '⚠️ Frigo Manager' : '⚠️ Fridge Manager';
                     var notifBody = '';
                     
                     if (outOfStock > 0) {
-                        notifBody += '📦 ' + outOfStock + ' produit' + (outOfStock > 1 ? 's' : '') + ' épuisé' + (outOfStock > 1 ? 's' : '');
+                        if (currentLang === 'fr') {
+                            notifBody += '📦 ' + outOfStock + ' produit' + (outOfStock > 1 ? 's' : '') + ' épuisé' + (outOfStock > 1 ? 's' : '');
+                        } else {
+                            notifBody += '📦 ' + outOfStock + ' product' + (outOfStock > 1 ? 's' : '') + ' out of stock';
+                        }
                     }
                     if (toRenew > 0) {
                         if (notifBody) notifBody += ' · ';
-                        notifBody += '📝 ' + toRenew + ' à renouveler';
+                        notifBody += '📝 ' + toRenew + ' ' + t('alerts.toRenew');
                     }
                     if (expired > 0) {
                         if (notifBody) notifBody += ' · ';
-                        notifBody += expired + ' périmé' + (expired > 1 ? 's' : '');
+                        if (currentLang === 'fr') {
+                            notifBody += expired + ' périmé' + (expired > 1 ? 's' : '');
+                        } else {
+                            notifBody += expired + ' expired';
+                        }
                     }
                     if (today > 0) {
                         if (notifBody) notifBody += ' · ';
-                        notifBody += today + ' expire' + (today > 1 ? 'nt' : '') + ' aujourd\'hui';
+                        if (currentLang === 'fr') {
+                            notifBody += today + ' expire' + (today > 1 ? 'nt' : '') + ' aujourd\'hui';
+                        } else {
+                            notifBody += today + ' expire' + (today > 1 ? 's' : '') + ' today';
+                        }
                     }
                     if (tomorrow > 0) {
                         if (notifBody) notifBody += ' · ';
-                        notifBody += tomorrow + ' expire' + (tomorrow > 1 ? 'nt' : '') + ' demain';
+                        if (currentLang === 'fr') {
+                            notifBody += tomorrow + ' expire' + (tomorrow > 1 ? 'nt' : '') + ' demain';
+                        } else {
+                            notifBody += tomorrow + ' expire' + (tomorrow > 1 ? 's' : '') + ' tomorrow';
+                        }
                     }
                     
                     if (notifBody) {
@@ -1818,31 +2423,56 @@
             var banner = document.getElementById('alertBanner');
             var messages = [];
             
+            // Helper pour gérer le pluriel
+            function plural(count, singular, plural) {
+                return count > 1 ? plural : singular;
+            }
+            
             // Alertes de stock en premier (le plus important)
             if (outOfStock > 0) {
-                messages.push('📦 ' + outOfStock + ' produit' + (outOfStock > 1 ? 's' : '') + ' ÉPUISÉ' + (outOfStock > 1 ? 'S' : ''));
+                if (currentLang === 'fr') {
+                    messages.push('📦 ' + outOfStock + ' produit' + (outOfStock > 1 ? 's' : '') + ' ÉPUISÉ' + (outOfStock > 1 ? 'S' : ''));
+                } else {
+                    messages.push('📦 ' + outOfStock + ' product' + (outOfStock > 1 ? 's' : '') + ' OUT OF STOCK');
+                }
             }
             if (toRenew > 0) {
-                messages.push('📝 ' + toRenew + ' à renouveler');
+                messages.push('📝 ' + toRenew + ' ' + t('alerts.toRenew'));
             }
             
             // Alertes de date
             if (expired > 0) {
-                messages.push('❌ ' + expired + ' produit' + (expired > 1 ? 's périmé' + (expired > 1 ? 's' : '') : ' périmé'));
+                if (currentLang === 'fr') {
+                    messages.push('❌ ' + expired + ' produit' + (expired > 1 ? 's périmés' : ' périmé'));
+                } else {
+                    messages.push('❌ ' + expired + ' product' + (expired > 1 ? 's' : '') + ' expired');
+                }
             }
             if (today > 0) {
-                messages.push('🔴 ' + today + ' expire' + (today > 1 ? 'nt' : '') + ' AUJOURD\'HUI');
+                if (currentLang === 'fr') {
+                    messages.push('🔴 ' + today + ' expire' + (today > 1 ? 'nt' : '') + ' AUJOURD\'HUI');
+                } else {
+                    messages.push('🔴 ' + today + ' expire' + (today > 1 ? 's' : '') + ' TODAY');
+                }
             }
             if (tomorrow > 0) {
-                messages.push('🟠 ' + tomorrow + ' expire' + (tomorrow > 1 ? 'nt' : '') + ' demain');
+                if (currentLang === 'fr') {
+                    messages.push('🟠 ' + tomorrow + ' expire' + (tomorrow > 1 ? 'nt' : '') + ' demain');
+                } else {
+                    messages.push('🟠 ' + tomorrow + ' expire' + (tomorrow > 1 ? 's' : '') + ' tomorrow');
+                }
             }
             if (twoDays > 0) {
-                messages.push('🟡 ' + twoDays + ' dans 2 jours');
+                if (currentLang === 'fr') {
+                    messages.push('🟡 ' + twoDays + ' dans 2 jours');
+                } else {
+                    messages.push('🟡 ' + twoDays + ' in 2 days');
+                }
             }
             
-            var html = '<div class="alert-banner-title">⚠️ ATTENTION : Action requise !</div>' +
+            var html = '<div class="alert-banner-title">' + t('alerts.title') + '</div>' +
                        '<div class="alert-banner-text">' + messages.join(' • ') + '</div>' +
-                       '<button class="alert-banner-btn" onclick="viewUrgentProducts()">👉 Voir les produits</button>';
+                       '<button class="alert-banner-btn" onclick="viewUrgentProducts()">' + t('alerts.viewProducts') + '</button>';
             
             banner.innerHTML = html;
             banner.classList.add('show');
@@ -1966,9 +2596,9 @@
                     // Afficher la quantité
                     var qty = getQuantity(item.quantite);
                     if (qty === 0) {
-                        html += '<div class="stock-alert">⚠️ Stock épuisé</div>';
+                        html += '<div class="stock-alert">⚠️ ' + (currentLang === 'fr' ? 'Stock épuisé' : 'Out of stock') + '</div>';
                     } else {
-                        html += '<div class="quantity-badge">📦 Quantité: ' + qty + '</div>';
+                        html += '<div class="quantity-badge">📦 ' + (currentLang === 'fr' ? 'Quantité: ' : 'Quantity: ') + qty + '</div>';
                     }
                     
                     // Afficher le badge "À renouveler"
@@ -2098,7 +2728,7 @@
             }, function(err) {
                 if (err) {
                     console.error(err);
-                    alert("Impossible d'accéder à la caméra");
+                    alert(t('messages.noCamera'));
                     stopScanner();
                     return;
                 }
@@ -2195,14 +2825,14 @@
                         };
                         showForm(currentProductData);
                     } else {
-                        alert('Produit non trouvé dans la base de données.\nVous pouvez l\'ajouter manuellement.');
+                        alert(t('messages.productNotFound'));
                         showForm({ barcode: barcode });
                     }
                 })
                 .catch(function(error) {
                     console.error('Erreur:', error);
                     document.getElementById('loading').classList.remove('active');
-                    alert('Erreur de connexion.\nVous pouvez ajouter le produit manuellement.');
+                    alert(t('messages.connectionError'));
                     showForm({ barcode: barcode });
                 });
         }
@@ -2251,72 +2881,72 @@
             suggestedDate.setDate(suggestedDate.getDate() + 7);
             var suggestedDateStr = suggestedDate.toISOString().split('T')[0];
             
-            var html = '<h3>➕ Ajouter au frigo</h3>';
+            var html = '<h3>➕ ' + (currentLang === 'fr' ? 'Ajouter au frigo' : 'Add to fridge') + '</h3>';
             
             if (productData.barcode) {
-                html += '<div class="barcode-badge">📊 Code-barres: ' + productData.barcode + '</div>';
+                html += '<div class="barcode-badge">📊 ' + (currentLang === 'fr' ? 'Code-barres: ' : 'Barcode: ') + productData.barcode + '</div>';
             }
             
             html += '<div class="form-group">';
             if (productData.image) {
                 html += '<img src="' + productData.image + '" class="preview-img" id="previewImage">';
             } else {
-                html += '<div id="previewImage" class="preview-placeholder">📷 Aucune photo</div>';
+                html += '<div id="previewImage" class="preview-placeholder">📷 ' + (currentLang === 'fr' ? 'Aucune photo' : 'No photo') + '</div>';
             }
             html += '<input type="file" id="customPhoto" accept="image/*" capture="environment" style="display: none;">';
-            html += '<label for="customPhoto" class="btn" style="background:#f59e0b;padding:12px;font-size:16px;margin:10px 0;">📸 ' + (productData.image ? 'Changer' : 'Prendre') + ' la photo</label>';
+            html += '<label for="customPhoto" class="btn" style="background:#f59e0b;padding:12px;font-size:16px;margin:10px 0;">📸 ' + (productData.image ? (currentLang === 'fr' ? 'Changer' : 'Change') : (currentLang === 'fr' ? 'Prendre' : 'Take')) + ' ' + (currentLang === 'fr' ? 'la photo' : 'photo') + '</label>';
             html += '</div>';
             
             html += '<div class="form-group">' +
-                    '<label for="formNom">Nom du produit *</label>' +
-                    '<input type="text" id="formNom" placeholder="Ex: Lait, Yaourt, Pommes..." value="' + (productData.nom || '') + '">' +
+                    '<label for="formNom">' + t('form.name') + ' *</label>' +
+                    '<input type="text" id="formNom" placeholder="' + (currentLang === 'fr' ? 'Ex: Lait, Yaourt, Pommes...' : 'E.g: Milk, Yogurt, Apples...') + '" value="' + (productData.nom || '') + '">' +
                     '</div>' +
                     '<div class="form-group">' +
-                    '<label for="formDate">Date de péremption</label>' +
+                    '<label for="formDate">' + t('form.expiry') + '</label>' +
                     '<input type="date" id="formDate" value="' + suggestedDateStr + '">' +
-                    '<div class="date-suggestion">💡 Date suggérée : +7 jours (modifiable)</div>' +
+                    '<div class="date-suggestion">💡 ' + (currentLang === 'fr' ? 'Date suggérée : +7 jours (modifiable)' : 'Suggested date: +7 days (editable)') + '</div>' +
                     '</div>' +
                     '<div class="form-group">' +
-                    '<label for="formCategorie">Catégorie</label>' +
+                    '<label for="formCategorie">' + t('form.category') + '</label>' +
                     '<select id="formCategorie">' +
-                    '<option value="fruit"' + (productData.categorie === 'fruit' ? ' selected' : '') + '>🍎 Fruit</option>' +
-                    '<option value="legume"' + (productData.categorie === 'legume' ? ' selected' : '') + '>🥕 Légume</option>' +
-                    '<option value="viande"' + (productData.categorie === 'viande' ? ' selected' : '') + '>🥩 Viande</option>' +
-                    '<option value="poisson"' + (productData.categorie === 'poisson' ? ' selected' : '') + '>🐟 Poisson</option>' +
-                    '<option value="produit_laitier"' + (productData.categorie === 'produit_laitier' ? ' selected' : '') + '>🥛 Produit laitier</option>' +
-                    '<option value="boisson"' + (productData.categorie === 'boisson' ? ' selected' : '') + '>🥤 Boisson</option>' +
-                    '<option value="autre"' + (productData.categorie === 'autre' || !productData.categorie ? ' selected' : '') + '>📦 Autre</option>' +
+                    '<option value="fruit"' + (productData.categorie === 'fruit' ? ' selected' : '') + '>🍎 ' + t('categories.Fruits') + '</option>' +
+                    '<option value="legume"' + (productData.categorie === 'legume' ? ' selected' : '') + '>🥕 ' + t('categories.Légumes') + '</option>' +
+                    '<option value="viande"' + (productData.categorie === 'viande' ? ' selected' : '') + '>🥩 ' + t('categories.Viande') + '</option>' +
+                    '<option value="poisson"' + (productData.categorie === 'poisson' ? ' selected' : '') + '>🐟 ' + t('categories.Poisson') + '</option>' +
+                    '<option value="produit_laitier"' + (productData.categorie === 'produit_laitier' ? ' selected' : '') + '>🥛 ' + t('categories.Produits_laitiers') + '</option>' +
+                    '<option value="boisson"' + (productData.categorie === 'boisson' ? ' selected' : '') + '>🥤 ' + t('categories.Boissons') + '</option>' +
+                    '<option value="autre"' + (productData.categorie === 'autre' || !productData.categorie ? ' selected' : '') + '>📦 ' + t('categories.Autre') + '</option>' +
                     '</select>' +
                     '</div>' +
                     '<div class="form-group">' +
-                    '<label for="formEmplacement">Emplacement</label>' +
+                    '<label for="formEmplacement">' + t('form.location') + '</label>' +
                     '<select id="formEmplacement">' +
-                    '<option value="frigo"' + (productData.emplacement === 'frigo' || !productData.emplacement ? ' selected' : '') + '>🧊 Frigo</option>' +
-                    '<option value="congelateur"' + (productData.emplacement === 'congelateur' ? ' selected' : '') + '>❄️ Congélateur</option>' +
-                    '<option value="placard"' + (productData.emplacement === 'placard' ? ' selected' : '') + '>🚪 Placard</option>' +
-                    '<option value="cave"' + (productData.emplacement === 'cave' ? ' selected' : '') + '>🍷 Cave</option>' +
-                    '<option value="corbeille"' + (productData.emplacement === 'corbeille' ? ' selected' : '') + '>🧺 Corbeille</option>' +
-                    '<option value="autre_emplacement"' + (productData.emplacement === 'autre_emplacement' ? ' selected' : '') + '>📍 Autre</option>' +
+                    '<option value="frigo"' + (productData.emplacement === 'frigo' || !productData.emplacement ? ' selected' : '') + '>🧊 ' + t('locations.frigo') + '</option>' +
+                    '<option value="congelateur"' + (productData.emplacement === 'congelateur' ? ' selected' : '') + '>❄️ ' + t('locations.congelateur') + '</option>' +
+                    '<option value="placard"' + (productData.emplacement === 'placard' ? ' selected' : '') + '>🚪 ' + t('locations.placard') + '</option>' +
+                    '<option value="cave"' + (productData.emplacement === 'cave' ? ' selected' : '') + '>🍷 ' + (currentLang === 'fr' ? 'Cave' : 'Cellar') + '</option>' +
+                    '<option value="corbeille"' + (productData.emplacement === 'corbeille' ? ' selected' : '') + '>🧺 ' + (currentLang === 'fr' ? 'Corbeille' : 'Basket') + '</option>' +
+                    '<option value="autre_emplacement"' + (productData.emplacement === 'autre_emplacement' ? ' selected' : '') + '>📍 ' + t('locations.autre') + '</option>' +
                     '</select>' +
                     '</div>' +
                     '<div class="form-group">' +
-                    '<label for="formQuantite">Quantité</label>' +
+                    '<label for="formQuantite">' + t('form.quantity') + '</label>' +
                     '<div style="display: flex; align-items: center; gap: 10px;">' +
                     '<button type="button" class="btn-quantity" id="btnMinus">−</button>' +
                     '<input type="number" id="formQuantite" value="' + getQuantity(productData.quantite) + '" min="0" max="99" style="width: 80px; text-align: center; font-size: 18px; font-weight: bold;">' +
                     '<button type="button" class="btn-quantity" id="btnPlus">+</button>' +
                     '</div>' +
-                    '<div class="date-suggestion">💡 Nombre d\'unités</div>' +
+                    '<div class="date-suggestion">💡 ' + (currentLang === 'fr' ? 'Nombre d\'unités' : 'Number of units') + '</div>' +
                     '</div>' +
                     '<div class="form-group" style="margin-top: 15px;">' +
                     '<label id="labelRenouvelerAdd" style="cursor: pointer; margin: 0; font-weight: 600; display: flex; align-items: center; gap: 15px; padding: 15px; background: #f5f5f5; border-radius: 10px; user-select: none; -webkit-tap-highlight-color: transparent;">' +
                     '<input type="checkbox" id="formRenouveler" ' + (productData.aRenouveler ? 'checked' : '') + ' style="display: none;">' +
                     '<span id="checkboxBoxAdd" style="font-size: 32px; line-height: 1; color: ' + (productData.aRenouveler ? '#667eea' : '#999') + ';">' + (productData.aRenouveler ? '☑️' : '☐') + '</span>' +
-                    '<span style="flex: 1;">📝 À renouveler (ajouter à la liste de courses)</span>' +
+                    '<span style="flex: 1;">📝 ' + (currentLang === 'fr' ? 'À renouveler (ajouter à la liste de courses)' : 'To renew (add to shopping list)') + '</span>' +
                     '</label>' +
                     '</div>' +
-                    '<button class="btn" id="btnAdd" style="background:#667eea;font-size:18px;padding:15px;margin-top:10px">✓ Ajouter au frigo</button>' +
-                    '<button class="btn" id="btnCancel" style="background:#ccc;color:#333;font-size:18px;padding:15px">✕ Annuler</button>';
+                    '<button class="btn" id="btnAdd" style="background:#667eea;font-size:18px;padding:15px;margin-top:10px">✓ ' + (currentLang === 'fr' ? 'Ajouter au frigo' : 'Add to fridge') + '</button>' +
+                    '<button class="btn" id="btnCancel" style="background:#ccc;color:#333;font-size:18px;padding:15px">✕ ' + t('form.cancel') + '</button>';
             
             form.innerHTML = html;
             form.classList.add('active');
@@ -2456,7 +3086,7 @@
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
                 
-                alert('✅ Recettes exportées avec succès !\n\n' + allRecipes.length + ' recettes sauvegardées en CSV.');
+                alert(tm('messages.recipesExported', {count: allRecipes.length}));
             } catch (err) {
                 alert('❌ Erreur lors de l\'export : ' + err.message);
                 console.error(err);
@@ -2535,7 +3165,7 @@
                     saveUserRecipes();
                     openRecipes(); // Rafraîchir la liste
                     
-                    alert('✅ Import CSV réussi !\n\n' + importedRecipes.length + ' recettes importées.');
+                    alert(tm('messages.recipesImported', {count: importedRecipes.length}));
                 } catch (err) {
                     alert('❌ Erreur lors de l\'import : ' + err.message);
                     console.error(err);
@@ -2585,7 +3215,7 @@
         function exportExcel() {
             try {
                 if (items.length === 0) {
-                    alert('❌ Aucun produit à exporter');
+                    alert(t('messages.noProductToExport'));
                     return;
                 }
                 
@@ -2629,10 +3259,11 @@
                 var filename = 'frigo-manager-' + new Date().toISOString().split('T')[0] + '.xlsx';
                 XLSX.writeFile(wb, filename);
                 
-                alert('✅ Export Excel réussi !\n\n' + items.length + ' produits exportés dans ' + filename);
+                var message = tm('messages.exportExcelSuccess', {count: items.length, filename: filename});
+                alert(message);
                 toggleSettings();
             } catch (err) {
-                alert('❌ Erreur lors de l\'export Excel : ' + err.message);
+                alert(currentLang === 'fr' ? '❌ Erreur lors de l\'export Excel : ' + err.message : '❌ Excel export error: ' + err.message);
                 console.error(err);
             }
         }
@@ -2718,9 +3349,10 @@
                     renderAll();
                     toggleSettings();
                     
-                    alert('✅ Import Excel réussi !\n\n' + importedItems.length + ' produits importés.');
+                    var message = tm('messages.importExcelSuccess', {count: importedItems.length});
+                    alert(message);
                 } catch (err) {
-                    alert('❌ Erreur lors de l\'import Excel : ' + err.message);
+                    alert(currentLang === 'fr' ? '❌ Erreur lors de l\'import Excel : ' + err.message : '❌ Excel import error: ' + err.message);
                     console.error(err);
                 }
             };
@@ -2752,17 +3384,17 @@
             if (toShop.length === 0) {
                 html = '<div style="text-align: center; padding: 40px; color: #666;">' +
                        '<div style="font-size: 3em; margin-bottom: 20px;">✅</div>' +
-                       '<h3>Aucun produit à acheter !</h3>' +
-                       '<p>Votre frigo est bien approvisionné.</p>' +
+                       '<h3>' + t('shopping.empty') + '</h3>' +
+                       '<p>' + t('shopping.emptyDesc') + '</p>' +
                        '</div>';
             } else {
                 toShop.forEach(function(item) {
                     var qty = getQuantity(item.quantite);
                     var reason = '';
                     if (qty === 0) {
-                        reason = '📦 Stock épuisé';
+                        reason = '📦 ' + t('shopping.exhausted');
                     } else if (item.aRenouveler) {
-                        reason = '📝 À renouveler';
+                        reason = '📝 ' + t('shopping.toRenew');
                     }
                     
                     var isChecked = shoppingListState[item.id] || false;
@@ -2798,20 +3430,20 @@
             });
             
             if (toShop.length === 0) {
-                alert('❌ Aucun produit dans la liste de courses');
+                alert(t('messages.noShoppingItems'));
                 return;
             }
             
-            var text = '🛒 LISTE DE COURSES\n';
+            var text = currentLang === 'fr' ? '🛒 LISTE DE COURSES\n' : '🛒 SHOPPING LIST\n';
             text += '═══════════════════\n\n';
             
             toShop.forEach(function(item) {
                 var qty = getQuantity(item.quantite);
                 var reason = '';
                 if (qty === 0) {
-                    reason = ' (épuisé)';
+                    reason = currentLang === 'fr' ? ' (épuisé)' : ' (out of stock)';
                 } else if (item.aRenouveler) {
-                    reason = ' (à renouveler)';
+                    reason = currentLang === 'fr' ? ' (à renouveler)' : ' (to renew)';
                 }
                 
                 var checked = shoppingListState[item.id] ? '✓' : '☐';
@@ -2819,13 +3451,13 @@
             });
             
             text += '\n═══════════════════\n';
-            text += 'Total: ' + toShop.length + ' produits\n';
-            text += 'Généré le ' + new Date().toLocaleString('fr-FR');
+            text += 'Total: ' + toShop.length + ' ' + (currentLang === 'fr' ? 'produits' : 'products') + '\n';
+            text += (currentLang === 'fr' ? 'Généré le ' : 'Generated on ') + new Date().toLocaleString(currentLang === 'fr' ? 'fr-FR' : 'en-US');
             
             // Copier dans le presse-papier
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(text).then(function() {
-                    alert('✅ Liste copiée dans le presse-papier !\n\nVous pouvez la coller dans Notes, Messages, etc.');
+                    alert(t('messages.listCopied'));
                 }).catch(function() {
                     // Fallback
                     showTextModal(text);
@@ -2836,7 +3468,8 @@
         }
         
         function showTextModal(text) {
-            var modal = prompt('Copiez cette liste :', text);
+            var promptText = currentLang === 'fr' ? 'Copiez cette liste :' : 'Copy this list:';
+            var modal = prompt(promptText, text);
         }
         
         function printShoppingList() {
@@ -2846,13 +3479,16 @@
             });
             
             if (toShop.length === 0) {
-                alert('❌ Aucun produit dans la liste de courses');
+                alert(t('messages.noShoppingItems'));
                 return;
             }
             
             var printWindow = window.open('', '', 'width=800,height=600');
+            var title = currentLang === 'fr' ? 'Liste de courses - Frigo Manager' : 'Shopping List - Fridge Manager';
+            var heading = currentLang === 'fr' ? '🛒 LISTE DE COURSES' : '🛒 SHOPPING LIST';
+            
             var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
-                      '<title>Liste de courses - Frigo Manager</title>' +
+                      '<title>' + title + '</title>' +
                       '<style>' +
                       'body { font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }' +
                       'h1 { color: #f97316; text-align: center; margin-bottom: 30px; }' +
@@ -2863,15 +3499,15 @@
                       '.footer { text-align: center; margin-top: 40px; color: #666; font-size: 0.9em; }' +
                       '@media print { body { padding: 20px; } }' +
                       '</style></head><body>' +
-                      '<h1>🛒 LISTE DE COURSES</h1>';
+                      '<h1>' + heading + '</h1>';
             
             toShop.forEach(function(item) {
                 var qty = getQuantity(item.quantite);
                 var reason = '';
                 if (qty === 0) {
-                    reason = '<span class="reason">(épuisé)</span>';
+                    reason = '<span class="reason">(' + (currentLang === 'fr' ? 'épuisé' : 'out of stock') + ')</span>';
                 } else if (item.aRenouveler) {
-                    reason = '<span class="reason">(à renouveler)</span>';
+                    reason = '<span class="reason">(' + (currentLang === 'fr' ? 'à renouveler' : 'to renew') + ')</span>';
                 }
                 
                 html += '<div class="item">' +
@@ -2881,9 +3517,9 @@
             });
             
             html += '<div class="footer">' +
-                   'Total: ' + toShop.length + ' produits<br>' +
-                   'Généré le ' + new Date().toLocaleString('fr-FR') + '<br>' +
-                   'Frigo Manager' +
+                   'Total: ' + toShop.length + ' ' + (currentLang === 'fr' ? 'produits' : 'products') + '<br>' +
+                   (currentLang === 'fr' ? 'Généré le ' : 'Generated on ') + new Date().toLocaleString(currentLang === 'fr' ? 'fr-FR' : 'en-US') + '<br>' +
+                   (currentLang === 'fr' ? 'Frigo Manager' : 'Fridge Manager') +
                    '</div>' +
                    '</body></html>';
             
@@ -3140,8 +3776,8 @@
             if (recipesWithMatch.length === 0 || recipesWithMatch[0].matchPercent === 0) {
                 html = '<div style="text-align: center; padding: 40px; color: #666;">' +
                        '<div style="font-size: 3em; margin-bottom: 20px;">🍳</div>' +
-                       '<h3>Aucune recette disponible</h3>' +
-                       '<p>Ajoutez des produits dans votre frigo pour voir des suggestions de recettes !</p>' +
+                       '<h3>' + (currentLang === 'fr' ? 'Aucune recette disponible' : 'No recipes available') + '</h3>' +
+                       '<p>' + (currentLang === 'fr' ? 'Ajoutez des produits dans votre frigo pour voir des suggestions de recettes !' : 'Add products to your fridge to see recipe suggestions!') + '</p>' +
                        '</div>';
             } else {
                 recipesWithMatch.forEach(function(item) {
@@ -3150,7 +3786,7 @@
                                         item.matchPercent >= 50 ? '#f59e0b' : '#6b7280';
                         
                         var isUserRecipe = item.recipe.id >= 1000; // Les recettes utilisateur ont des IDs >= 1000
-                        var userBadge = isUserRecipe ? '<span class="user-recipe-badge">Ma recette</span>' : '';
+                        var userBadge = isUserRecipe ? '<span class="user-recipe-badge">' + t('recipes.userRecipe') + '</span>' : '';
                         
                         html += '<div class="recipe-card" onclick="showRecipeDetail(' + item.recipe.id + ')">' +
                                '<div class="recipe-card-header">' +
@@ -3161,10 +3797,10 @@
                                '</div>' +
                                '</div>' +
                                '<div class="recipe-ingredients-preview">' +
-                               'Pour ' + item.recipe.servings + ' personne' + (item.recipe.servings > 1 ? 's' : '') +
+                               (currentLang === 'fr' ? 'Pour ' : 'For ') + item.recipe.servings + ' ' + (currentLang === 'fr' ? 'personne' + (item.recipe.servings > 1 ? 's' : '') : item.recipe.servings > 1 ? 'servings' : 'serving') +
                                '</div>' +
                                '<span class="recipe-match" style="background: ' + matchColor + ';">' +
-                               '✓ ' + item.matchCount + '/' + item.totalIngredients + ' ingrédients disponibles (' + item.matchPercent + '%)' +
+                               '✓ ' + item.matchCount + '/' + item.totalIngredients + ' ' + (currentLang === 'fr' ? 'ingrédients disponibles' : 'ingredients available') + ' (' + item.matchPercent + '%)' +
                                '</span>' +
                                '</div>';
                     }
@@ -3204,20 +3840,20 @@
                       '<h1 class="recipe-detail-title">' + recipe.name + '</h1>' +
                       '<div class="recipe-detail-meta">' +
                       '<div class="recipe-meta-item">' +
-                      '<div class="recipe-meta-label">Temps</div>' +
+                      '<div class="recipe-meta-label">' + t('recipes.time') + '</div>' +
                       '<div class="recipe-meta-value">' + recipe.time + '</div>' +
                       '</div>' +
                       '<div class="recipe-meta-item">' +
-                      '<div class="recipe-meta-label">Difficulté</div>' +
+                      '<div class="recipe-meta-label">' + t('recipes.difficulty') + '</div>' +
                       '<div class="recipe-meta-value">' + recipe.difficulty + '</div>' +
                       '</div>' +
                       '<div class="recipe-meta-item">' +
-                      '<div class="recipe-meta-label">Portions</div>' +
+                      '<div class="recipe-meta-label">' + (currentLang === 'fr' ? 'Portions' : 'Servings') + '</div>' +
                       '<div class="recipe-meta-value">' + recipe.servings + '</div>' +
                       '</div>' +
                       '</div>' +
                       '<div class="recipe-section">' +
-                      '<h3 class="recipe-section-title">🛒 Ingrédients</h3>' +
+                      '<h3 class="recipe-section-title">🛒 ' + t('recipes.ingredients') + '</h3>' +
                       '<ul class="recipe-ingredients-list">';
             
             recipe.ingredients.forEach(function(ingredient) {
@@ -3231,7 +3867,7 @@
             
             html += '</ul></div>' +
                    '<div class="recipe-section">' +
-                   '<h3 class="recipe-section-title">👨‍🍳 Préparation</h3>' +
+                   '<h3 class="recipe-section-title">👨‍🍳 ' + (currentLang === 'fr' ? 'Préparation' : 'Preparation') + '</h3>' +
                    '<ol class="recipe-steps-list">';
             
             recipe.steps.forEach(function(step) {
@@ -3243,8 +3879,8 @@
             // Ajouter les boutons modifier/supprimer si c'est une recette utilisateur
             if (isUserRecipe) {
                 html += '<div class="recipe-actions-bar">' +
-                       '<button class="btn" onclick="editRecipe(' + recipeId + ')" style="background: #f59e0b; flex: 1;">✏️ Modifier</button>' +
-                       '<button class="btn" onclick="deleteRecipe(' + recipeId + ')" style="background: #ef4444; flex: 1;">🗑️ Supprimer</button>' +
+                       '<button class="btn" onclick="editRecipe(' + recipeId + ')" style="background: #f59e0b; flex: 1;">' + t('recipes.edit') + '</button>' +
+                       '<button class="btn" onclick="deleteRecipe(' + recipeId + ')" style="background: #ef4444; flex: 1;">' + t('recipes.deleteBtn') + '</button>' +
                        '</div>';
             }
             
@@ -3260,12 +3896,12 @@
         
         function openCreateRecipe() {
             currentEditingRecipeId = null;
-            document.getElementById('createRecipeTitle').textContent = '➕ Créer une recette';
+            document.getElementById('createRecipeTitle').textContent = currentLang === 'fr' ? '➕ Créer une recette' : '➕ Create a recipe';
             document.getElementById('recipeNameInput').value = '';
             document.getElementById('recipeIconInput').value = '🍳';
             document.getElementById('selectedEmoji').textContent = '🍳';
             document.getElementById('recipeTimeInput').value = '';
-            document.getElementById('recipeDifficultyInput').value = 'Facile';
+            document.getElementById('recipeDifficultyInput').value = currentLang === 'fr' ? 'Facile' : 'Easy';
             document.getElementById('recipeServingsInput').value = '2';
             document.getElementById('ingredientsList').innerHTML = '';
             document.getElementById('stepsList').innerHTML = '';
@@ -3348,12 +3984,12 @@
             
             // Validation
             if (!name) {
-                alert('❌ Veuillez entrer un nom de recette');
+                alert(currentLang === 'fr' ? '❌ Veuillez entrer un nom de recette' : '❌ Please enter a recipe name');
                 return;
             }
             
             if (!time) {
-                alert('❌ Veuillez entrer un temps de préparation');
+                alert(currentLang === 'fr' ? '❌ Veuillez entrer un temps de préparation' : '❌ Please enter preparation time');
                 return;
             }
             
@@ -3366,7 +4002,7 @@
             });
             
             if (ingredients.length === 0) {
-                alert('❌ Veuillez ajouter au moins un ingrédient');
+                alert(currentLang === 'fr' ? '❌ Veuillez ajouter au moins un ingrédient' : '❌ Please add at least one ingredient');
                 return;
             }
             
@@ -3379,7 +4015,7 @@
             });
             
             if (steps.length === 0) {
-                alert('❌ Veuillez ajouter au moins une étape');
+                alert(currentLang === 'fr' ? '❌ Veuillez ajouter au moins une étape' : '❌ Please add at least one step');
                 return;
             }
             
@@ -3419,7 +4055,9 @@
             closeCreateRecipe();
             openRecipes(); // Rafraîchir la liste
             
-            alert('✅ Recette ' + (currentEditingRecipeId ? 'modifiée' : 'créée') + ' avec succès !');
+            var action = currentEditingRecipeId ? (currentLang === 'fr' ? 'modifiée' : 'updated') : (currentLang === 'fr' ? 'créée' : 'created');
+            var message = currentLang === 'fr' ? '✅ Recette ' + action + ' avec succès !' : '✅ Recipe ' + action + ' successfully!';
+            alert(message);
         }
         
         function editRecipe(recipeId) {
@@ -3432,7 +4070,7 @@
             closeRecipeDetail();
             
             // Remplir le formulaire
-            document.getElementById('createRecipeTitle').textContent = '✏️ Modifier la recette';
+            document.getElementById('createRecipeTitle').textContent = currentLang === 'fr' ? '✏️ Modifier la recette' : '✏️ Edit recipe';
             document.getElementById('recipeNameInput').value = recipe.name;
             document.getElementById('recipeIconInput').value = recipe.icon;
             document.getElementById('selectedEmoji').textContent = recipe.icon;
@@ -3469,39 +4107,52 @@
             var recipe = userRecipes.find(function(r) { return r.id === recipeId; });
             if (!recipe) return;
             
-            var confirm = window.confirm('⚠️ Supprimer la recette "' + recipe.name + '" ?\n\nCette action est irréversible.');
+            var message = currentLang === 'fr' 
+                ? '⚠️ Supprimer la recette "' + recipe.name + '" ?\n\nCette action est irréversible.'
+                : '⚠️ Delete recipe "' + recipe.name + '"?\n\nThis action is irreversible.';
+            
+            var confirm = window.confirm(message);
             
             if (confirm) {
                 userRecipes = userRecipes.filter(function(r) { return r.id !== recipeId; });
                 saveUserRecipes();
                 closeRecipeDetail();
                 openRecipes(); // Rafraîchir la liste
-                alert('✅ Recette supprimée avec succès');
+                alert(currentLang === 'fr' ? '✅ Recette supprimée avec succès' : '✅ Recipe deleted successfully');
             }
         }
         
         function confirmDeleteAll() {
-            var confirm1 = window.confirm(
-                '⚠️ SUPPRIMER TOUTES LES DONNÉES ?\n\n' +
-                'Cette action supprimera définitivement tous vos ' + items.length + ' produits.\n\n' +
-                'Cette action est IRRÉVERSIBLE.\n\n' +
-                'Êtes-vous sûr ?'
-            );
+            var message1 = currentLang === 'fr' 
+                ? '⚠️ SUPPRIMER TOUTES LES DONNÉES ?\n\n' +
+                  'Cette action supprimera définitivement tous vos ' + items.length + ' produits.\n\n' +
+                  'Cette action est IRRÉVERSIBLE.\n\n' +
+                  'Êtes-vous sûr ?'
+                : '⚠️ DELETE ALL DATA?\n\n' +
+                  'This will permanently delete all your ' + items.length + ' products.\n\n' +
+                  'This action is IRREVERSIBLE.\n\n' +
+                  'Are you sure?';
+            
+            var confirm1 = window.confirm(message1);
             
             if (!confirm1) return;
             
-            var confirm2 = window.confirm(
-                '⚠️ DERNIÈRE CONFIRMATION\n\n' +
-                'Voulez-vous vraiment supprimer TOUTES les données ?\n\n' +
-                'Pensez à exporter vos données avant si vous voulez les sauvegarder.'
-            );
+            var message2 = currentLang === 'fr'
+                ? '⚠️ DERNIÈRE CONFIRMATION\n\n' +
+                  'Voulez-vous vraiment supprimer TOUTES les données ?\n\n' +
+                  'Pensez à exporter vos données avant si vous voulez les sauvegarder.'
+                : '⚠️ FINAL CONFIRMATION\n\n' +
+                  'Do you really want to delete ALL data?\n\n' +
+                  'Consider exporting your data first if you want to save them.';
+            
+            var confirm2 = window.confirm(message2);
             
             if (confirm2) {
                 items = [];
                 saveItems();
                 renderAll();
                 toggleSettings();
-                alert('✅ Toutes les données ont été supprimées.');
+                alert(t('messages.allDeleted'));
             }
         }
 
@@ -3727,6 +4378,7 @@
 
         // Initialisation
         renderAll();
+        setLanguage(currentLang); // Initialize language
     </script>
 </body>
 </html>
