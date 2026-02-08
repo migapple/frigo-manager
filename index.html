@@ -224,15 +224,15 @@
         }
         
         .filters {
-            display: flex;
-            gap: 10px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
             margin-bottom: 20px;
-            overflow-x: auto;
-            padding: 10px 0;
+            padding: 0;
         }
         
         .filter-btn {
-            padding: 12px 20px;
+            padding: 12px 8px;
             border: none;
             border-radius: 10px;
             background: white;
@@ -240,6 +240,8 @@
             cursor: pointer;
             white-space: nowrap;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 0.9em;
+            text-align: center;
         }
         
         .filter-btn.active {
@@ -380,6 +382,20 @@
             background: #f0f0f0;
         }
         
+        .preview-placeholder {
+            width: 100%;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f0f0;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-size: 1.2em;
+            color: #999;
+        }
+        
         .barcode-badge {
             display: inline-block;
             background: #e8f5e9;
@@ -416,7 +432,7 @@
         
         <div id="actions" class="actions">
             <button class="btn btn-scan" id="btnScan">📷 Scanner un code-barres</button>
-            <button class="btn btn-manual" id="btnManual">✍️ Saisie manuelle (sans code-barres)</button>
+            <button class="btn btn-manual" id="btnManual">✍️ Saisie manuelle</button>
         </div>
 
         <div id="scanner" class="scanner">
@@ -745,9 +761,15 @@
                 html += '<div class="barcode-badge">📊 Code-barres: ' + productData.barcode + '</div>';
             }
             
+            html += '<div class="form-group">';
             if (productData.image) {
-                html += '<img src="' + productData.image + '" class="preview-img">';
+                html += '<img src="' + productData.image + '" class="preview-img" id="previewImage">';
+            } else {
+                html += '<div id="previewImage" class="preview-placeholder">📷 Aucune photo</div>';
             }
+            html += '<input type="file" id="customPhoto" accept="image/*" capture="environment" style="display: none;">';
+            html += '<label for="customPhoto" class="btn" style="background:#f59e0b;padding:12px;font-size:16px;margin:10px 0;">📸 ' + (productData.image ? 'Changer' : 'Prendre') + ' la photo</label>';
+            html += '</div>';
             
             html += '<div class="form-group">' +
                     '<label for="formNom">Nom du produit *</label>' +
@@ -777,6 +799,28 @@
             form.classList.add('active');
             document.getElementById('actions').style.display = 'none';
             
+            // Gestion de la photo personnalisée
+            var customImageData = productData.image || null;
+            
+            document.getElementById('customPhoto').addEventListener('change', function(e) {
+                var file = e.target.files[0];
+                if (!file) return;
+                
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    customImageData = event.target.result;
+                    var preview = document.getElementById('previewImage');
+                    if (preview.tagName === 'IMG') {
+                        preview.src = customImageData;
+                    } else {
+                        preview.outerHTML = '<img src="' + customImageData + '" class="preview-img" id="previewImage">';
+                    }
+                    // Changer le texte du bouton
+                    document.querySelector('label[for="customPhoto"]').innerHTML = '📸 Changer la photo';
+                };
+                reader.readAsDataURL(file);
+            });
+            
             document.getElementById('btnAdd').onclick = function() {
                 var nom = document.getElementById('formNom').value.trim();
                 if (!nom) {
@@ -792,7 +836,7 @@
                     datePeremption: dateValue || null,
                     categorie: document.getElementById('formCategorie').value,
                     dateAjout: new Date().toISOString().split('T')[0],
-                    image: productData.image || null,
+                    image: customImageData,
                     barcode: productData.barcode || null
                 };
                 
