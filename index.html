@@ -225,14 +225,14 @@
         
         .filters {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 8px;
             margin-bottom: 20px;
             padding: 0;
         }
         
         .filter-btn {
-            padding: 12px 4px;
+            padding: 10px 4px;
             border: none;
             border-radius: 10px;
             background: white;
@@ -240,7 +240,7 @@
             cursor: pointer;
             white-space: nowrap;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            font-size: 0.85em;
+            font-size: 0.8em;
             text-align: center;
         }
         
@@ -575,6 +575,17 @@
             margin: 5px 5px 5px 0;
         }
         
+        .renouveler-badge {
+            display: inline-block;
+            background: #f59e0b;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin: 5px 5px 5px 0;
+        }
+        
         .quantity-controls {
             display: flex;
             align-items: center;
@@ -687,6 +698,7 @@
             <button class="filter-btn" data-f="soon">⚠️ Urgent</button>
             <button class="filter-btn" data-f="expired">❌ Périmés</button>
             <button class="filter-btn" data-f="out_of_stock">📦 Épuisés</button>
+            <button class="filter-btn" data-f="to_renew">📝 À renouveler</button>
         </div>
 
         <div id="filtersEmplacement" class="filters-emplacement">
@@ -830,6 +842,7 @@
             var expired = 0;
             var outOfStock = 0;
             var lowStock = 0;
+            var toRenew = 0;
             
             for (var i = 0; i < items.length; i++) {
                 var days = getDays(items[i].datePeremption);
@@ -840,6 +853,11 @@
                     outOfStock++;
                 } else if (qty === 1) {
                     lowStock++;
+                }
+                
+                // Vérifier "à renouveler"
+                if (items[i].aRenouveler) {
+                    toRenew++;
                 }
                 
                 // Vérifier les dates
@@ -853,12 +871,12 @@
             
             var total = today + tomorrow + twoDays;
             
-            // Mettre à jour le badge (inclure les ruptures de stock)
-            updateBadge(total + expired + outOfStock);
+            // Mettre à jour le badge (inclure les ruptures de stock ET à renouveler)
+            updateBadge(total + expired + outOfStock + toRenew);
             
-            // Afficher la bannière si des produits urgents OU en rupture de stock
-            if (total > 0 || expired > 0 || outOfStock > 0 || lowStock > 0) {
-                showAlertBanner(today, tomorrow, twoDays, expired, outOfStock, lowStock);
+            // Afficher la bannière si des produits urgents OU en rupture de stock OU à renouveler
+            if (total > 0 || expired > 0 || outOfStock > 0 || lowStock > 0 || toRenew > 0) {
+                showAlertBanner(today, tomorrow, twoDays, expired, outOfStock, lowStock, toRenew);
                 
                 // Afficher le prompt de notification si pas encore répondu
                 var notificationAsked = localStorage.getItem('notification-asked');
@@ -875,6 +893,10 @@
                     
                     if (outOfStock > 0) {
                         notifBody += '📦 ' + outOfStock + ' produit' + (outOfStock > 1 ? 's' : '') + ' épuisé' + (outOfStock > 1 ? 's' : '');
+                    }
+                    if (toRenew > 0) {
+                        if (notifBody) notifBody += ' · ';
+                        notifBody += '📝 ' + toRenew + ' à renouveler';
                     }
                     if (lowStock > 0) {
                         if (notifBody) notifBody += ' · ';
@@ -903,13 +925,16 @@
             }
         }
         
-        function showAlertBanner(today, tomorrow, twoDays, expired, outOfStock, lowStock) {
+        function showAlertBanner(today, tomorrow, twoDays, expired, outOfStock, lowStock, toRenew) {
             var banner = document.getElementById('alertBanner');
             var messages = [];
             
             // Alertes de stock en premier (le plus important)
             if (outOfStock > 0) {
                 messages.push('📦 ' + outOfStock + ' produit' + (outOfStock > 1 ? 's' : '') + ' ÉPUISÉ' + (outOfStock > 1 ? 'S' : ''));
+            }
+            if (toRenew > 0) {
+                messages.push('📝 ' + toRenew + ' à renouveler');
             }
             if (lowStock > 0) {
                 messages.push('⚠️ ' + lowStock + ' produit' + (lowStock > 1 ? 's' : '') + ' bientôt épuisé' + (lowStock > 1 ? 's' : '') + ' (1 restant)');
@@ -941,6 +966,7 @@
             // Compter les différents types d'alertes
             var outOfStock = 0;
             var lowStock = 0;
+            var toRenew = 0;
             var expiredOrSoon = 0;
             
             for (var i = 0; i < items.length; i++) {
@@ -949,6 +975,7 @@
                 
                 if (qty === 0) outOfStock++;
                 if (qty === 1) lowStock++;
+                if (items[i].aRenouveler) toRenew++;
                 if (days !== null && (days < 0 || (days >= 0 && days <= 3))) expiredOrSoon++;
             }
             
@@ -956,6 +983,9 @@
             if (outOfStock > 0) {
                 // Priorité aux produits épuisés
                 currentFilter = 'out_of_stock';
+            } else if (toRenew > 0) {
+                // Ensuite, les produits à renouveler
+                currentFilter = 'to_renew';
             } else if (expiredOrSoon > 0) {
                 // Sinon, montrer les produits qui expirent bientôt ou périmés
                 currentFilter = 'soon';
@@ -1012,6 +1042,7 @@
                 if (currentFilter === 'soon') statusMatch = d !== null && d >= 0 && d <= 3;
                 if (currentFilter === 'fresh') statusMatch = d === null || d > 3;
                 if (currentFilter === 'out_of_stock') statusMatch = qty === 0;
+                if (currentFilter === 'to_renew') statusMatch = item.aRenouveler === true;
                 
                 var emplacementMatch = currentEmplacement === 'all' || (item.emplacement || 'frigo') === currentEmplacement;
                 
@@ -1054,6 +1085,11 @@
                         html += '<div class="stock-alert">⚠️ Stock épuisé</div>';
                     } else {
                         html += '<div class="quantity-badge">📦 Quantité: ' + qty + '</div>';
+                    }
+                    
+                    // Afficher le badge "À renouveler"
+                    if (item.aRenouveler) {
+                        html += '<div class="renouveler-badge">📝 À renouveler</div>';
                     }
                     
                     html += '<div class="item-info">📅 Ajouté: ' + new Date(item.dateAjout).toLocaleDateString('fr-FR') + '</div>' +
@@ -1367,6 +1403,12 @@
                     '</div>' +
                     '<div class="date-suggestion">💡 Nombre d\'unités</div>' +
                     '</div>' +
+                    '<div class="form-group">' +
+                    '<label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">' +
+                    '<input type="checkbox" id="formRenouveler" ' + (productData.aRenouveler ? 'checked' : '') + ' style="width: 20px; height: 20px; cursor: pointer;">' +
+                    '<span style="font-weight: 600;">📝 À renouveler (ajouter à la liste de courses)</span>' +
+                    '</label>' +
+                    '</div>' +
                     '<button class="btn" id="btnAdd" style="background:#667eea;font-size:18px;padding:15px;margin-top:10px">✓ Ajouter au frigo</button>' +
                     '<button class="btn" id="btnCancel" style="background:#ccc;color:#333;font-size:18px;padding:15px">✕ Annuler</button>';
             
@@ -1425,6 +1467,7 @@
                     categorie: document.getElementById('formCategorie').value,
                     emplacement: document.getElementById('formEmplacement').value,
                     quantite: parseInt(document.getElementById('formQuantite').value) || 1,
+                    aRenouveler: document.getElementById('formRenouveler').checked,
                     dateAjout: new Date().toISOString().split('T')[0],
                     image: customImageData,
                     barcode: productData.barcode || null
@@ -1514,6 +1557,12 @@
                     '</div>' +
                     '<div class="date-suggestion">💡 Nombre d\'unités</div>' +
                     '</div>' +
+                    '<div class="form-group">' +
+                    '<label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">' +
+                    '<input type="checkbox" id="formRenouveler" ' + (item.aRenouveler ? 'checked' : '') + ' style="width: 20px; height: 20px; cursor: pointer;">' +
+                    '<span style="font-weight: 600;">📝 À renouveler (ajouter à la liste de courses)</span>' +
+                    '</label>' +
+                    '</div>' +
                     '<button class="btn" id="btnUpdate" style="background:#667eea;font-size:18px;padding:15px;margin-top:10px">✓ Enregistrer</button>' +
                     '<button class="btn" id="btnCancel" style="background:#ccc;color:#333;font-size:18px;padding:15px">✕ Annuler</button>';
             
@@ -1570,6 +1619,7 @@
                     items[index].categorie = document.getElementById('formCategorie').value;
                     items[index].emplacement = document.getElementById('formEmplacement').value;
                     items[index].quantite = parseInt(document.getElementById('formQuantite').value) || 0;
+                    items[index].aRenouveler = document.getElementById('formRenouveler').checked;
                     items[index].image = customImageData;
                 }
                 
