@@ -32,11 +32,72 @@
             text-align: center;
             color: white;
             margin-bottom: 30px;
+            position: relative;
         }
         
         .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
+        }
+        
+        .settings-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            font-size: 24px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .settings-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0.95);
+        }
+        
+        .settings-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        
+        .settings-menu.active {
+            display: flex;
+        }
+        
+        .settings-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .settings-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .settings-section h4 {
+            margin-top: 0;
+            color: #333;
+            font-size: 1.1em;
         }
         
         .stats {
@@ -630,12 +691,40 @@
             margin: 10px 0;
         }
     </style>
+    <!-- Bibliothèque SheetJS pour Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🧊 Frigo Manager</h1>
             <p>Scanner de code-barres intelligent</p>
+            <button class="settings-btn" onclick="toggleSettings()">⚙️</button>
+        </div>
+
+        <div id="settingsMenu" class="settings-menu">
+            <div class="settings-content">
+                <h3 style="margin-top: 0; color: #667eea;">⚙️ Paramètres</h3>
+                
+                <div class="settings-section">
+                    <h4>💾 Sauvegarde</h4>
+                    <button class="btn" onclick="exportData()" style="background: #10b981; margin-bottom: 10px;">📤 Exporter JSON</button>
+                    <button class="btn" onclick="exportExcel()" style="background: #059669; margin-bottom: 10px;">📊 Exporter Excel</button>
+                    <button class="btn" onclick="document.getElementById('importFile').click()" style="background: #3b82f6; margin-bottom: 10px;">📥 Importer JSON</button>
+                    <button class="btn" onclick="document.getElementById('importExcel').click()" style="background: #2563eb; margin-bottom: 10px;">📊 Importer Excel</button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                    <input type="file" id="importExcel" accept=".xlsx,.xls" style="display: none;" onchange="importExcel(event)">
+                    <p style="font-size: 0.85em; color: #666; margin: 10px 0;">Sauvegardez vos données ou transférez-les vers un autre appareil</p>
+                </div>
+                
+                <div class="settings-section">
+                    <h4>🗑️ Données</h4>
+                    <button class="btn" onclick="confirmDeleteAll()" style="background: #ef4444;">Supprimer toutes les données</button>
+                    <p style="font-size: 0.85em; color: #666; margin: 10px 0;">Attention : cette action est irréversible</p>
+                </div>
+                
+                <button class="btn" onclick="toggleSettings()" style="background: #ccc; color: #333; margin-top: 20px;">✕ Fermer</button>
+            </div>
         </div>
 
         <div id="alertBanner" class="alert-banner"></div>
@@ -1521,6 +1610,277 @@
             setTimeout(function() {
                 document.getElementById('formNom').focus();
             }, 100);
+        }
+
+        // === FONCTIONS IMPORT/EXPORT ===
+        
+        function toggleSettings() {
+            var menu = document.getElementById('settingsMenu');
+            menu.classList.toggle('active');
+        }
+        
+        function exportData() {
+            try {
+                // Récupérer toutes les données
+                var data = {
+                    version: "1.0",
+                    exportDate: new Date().toISOString(),
+                    items: items,
+                    notificationAsked: localStorage.getItem('notification-asked') === 'true'
+                };
+                
+                // Créer un fichier JSON
+                var dataStr = JSON.stringify(data, null, 2);
+                var dataBlob = new Blob([dataStr], { type: 'application/json' });
+                
+                // Créer un lien de téléchargement
+                var url = URL.createObjectURL(dataBlob);
+                var link = document.createElement('a');
+                link.href = url;
+                link.download = 'frigo-manager-backup-' + new Date().toISOString().split('T')[0] + '.json';
+                
+                // Déclencher le téléchargement
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                alert('✅ Données exportées avec succès !\n\n' + items.length + ' produits sauvegardés.');
+                toggleSettings();
+            } catch (err) {
+                alert('❌ Erreur lors de l\'export : ' + err.message);
+            }
+        }
+        
+        function importData(event) {
+            var file = event.target.files[0];
+            if (!file) return;
+            
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    var data = JSON.parse(e.target.result);
+                    
+                    // Vérifier la structure
+                    if (!data.items || !Array.isArray(data.items)) {
+                        throw new Error('Format de fichier invalide');
+                    }
+                    
+                    // Demander confirmation
+                    if (items.length > 0) {
+                        var confirm = window.confirm(
+                            '⚠️ ATTENTION\n\n' +
+                            'Vous avez actuellement ' + items.length + ' produits.\n' +
+                            'Le fichier contient ' + data.items.length + ' produits.\n\n' +
+                            'Voulez-vous REMPLACER vos données actuelles ?\n\n' +
+                            '(Cliquez "Annuler" pour ajouter les produits sans supprimer les actuels)'
+                        );
+                        
+                        if (confirm) {
+                            // Remplacer
+                            items = data.items;
+                        } else {
+                            // Ajouter
+                            data.items.forEach(function(item) {
+                                // Changer les IDs pour éviter les conflits
+                                item.id = Date.now() + Math.random();
+                                items.push(item);
+                            });
+                        }
+                    } else {
+                        // Pas de données actuelles, importer directement
+                        items = data.items;
+                    }
+                    
+                    // Sauvegarder
+                    saveItems();
+                    renderAll();
+                    toggleSettings();
+                    
+                    alert('✅ Import réussi !\n\n' + data.items.length + ' produits importés.');
+                } catch (err) {
+                    alert('❌ Erreur lors de l\'import : ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset l'input pour permettre de réimporter le même fichier
+            event.target.value = '';
+        }
+        
+        // === FONCTIONS EXCEL ===
+        
+        function exportExcel() {
+            try {
+                if (items.length === 0) {
+                    alert('❌ Aucun produit à exporter');
+                    return;
+                }
+                
+                // Préparer les données pour Excel
+                var excelData = items.map(function(item) {
+                    return {
+                        'Nom': item.nom || '',
+                        'Code-barres': item.barcode || '',
+                        'Date d\'ajout': item.dateAjout ? new Date(item.dateAjout).toLocaleDateString('fr-FR') : '',
+                        'Date d\'expiration': item.datePeremption ? new Date(item.datePeremption).toLocaleDateString('fr-FR') : '',
+                        'Catégorie': item.categorie || '',
+                        'Emplacement': item.emplacement || '',
+                        'Quantité': item.quantite || 0,
+                        'À renouveler': item.aRenouveler ? 'Oui' : 'Non'
+                    };
+                });
+                
+                // Créer un nouveau workbook
+                var wb = XLSX.utils.book_new();
+                
+                // Convertir les données en worksheet
+                var ws = XLSX.utils.json_to_sheet(excelData);
+                
+                // Ajuster la largeur des colonnes
+                var wscols = [
+                    {wch: 25},  // Nom
+                    {wch: 15},  // Code-barres
+                    {wch: 12},  // Date d'ajout
+                    {wch: 15},  // Date d'expiration
+                    {wch: 15},  // Catégorie
+                    {wch: 15},  // Emplacement
+                    {wch: 10},  // Quantité
+                    {wch: 12}   // À renouveler
+                ];
+                ws['!cols'] = wscols;
+                
+                // Ajouter le worksheet au workbook
+                XLSX.utils.book_append_sheet(wb, ws, 'Produits');
+                
+                // Générer le fichier Excel
+                var filename = 'frigo-manager-' + new Date().toISOString().split('T')[0] + '.xlsx';
+                XLSX.writeFile(wb, filename);
+                
+                alert('✅ Export Excel réussi !\n\n' + items.length + ' produits exportés dans ' + filename);
+                toggleSettings();
+            } catch (err) {
+                alert('❌ Erreur lors de l\'export Excel : ' + err.message);
+                console.error(err);
+            }
+        }
+        
+        function importExcel(event) {
+            var file = event.target.files[0];
+            if (!file) return;
+            
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    // Lire le fichier Excel
+                    var data = new Uint8Array(e.target.result);
+                    var workbook = XLSX.read(data, {type: 'array'});
+                    
+                    // Prendre la première feuille
+                    var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    
+                    // Convertir en JSON
+                    var excelData = XLSX.utils.sheet_to_json(firstSheet);
+                    
+                    if (excelData.length === 0) {
+                        throw new Error('Le fichier Excel est vide');
+                    }
+                    
+                    // Convertir les données Excel en format interne
+                    var importedItems = excelData.map(function(row) {
+                        // Parser les dates
+                        var dateAjout = null;
+                        if (row['Date d\'ajout']) {
+                            var parts = row['Date d\'ajout'].split('/');
+                            if (parts.length === 3) {
+                                dateAjout = parts[2] + '-' + parts[1].padStart(2, '0') + '-' + parts[0].padStart(2, '0');
+                            }
+                        }
+                        
+                        var datePeremption = null;
+                        if (row['Date d\'expiration']) {
+                            var parts2 = row['Date d\'expiration'].split('/');
+                            if (parts2.length === 3) {
+                                datePeremption = parts2[2] + '-' + parts2[1].padStart(2, '0') + '-' + parts2[0].padStart(2, '0');
+                            }
+                        }
+                        
+                        return {
+                            id: Date.now() + Math.random(),
+                            nom: row['Nom'] || 'Produit',
+                            barcode: row['Code-barres'] || null,
+                            dateAjout: dateAjout || new Date().toISOString().split('T')[0],
+                            datePeremption: datePeremption,
+                            categorie: row['Catégorie'] || 'autre',
+                            emplacement: row['Emplacement'] || 'frigo',
+                            quantite: parseInt(row['Quantité']) || 1,
+                            aRenouveler: row['À renouveler'] === 'Oui',
+                            image: null
+                        };
+                    });
+                    
+                    // Demander confirmation
+                    if (items.length > 0) {
+                        var confirm = window.confirm(
+                            '⚠️ ATTENTION\n\n' +
+                            'Vous avez actuellement ' + items.length + ' produits.\n' +
+                            'Le fichier Excel contient ' + importedItems.length + ' produits.\n\n' +
+                            'Voulez-vous REMPLACER vos données actuelles ?\n\n' +
+                            '(Cliquez "Annuler" pour ajouter les produits sans supprimer les actuels)'
+                        );
+                        
+                        if (confirm) {
+                            // Remplacer
+                            items = importedItems;
+                        } else {
+                            // Ajouter
+                            items = items.concat(importedItems);
+                        }
+                    } else {
+                        // Pas de données actuelles, importer directement
+                        items = importedItems;
+                    }
+                    
+                    // Sauvegarder
+                    saveItems();
+                    renderAll();
+                    toggleSettings();
+                    
+                    alert('✅ Import Excel réussi !\n\n' + importedItems.length + ' produits importés.');
+                } catch (err) {
+                    alert('❌ Erreur lors de l\'import Excel : ' + err.message);
+                    console.error(err);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            
+            // Reset l'input
+            event.target.value = '';
+        }
+        
+        function confirmDeleteAll() {
+            var confirm1 = window.confirm(
+                '⚠️ SUPPRIMER TOUTES LES DONNÉES ?\n\n' +
+                'Cette action supprimera définitivement tous vos ' + items.length + ' produits.\n\n' +
+                'Cette action est IRRÉVERSIBLE.\n\n' +
+                'Êtes-vous sûr ?'
+            );
+            
+            if (!confirm1) return;
+            
+            var confirm2 = window.confirm(
+                '⚠️ DERNIÈRE CONFIRMATION\n\n' +
+                'Voulez-vous vraiment supprimer TOUTES les données ?\n\n' +
+                'Pensez à exporter vos données avant si vous voulez les sauvegarder.'
+            );
+            
+            if (confirm2) {
+                items = [];
+                saveItems();
+                renderAll();
+                toggleSettings();
+                alert('✅ Toutes les données ont été supprimées.');
+            }
         }
 
         function closeForm() {
