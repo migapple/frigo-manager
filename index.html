@@ -1364,6 +1364,28 @@
                     <p style="font-size: 0.85em; color: #666; margin: 10px 0;">Attention : cette action est irréversible</p>
                 </div>
                 
+                <div class="settings-section" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0ea5e9;">
+                    <h4 style="color: #0369a1;">ℹ️ À propos</h4>
+                    <div style="text-align: center; margin: 15px 0;">
+                        <div style="font-size: 3em; margin-bottom: 10px;">🧊</div>
+                        <div style="font-size: 1.2em; font-weight: bold; color: #0369a1; margin-bottom: 5px;">Frigo Manager</div>
+                        <div style="font-size: 0.9em; color: #64748b; margin-bottom: 15px;">Version 1.0</div>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 10px; margin: 10px 0;">
+                        <div style="font-size: 0.95em; color: #334155; margin-bottom: 8px;">
+                            <strong>👨‍💻 Développé par :</strong><br>
+                            <span style="color: #0369a1; font-weight: 600;">Michel Garlandat</span>
+                        </div>
+                        <div style="font-size: 0.85em; color: #64748b; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+                            🤖 Réalisé à l'aide d'<strong>Anthropic Claude</strong>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.75em; color: #64748b; text-align: center; margin-top: 15px;">
+                        © 2026 Michel Garlandat<br>
+                        Tous droits réservés
+                    </div>
+                </div>
+                
                 <button class="btn" onclick="toggleSettings()" style="background: #ccc; color: #333; margin-top: 20px;">✕ Fermer</button>
             </div>
         </div>
@@ -2728,7 +2750,7 @@
             // Filtrer les produits à acheter
             var toShop = items.filter(function(item) {
                 var qty = getQuantity(item.quantite);
-                return qty === 0 || item.aRenouveler || qty === 1;
+                return qty === 0 || item.aRenouveler;
             });
             
             // Afficher le modal
@@ -2753,8 +2775,6 @@
                         reason = '📦 Stock épuisé';
                     } else if (item.aRenouveler) {
                         reason = '📝 À renouveler';
-                    } else if (qty === 1) {
-                        reason = '⚠️ Bientôt épuisé (1 restant)';
                     }
                     
                     var isChecked = shoppingListState[item.id] || false;
@@ -2786,7 +2806,7 @@
         function exportShoppingListText() {
             var toShop = items.filter(function(item) {
                 var qty = getQuantity(item.quantite);
-                return qty === 0 || item.aRenouveler || qty === 1;
+                return qty === 0 || item.aRenouveler;
             });
             
             if (toShop.length === 0) {
@@ -2804,8 +2824,6 @@
                     reason = ' (épuisé)';
                 } else if (item.aRenouveler) {
                     reason = ' (à renouveler)';
-                } else if (qty === 1) {
-                    reason = ' (1 restant)';
                 }
                 
                 var checked = shoppingListState[item.id] ? '✓' : '☐';
@@ -2836,7 +2854,7 @@
         function printShoppingList() {
             var toShop = items.filter(function(item) {
                 var qty = getQuantity(item.quantite);
-                return qty === 0 || item.aRenouveler || qty === 1;
+                return qty === 0 || item.aRenouveler;
             });
             
             if (toShop.length === 0) {
@@ -2866,8 +2884,6 @@
                     reason = '<span class="reason">(épuisé)</span>';
                 } else if (item.aRenouveler) {
                     reason = '<span class="reason">(à renouveler)</span>';
-                } else if (qty === 1) {
-                    reason = '<span class="reason">(1 restant)</span>';
                 }
                 
                 html += '<div class="item">' +
