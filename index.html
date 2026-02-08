@@ -1430,6 +1430,16 @@
                 if (val > 0) quantityInput.value = val - 1;
             };
             
+            // Forcer le fonctionnement du checkbox sur iOS
+            var checkbox = document.getElementById('formRenouveler');
+            var checkboxLabel = document.querySelector('label[for="formRenouveler"]');
+            if (checkbox && checkboxLabel) {
+                checkboxLabel.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    checkbox.checked = !checkbox.checked;
+                });
+            }
+            
             document.getElementById('customPhoto').addEventListener('change', function(e) {
                 var file = e.target.files[0];
                 if (!file) return;
@@ -1581,6 +1591,16 @@
                 if (isNaN(val)) val = 1;
                 if (val > 0) quantityInput.value = val - 1;
             };
+            
+            // Forcer le fonctionnement du checkbox sur iOS
+            var checkbox = document.getElementById('formRenouveler');
+            var checkboxLabel = document.querySelector('label[for="formRenouveler"]');
+            if (checkbox && checkboxLabel) {
+                checkboxLabel.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    checkbox.checked = !checkbox.checked;
+                });
+            }
             
             document.getElementById('customPhoto').addEventListener('change', function(e) {
                 var file = e.target.files[0];
