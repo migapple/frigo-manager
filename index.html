@@ -1737,7 +1737,6 @@
             var twoDays = 0;
             var expired = 0;
             var outOfStock = 0;
-            var lowStock = 0;
             var toRenew = 0;
             
             for (var i = 0; i < items.length; i++) {
@@ -1747,8 +1746,6 @@
                 // Vérifier le stock
                 if (qty === 0) {
                     outOfStock++;
-                } else if (qty === 1) {
-                    lowStock++;
                 }
                 
                 // Vérifier "à renouveler"
@@ -1771,8 +1768,8 @@
             updateBadge(total + expired + outOfStock + toRenew);
             
             // Afficher la bannière si des produits urgents OU en rupture de stock OU à renouveler
-            if (total > 0 || expired > 0 || outOfStock > 0 || lowStock > 0 || toRenew > 0) {
-                showAlertBanner(today, tomorrow, twoDays, expired, outOfStock, lowStock, toRenew);
+            if (total > 0 || expired > 0 || outOfStock > 0 || toRenew > 0) {
+                showAlertBanner(today, tomorrow, twoDays, expired, outOfStock, toRenew);
                 
                 // Afficher le prompt de notification si pas encore répondu
                 var notificationAsked = localStorage.getItem('notification-asked');
@@ -1793,10 +1790,6 @@
                     if (toRenew > 0) {
                         if (notifBody) notifBody += ' · ';
                         notifBody += '📝 ' + toRenew + ' à renouveler';
-                    }
-                    if (lowStock > 0) {
-                        if (notifBody) notifBody += ' · ';
-                        notifBody += '⚠️ ' + lowStock + ' produit' + (lowStock > 1 ? 's' : '') + ' bientôt épuisé' + (lowStock > 1 ? 's' : '');
                     }
                     if (expired > 0) {
                         if (notifBody) notifBody += ' · ';
@@ -1821,7 +1814,7 @@
             }
         }
         
-        function showAlertBanner(today, tomorrow, twoDays, expired, outOfStock, lowStock, toRenew) {
+        function showAlertBanner(today, tomorrow, twoDays, expired, outOfStock, toRenew) {
             var banner = document.getElementById('alertBanner');
             var messages = [];
             
@@ -1831,9 +1824,6 @@
             }
             if (toRenew > 0) {
                 messages.push('📝 ' + toRenew + ' à renouveler');
-            }
-            if (lowStock > 0) {
-                messages.push('⚠️ ' + lowStock + ' produit' + (lowStock > 1 ? 's' : '') + ' bientôt épuisé' + (lowStock > 1 ? 's' : '') + ' (1 restant)');
             }
             
             // Alertes de date
@@ -1861,7 +1851,6 @@
         function viewUrgentProducts() {
             // Compter les différents types d'alertes
             var outOfStock = 0;
-            var lowStock = 0;
             var toRenew = 0;
             var expiredOrSoon = 0;
             
@@ -1870,7 +1859,6 @@
                 var days = getDays(items[i].datePeremption);
                 
                 if (qty === 0) outOfStock++;
-                if (qty === 1) lowStock++;
                 if (items[i].aRenouveler) toRenew++;
                 if (days !== null && (days < 0 || (days >= 0 && days <= 3))) expiredOrSoon++;
             }
