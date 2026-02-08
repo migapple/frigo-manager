@@ -1146,6 +1146,165 @@
             font-weight: bold;
             font-size: 1.1em;
         }
+        
+        /* Création de recette */
+        .create-recipe-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            z-index: 5000;
+            overflow-y: auto;
+        }
+        
+        .create-recipe-modal.active {
+            display: block;
+        }
+        
+        .create-recipe-content {
+            background: white;
+            min-height: 100%;
+        }
+        
+        .create-recipe-header {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        .create-recipe-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        
+        .btn-close-create-recipe {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .create-recipe-body {
+            padding: 30px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .emoji-picker {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
+        
+        .emoji-btn {
+            font-size: 2em;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .emoji-btn:active {
+            transform: scale(0.9);
+            background: #f0f0f0;
+        }
+        
+        .emoji-btn.selected {
+            border-color: #10b981;
+            background: #d1fae5;
+        }
+        
+        .ingredient-field, .step-field {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .ingredient-field input, .step-field textarea {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+        
+        .step-field textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+        
+        .btn-remove-field {
+            background: #ef4444;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .create-recipe-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .create-recipe-actions .btn {
+            flex: 1;
+        }
+        
+        .user-recipe-badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .recipe-actions-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
     </style>
     <!-- Bibliothèque SheetJS pour Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -1228,6 +1387,7 @@
                     <div class="recipes-stat">
                         <span class="recipes-stat-label">Avec vos ingrédients disponibles</span>
                     </div>
+                    <button class="btn" onclick="openCreateRecipe()" style="background: #10b981; margin-top: 10px;">➕ Créer une recette</button>
                 </div>
                 
                 <div id="recipesListItems" class="recipes-list-items">
@@ -1248,6 +1408,83 @@
                 </div>
                 <div id="recipeDetailBody" class="recipe-detail-body">
                     <!-- Le détail de la recette sera ajouté ici -->
+                </div>
+            </div>
+        </div>
+
+        <div id="createRecipeModal" class="create-recipe-modal">
+            <div class="create-recipe-content">
+                <div class="create-recipe-header">
+                    <h2 id="createRecipeTitle">➕ Créer une recette</h2>
+                    <button class="btn-close-create-recipe" onclick="closeCreateRecipe()">✕</button>
+                </div>
+                
+                <div class="create-recipe-body">
+                    <div class="form-group">
+                        <label>Nom de la recette *</label>
+                        <input type="text" id="recipeNameInput" placeholder="Ex: Gratin dauphinois" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Icône (emoji)</label>
+                        <div class="emoji-picker">
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🍳')">🍳</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🥗')">🥗</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🍝')">🍝</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🥪')">🥪</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🥤')">🥤</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🍚')">🍚</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🍗')">🍗</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🍲')">🍲</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🥖')">🥖</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🥄')">🥄</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🍕')">🍕</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🍔')">🍔</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🌮')">🌮</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🍛')">🍛</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🍜')">🍜</button>
+                            <button type="button" class="emoji-btn" onclick="selectEmoji('🥘')">🥘</button>
+                        </div>
+                        <input type="hidden" id="recipeIconInput" value="🍳">
+                        <div id="selectedEmoji" style="font-size: 3em; text-align: center; margin: 10px 0;">🍳</div>
+                    </div>
+                    
+                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                        <div>
+                            <label>Temps</label>
+                            <input type="text" id="recipeTimeInput" placeholder="Ex: 30 min" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                        </div>
+                        <div>
+                            <label>Difficulté</label>
+                            <select id="recipeDifficultyInput" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                                <option>Très facile</option>
+                                <option>Facile</option>
+                                <option>Moyen</option>
+                                <option>Difficile</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Portions</label>
+                            <input type="number" id="recipeServingsInput" value="2" min="1" max="20" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Ingrédients *</label>
+                        <div id="ingredientsList"></div>
+                        <button type="button" class="btn" onclick="addIngredientField()" style="background: #3b82f6; margin-top: 10px;">➕ Ajouter un ingrédient</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Étapes de préparation *</label>
+                        <div id="stepsList"></div>
+                        <button type="button" class="btn" onclick="addStepField()" style="background: #3b82f6; margin-top: 10px;">➕ Ajouter une étape</button>
+                    </div>
+                    
+                    <div class="create-recipe-actions">
+                        <button class="btn" onclick="saveRecipe()" style="background: #10b981;">✓ Enregistrer</button>
+                        <button class="btn" onclick="closeCreateRecipe()" style="background: #6b7280;">✕ Annuler</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2551,6 +2788,17 @@
         
         // === SUGGESTIONS DE RECETTES ===
         
+        var userRecipes = JSON.parse(localStorage.getItem('userRecipes') || '[]');
+        var currentEditingRecipeId = null;
+        
+        function saveUserRecipes() {
+            localStorage.setItem('userRecipes', JSON.stringify(userRecipes));
+        }
+        
+        function getAllRecipes() {
+            return recipesDatabase.concat(userRecipes);
+        }
+        
         var recipesDatabase = [
             {
                 id: 1,
@@ -2744,8 +2992,11 @@
                 return p.nom.toLowerCase();
             });
             
+            // Utiliser toutes les recettes (défaut + utilisateur)
+            var allRecipes = getAllRecipes();
+            
             // Calculer le match pour chaque recette
-            var recipesWithMatch = recipesDatabase.map(function(recipe) {
+            var recipesWithMatch = allRecipes.map(function(recipe) {
                 var matchCount = 0;
                 var totalIngredients = recipe.ingredients.length;
                 
@@ -2788,11 +3039,14 @@
                         var matchColor = item.matchPercent >= 80 ? '#10b981' : 
                                         item.matchPercent >= 50 ? '#f59e0b' : '#6b7280';
                         
+                        var isUserRecipe = item.recipe.id >= 1000; // Les recettes utilisateur ont des IDs >= 1000
+                        var userBadge = isUserRecipe ? '<span class="user-recipe-badge">Ma recette</span>' : '';
+                        
                         html += '<div class="recipe-card" onclick="showRecipeDetail(' + item.recipe.id + ')">' +
                                '<div class="recipe-card-header">' +
                                '<div class="recipe-icon">' + item.recipe.icon + '</div>' +
                                '<div class="recipe-card-title">' +
-                               '<div class="recipe-name">' + item.recipe.name + '</div>' +
+                               '<div class="recipe-name">' + item.recipe.name + userBadge + '</div>' +
                                '<div class="recipe-time">⏱️ ' + item.recipe.time + ' • ' + item.recipe.difficulty + '</div>' +
                                '</div>' +
                                '</div>' +
@@ -2815,8 +3069,11 @@
         }
         
         function showRecipeDetail(recipeId) {
-            var recipe = recipesDatabase.find(function(r) { return r.id === recipeId; });
+            var allRecipes = getAllRecipes();
+            var recipe = allRecipes.find(function(r) { return r.id === recipeId; });
             if (!recipe) return;
+            
+            var isUserRecipe = recipeId >= 1000;
             
             // Récupérer les produits disponibles
             var availableProducts = items.filter(function(item) {
@@ -2873,12 +3130,244 @@
             
             html += '</ol></div>';
             
+            // Ajouter les boutons modifier/supprimer si c'est une recette utilisateur
+            if (isUserRecipe) {
+                html += '<div class="recipe-actions-bar">' +
+                       '<button class="btn" onclick="editRecipe(' + recipeId + ')" style="background: #f59e0b; flex: 1;">✏️ Modifier</button>' +
+                       '<button class="btn" onclick="deleteRecipe(' + recipeId + ')" style="background: #ef4444; flex: 1;">🗑️ Supprimer</button>' +
+                       '</div>';
+            }
+            
             document.getElementById('recipeDetailBody').innerHTML = html;
             document.getElementById('recipeDetailModal').classList.add('active');
         }
         
         function closeRecipeDetail() {
             document.getElementById('recipeDetailModal').classList.remove('active');
+        }
+        
+        // === CRÉATION/MODIFICATION DE RECETTES ===
+        
+        function openCreateRecipe() {
+            currentEditingRecipeId = null;
+            document.getElementById('createRecipeTitle').textContent = '➕ Créer une recette';
+            document.getElementById('recipeNameInput').value = '';
+            document.getElementById('recipeIconInput').value = '🍳';
+            document.getElementById('selectedEmoji').textContent = '🍳';
+            document.getElementById('recipeTimeInput').value = '';
+            document.getElementById('recipeDifficultyInput').value = 'Facile';
+            document.getElementById('recipeServingsInput').value = '2';
+            document.getElementById('ingredientsList').innerHTML = '';
+            document.getElementById('stepsList').innerHTML = '';
+            
+            // Ajouter 3 champs ingrédients par défaut
+            addIngredientField();
+            addIngredientField();
+            addIngredientField();
+            
+            // Ajouter 3 champs étapes par défaut
+            addStepField();
+            addStepField();
+            addStepField();
+            
+            // Sélectionner tous les boutons emoji
+            var emojiButtons = document.querySelectorAll('.emoji-btn');
+            emojiButtons.forEach(function(btn) {
+                btn.classList.remove('selected');
+            });
+            emojiButtons[0].classList.add('selected');
+            
+            document.getElementById('createRecipeModal').classList.add('active');
+        }
+        
+        function closeCreateRecipe() {
+            document.getElementById('createRecipeModal').classList.remove('active');
+        }
+        
+        function selectEmoji(emoji) {
+            document.getElementById('recipeIconInput').value = emoji;
+            document.getElementById('selectedEmoji').textContent = emoji;
+            
+            // Mettre à jour la sélection visuelle
+            var emojiButtons = document.querySelectorAll('.emoji-btn');
+            emojiButtons.forEach(function(btn) {
+                if (btn.textContent === emoji) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+        }
+        
+        function addIngredientField(value) {
+            var ingredientsList = document.getElementById('ingredientsList');
+            var fieldId = 'ingredient_' + Date.now();
+            
+            var html = '<div class="ingredient-field" id="' + fieldId + '">' +
+                      '<input type="text" placeholder="Ex: tomates" value="' + (value || '') + '">' +
+                      '<button type="button" class="btn-remove-field" onclick="removeField(\'' + fieldId + '\')">✕</button>' +
+                      '</div>';
+            
+            ingredientsList.insertAdjacentHTML('beforeend', html);
+        }
+        
+        function addStepField(value) {
+            var stepsList = document.getElementById('stepsList');
+            var fieldId = 'step_' + Date.now();
+            
+            var html = '<div class="step-field" id="' + fieldId + '">' +
+                      '<textarea placeholder="Décrivez l\'étape...">' + (value || '') + '</textarea>' +
+                      '<button type="button" class="btn-remove-field" onclick="removeField(\'' + fieldId + '\')">✕</button>' +
+                      '</div>';
+            
+            stepsList.insertAdjacentHTML('beforeend', html);
+        }
+        
+        function removeField(fieldId) {
+            var field = document.getElementById(fieldId);
+            if (field) field.remove();
+        }
+        
+        function saveRecipe() {
+            // Récupérer les valeurs
+            var name = document.getElementById('recipeNameInput').value.trim();
+            var icon = document.getElementById('recipeIconInput').value;
+            var time = document.getElementById('recipeTimeInput').value.trim();
+            var difficulty = document.getElementById('recipeDifficultyInput').value;
+            var servings = parseInt(document.getElementById('recipeServingsInput').value);
+            
+            // Validation
+            if (!name) {
+                alert('❌ Veuillez entrer un nom de recette');
+                return;
+            }
+            
+            if (!time) {
+                alert('❌ Veuillez entrer un temps de préparation');
+                return;
+            }
+            
+            // Récupérer les ingrédients
+            var ingredientInputs = document.querySelectorAll('#ingredientsList input');
+            var ingredients = [];
+            ingredientInputs.forEach(function(input) {
+                var value = input.value.trim().toLowerCase();
+                if (value) ingredients.push(value);
+            });
+            
+            if (ingredients.length === 0) {
+                alert('❌ Veuillez ajouter au moins un ingrédient');
+                return;
+            }
+            
+            // Récupérer les étapes
+            var stepTextareas = document.querySelectorAll('#stepsList textarea');
+            var steps = [];
+            stepTextareas.forEach(function(textarea) {
+                var value = textarea.value.trim();
+                if (value) steps.push(value);
+            });
+            
+            if (steps.length === 0) {
+                alert('❌ Veuillez ajouter au moins une étape');
+                return;
+            }
+            
+            // Créer ou modifier la recette
+            if (currentEditingRecipeId) {
+                // Modification
+                var index = userRecipes.findIndex(function(r) { return r.id === currentEditingRecipeId; });
+                if (index !== -1) {
+                    userRecipes[index] = {
+                        id: currentEditingRecipeId,
+                        name: name,
+                        icon: icon,
+                        time: time,
+                        difficulty: difficulty,
+                        servings: servings,
+                        ingredients: ingredients,
+                        steps: steps
+                    };
+                }
+            } else {
+                // Création
+                var newRecipe = {
+                    id: 1000 + userRecipes.length + Math.floor(Math.random() * 1000),
+                    name: name,
+                    icon: icon,
+                    time: time,
+                    difficulty: difficulty,
+                    servings: servings,
+                    ingredients: ingredients,
+                    steps: steps
+                };
+                userRecipes.push(newRecipe);
+            }
+            
+            // Sauvegarder
+            saveUserRecipes();
+            closeCreateRecipe();
+            openRecipes(); // Rafraîchir la liste
+            
+            alert('✅ Recette ' + (currentEditingRecipeId ? 'modifiée' : 'créée') + ' avec succès !');
+        }
+        
+        function editRecipe(recipeId) {
+            var recipe = userRecipes.find(function(r) { return r.id === recipeId; });
+            if (!recipe) return;
+            
+            currentEditingRecipeId = recipeId;
+            
+            // Fermer le détail
+            closeRecipeDetail();
+            
+            // Remplir le formulaire
+            document.getElementById('createRecipeTitle').textContent = '✏️ Modifier la recette';
+            document.getElementById('recipeNameInput').value = recipe.name;
+            document.getElementById('recipeIconInput').value = recipe.icon;
+            document.getElementById('selectedEmoji').textContent = recipe.icon;
+            document.getElementById('recipeTimeInput').value = recipe.time;
+            document.getElementById('recipeDifficultyInput').value = recipe.difficulty;
+            document.getElementById('recipeServingsInput').value = recipe.servings;
+            
+            // Remplir les ingrédients
+            document.getElementById('ingredientsList').innerHTML = '';
+            recipe.ingredients.forEach(function(ing) {
+                addIngredientField(ing);
+            });
+            
+            // Remplir les étapes
+            document.getElementById('stepsList').innerHTML = '';
+            recipe.steps.forEach(function(step) {
+                addStepField(step);
+            });
+            
+            // Sélectionner l'emoji
+            var emojiButtons = document.querySelectorAll('.emoji-btn');
+            emojiButtons.forEach(function(btn) {
+                if (btn.textContent === recipe.icon) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+            
+            document.getElementById('createRecipeModal').classList.add('active');
+        }
+        
+        function deleteRecipe(recipeId) {
+            var recipe = userRecipes.find(function(r) { return r.id === recipeId; });
+            if (!recipe) return;
+            
+            var confirm = window.confirm('⚠️ Supprimer la recette "' + recipe.name + '" ?\n\nCette action est irréversible.');
+            
+            if (confirm) {
+                userRecipes = userRecipes.filter(function(r) { return r.id !== recipeId; });
+                saveUserRecipes();
+                closeRecipeDetail();
+                openRecipes(); // Rafraîchir la liste
+                alert('✅ Recette supprimée avec succès');
+            }
         }
         
         function confirmDeleteAll() {
