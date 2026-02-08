@@ -225,14 +225,14 @@
         
         .filters {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 8px;
             margin-bottom: 20px;
             padding: 0;
         }
         
         .filter-btn {
-            padding: 12px 8px;
+            padding: 12px 4px;
             border: none;
             border-radius: 10px;
             background: white;
@@ -240,7 +240,7 @@
             cursor: pointer;
             white-space: nowrap;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            font-size: 0.9em;
+            font-size: 0.85em;
             text-align: center;
         }
         
@@ -686,6 +686,7 @@
             <button class="filter-btn" data-f="fresh">✅ Frais</button>
             <button class="filter-btn" data-f="soon">⚠️ Urgent</button>
             <button class="filter-btn" data-f="expired">❌ Périmés</button>
+            <button class="filter-btn" data-f="out_of_stock">📦 Épuisés</button>
         </div>
 
         <div id="filtersEmplacement" class="filters-emplacement">
@@ -932,15 +933,41 @@
         }
         
         function viewUrgentProducts() {
-            // Activer le filtre "Urgent"
-            currentFilter = 'soon';
+            // Compter les différents types d'alertes
+            var outOfStock = 0;
+            var lowStock = 0;
+            var expiredOrSoon = 0;
+            
+            for (var i = 0; i < items.length; i++) {
+                var qty = items[i].quantite || 1;
+                var days = getDays(items[i].datePeremption);
+                
+                if (qty === 0) outOfStock++;
+                if (qty === 1) lowStock++;
+                if (days !== null && (days < 0 || (days >= 0 && days <= 3))) expiredOrSoon++;
+            }
+            
+            // Choisir le filtre le plus pertinent
+            if (outOfStock > 0) {
+                // Priorité aux produits épuisés
+                currentFilter = 'out_of_stock';
+            } else if (expiredOrSoon > 0) {
+                // Sinon, montrer les produits qui expirent bientôt ou périmés
+                currentFilter = 'soon';
+            } else {
+                // Par défaut, tout montrer
+                currentFilter = 'all';
+            }
+            
+            // Mettre à jour l'UI des boutons
             var filterBtns = document.querySelectorAll('.filter-btn');
             for (var i = 0; i < filterBtns.length; i++) {
                 filterBtns[i].classList.remove('active');
-                if (filterBtns[i].getAttribute('data-f') === 'soon') {
+                if (filterBtns[i].getAttribute('data-f') === currentFilter) {
                     filterBtns[i].classList.add('active');
                 }
             }
+            
             renderItems();
             
             // Scroller vers les produits
@@ -972,11 +999,14 @@
         function renderItems() {
             var filtered = items.filter(function(item) {
                 var d = getDays(item.datePeremption);
+                var qty = item.quantite || 1;
+                
                 var statusMatch = false;
                 if (currentFilter === 'all') statusMatch = true;
                 if (currentFilter === 'expired') statusMatch = d !== null && d < 0;
                 if (currentFilter === 'soon') statusMatch = d !== null && d >= 0 && d <= 3;
                 if (currentFilter === 'fresh') statusMatch = d === null || d > 3;
+                if (currentFilter === 'out_of_stock') statusMatch = qty === 0;
                 
                 var emplacementMatch = currentEmplacement === 'all' || (item.emplacement || 'congelateur') === currentEmplacement;
                 
