@@ -491,6 +491,58 @@
             cursor: pointer;
             font-size: 0.95em;
         }
+        
+        .notification-prompt {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .notification-prompt.show {
+            display: block;
+        }
+        
+        .notification-prompt-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .notification-prompt-text {
+            font-size: 0.95em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .notification-prompt-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px;
+        }
+        
+        .notification-prompt-btn-cancel {
+            background: #e0e0e0;
+            color: #666;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px;
+        }
     </style>
 </head>
 <body>
@@ -501,6 +553,16 @@
         </div>
 
         <div id="alertBanner" class="alert-banner"></div>
+        
+        <div id="notificationPrompt" class="notification-prompt" style="display: none;">
+            <div class="notification-prompt-content">
+                <div style="font-size: 2em; margin-bottom: 10px;">🔔</div>
+                <div class="notification-prompt-title">Activer les notifications</div>
+                <div class="notification-prompt-text">Recevez des alertes quand vos produits arrivent à expiration</div>
+                <button class="notification-prompt-btn" id="btnEnableNotifications">✓ Activer</button>
+                <button class="notification-prompt-btn-cancel" id="btnCancelNotifications">Plus tard</button>
+            </div>
+        </div>
 
         <div id="stats" class="stats">
             <div class="stat-card">
@@ -704,30 +766,38 @@
             // Afficher la bannière si des produits urgents
             if (total > 0 || expired > 0) {
                 showAlertBanner(today, tomorrow, twoDays, expired);
-            }
-            
-            // Envoyer une notification si des produits urgents
-            if (total > 0 || expired > 0) {
-                var notifTitle = '⚠️ Frigo Manager';
-                var notifBody = '';
                 
-                if (expired > 0) {
-                    notifBody += expired + ' produit' + (expired > 1 ? 's périmé' + (expired > 1 ? 's' : '') : ' périmé');
-                }
-                if (today > 0) {
-                    if (notifBody) notifBody += ' · ';
-                    notifBody += today + ' expire' + (today > 1 ? 'nt' : '') + ' aujourd\'hui';
-                }
-                if (tomorrow > 0) {
-                    if (notifBody) notifBody += ' · ';
-                    notifBody += tomorrow + ' expire' + (tomorrow > 1 ? 'nt' : '') + ' demain';
-                }
-                if (twoDays > 0 && !today && !tomorrow) {
-                    if (notifBody) notifBody += ' · ';
-                    notifBody += twoDays + ' dans 2 jours';
+                // Afficher le prompt de notification si pas encore répondu
+                var notificationAsked = localStorage.getItem('notification-asked');
+                if (!notificationAsked && Notification.permission === 'default') {
+                    setTimeout(function() {
+                        document.getElementById('notificationPrompt').classList.add('show');
+                    }, 1000);
                 }
                 
-                sendNotification(notifTitle, notifBody, total);
+                // Envoyer une notification si déjà autorisé
+                if (Notification.permission === 'granted') {
+                    var notifTitle = '⚠️ Frigo Manager';
+                    var notifBody = '';
+                    
+                    if (expired > 0) {
+                        notifBody += expired + ' produit' + (expired > 1 ? 's périmé' + (expired > 1 ? 's' : '') : ' périmé');
+                    }
+                    if (today > 0) {
+                        if (notifBody) notifBody += ' · ';
+                        notifBody += today + ' expire' + (today > 1 ? 'nt' : '') + ' aujourd\'hui';
+                    }
+                    if (tomorrow > 0) {
+                        if (notifBody) notifBody += ' · ';
+                        notifBody += tomorrow + ' expire' + (tomorrow > 1 ? 'nt' : '') + ' demain';
+                    }
+                    if (twoDays > 0 && !today && !tomorrow) {
+                        if (notifBody) notifBody += ' · ';
+                        notifBody += twoDays + ' dans 2 jours';
+                    }
+                    
+                    sendNotification(notifTitle, notifBody, total);
+                }
             } else {
                 // Cacher la bannière s'il n'y a rien d'urgent
                 document.getElementById('alertBanner').classList.remove('show');
@@ -742,7 +812,7 @@
                 messages.push('❌ ' + expired + ' produit' + (expired > 1 ? 's périmé' + (expired > 1 ? 's' : '') : ' périmé'));
             }
             if (today > 0) {
-                messages.push('🔴 ' + today + ' expire' + (today > 1 ? 'nt' : '') + ' aujourd\'hui');
+                messages.push('🔴 ' + today + ' expire' + (today > 1 ? 'nt' : '') + ' AUJOURD\'HUI');
             }
             if (tomorrow > 0) {
                 messages.push('🟠 ' + tomorrow + ' expire' + (tomorrow > 1 ? 'nt' : '') + ' demain');
@@ -751,9 +821,9 @@
                 messages.push('🟡 ' + twoDays + ' dans 2 jours');
             }
             
-            var html = '<div class="alert-banner-title">⚠️ Alerte Produits !</div>' +
+            var html = '<div class="alert-banner-title">⚠️ ATTENTION : Produits à consommer !</div>' +
                        '<div class="alert-banner-text">' + messages.join(' • ') + '</div>' +
-                       '<button class="alert-banner-btn" onclick="viewUrgentProducts()">Voir les produits →</button>';
+                       '<button class="alert-banner-btn" onclick="viewUrgentProducts()">👉 Voir les produits</button>';
             
             banner.innerHTML = html;
             banner.classList.add('show');
@@ -1307,16 +1377,29 @@
             stopScanner();
             showForm();
         };
+        
+        // Boutons de notification
+        document.getElementById('btnEnableNotifications').onclick = function() {
+            requestNotificationPermission().then(function(permission) {
+                localStorage.setItem('notification-asked', 'true');
+                document.getElementById('notificationPrompt').classList.remove('show');
+                if (permission === 'granted') {
+                    alert('✅ Notifications activées ! Vous recevrez des alertes pour vos produits.');
+                    // Vérifier immédiatement et notifier
+                    checkUrgentProducts();
+                } else if (permission === 'denied') {
+                    alert('ℹ️ Pour activer les notifications plus tard :\n\n1. Ouvrez Réglages iPhone\n2. Safari → Notifications\n3. Autorisez pour ce site');
+                }
+            });
+        };
+        
+        document.getElementById('btnCancelNotifications').onclick = function() {
+            localStorage.setItem('notification-asked', 'true');
+            document.getElementById('notificationPrompt').classList.remove('show');
+        };
 
         // Initialisation
         renderAll();
-        
-        // Demander la permission pour les notifications après un court délai
-        setTimeout(function() {
-            requestNotificationPermission().then(function(permission) {
-                console.log('Permission notifications:', permission);
-            });
-        }, 2000);
     </script>
 </body>
 </html>
