@@ -1008,7 +1008,7 @@
                 if (currentFilter === 'fresh') statusMatch = d === null || d > 3;
                 if (currentFilter === 'out_of_stock') statusMatch = qty === 0;
                 
-                var emplacementMatch = currentEmplacement === 'all' || (item.emplacement || 'congelateur') === currentEmplacement;
+                var emplacementMatch = currentEmplacement === 'all' || (item.emplacement || 'frigo') === currentEmplacement;
                 
                 return statusMatch && emplacementMatch;
             });
@@ -1121,24 +1121,20 @@
             
             var newQty = (item.quantite || 1) + delta;
             
+            // Empêcher de descendre en dessous de 0
             if (newQty < 0) {
-                // Si on essaie de descendre en dessous de 0, demander si on veut supprimer
-                if (confirm('Stock épuisé. Supprimer ce produit ?')) {
-                    items = items.filter(function(it) { return it.id !== itemId; });
-                    saveItems();
-                    renderAll();
-                }
-            } else if (newQty === 0) {
-                // Quantité à 0, on garde l'item mais on alerte
-                item.quantite = 0;
-                saveItems();
-                renderAll();
-            } else {
-                // Changement normal
-                item.quantite = newQty;
-                saveItems();
-                renderAll();
+                newQty = 0;
             }
+            
+            // Limiter à 99 maximum
+            if (newQty > 99) {
+                newQty = 99;
+            }
+            
+            // Mettre à jour la quantité
+            item.quantite = newQty;
+            saveItems();
+            renderAll();
         }
 
         function startScanner() {
@@ -1347,8 +1343,8 @@
                     '<div class="form-group">' +
                     '<label for="formEmplacement">Emplacement</label>' +
                     '<select id="formEmplacement">' +
-                    '<option value="frigo"' + (productData.emplacement === 'frigo' ? ' selected' : '') + '>🧊 Frigo</option>' +
-                    '<option value="congelateur"' + (productData.emplacement === 'congelateur' || !productData.emplacement ? ' selected' : '') + '>❄️ Congélateur</option>' +
+                    '<option value="frigo"' + (productData.emplacement === 'frigo' || !productData.emplacement ? ' selected' : '') + '>🧊 Frigo</option>' +
+                    '<option value="congelateur"' + (productData.emplacement === 'congelateur' ? ' selected' : '') + '>❄️ Congélateur</option>' +
                     '<option value="placard"' + (productData.emplacement === 'placard' ? ' selected' : '') + '>🚪 Placard</option>' +
                     '<option value="cave"' + (productData.emplacement === 'cave' ? ' selected' : '') + '>🍷 Cave</option>' +
                     '<option value="corbeille"' + (productData.emplacement === 'corbeille' ? ' selected' : '') + '>🧺 Corbeille</option>' +
@@ -1492,8 +1488,8 @@
                     '<div class="form-group">' +
                     '<label for="formEmplacement">Emplacement</label>' +
                     '<select id="formEmplacement">' +
-                    '<option value="frigo"' + (item.emplacement === 'frigo' ? ' selected' : '') + '>🧊 Frigo</option>' +
-                    '<option value="congelateur"' + (item.emplacement === 'congelateur' || !item.emplacement ? ' selected' : '') + '>❄️ Congélateur</option>' +
+                    '<option value="frigo"' + (item.emplacement === 'frigo' || !item.emplacement ? ' selected' : '') + '>🧊 Frigo</option>' +
+                    '<option value="congelateur"' + (item.emplacement === 'congelateur' ? ' selected' : '') + '>❄️ Congélateur</option>' +
                     '<option value="placard"' + (item.emplacement === 'placard' ? ' selected' : '') + '>🚪 Placard</option>' +
                     '<option value="cave"' + (item.emplacement === 'cave' ? ' selected' : '') + '>🍷 Cave</option>' +
                     '<option value="corbeille"' + (item.emplacement === 'corbeille' ? ' selected' : '') + '>🧺 Corbeille</option>' +
