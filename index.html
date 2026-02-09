@@ -672,6 +672,15 @@
             display: block;
         }
         
+        /* Masquer les autres éléments quand le formulaire est ouvert */
+        .form.active ~ .search-container,
+        .form.active ~ #filters,
+        .form.active ~ #filtersEmplacement,
+        .form.active ~ #items,
+        .form.active ~ .alert-banner {
+            display: none !important;
+        }
+        
         .form h3 {
             color: #667eea;
             margin-bottom: 15px;
@@ -3266,6 +3275,7 @@
             form.innerHTML = html;
             form.classList.add('active');
             document.getElementById('actions').style.display = 'none';
+            document.getElementById('stats').style.display = 'none';
             
             // Gestion de la photo personnalisée
             var customImageData = productData.image || null;
@@ -4476,6 +4486,7 @@
             document.getElementById('form').classList.remove('active');
             document.getElementById('form').innerHTML = '';
             document.getElementById('actions').style.display = 'grid';
+            document.getElementById('stats').style.display = 'grid';
             currentBarcode = null;
             currentProductData = null;
         }
@@ -4558,6 +4569,7 @@
             form.innerHTML = html;
             form.classList.add('active');
             document.getElementById('actions').style.display = 'none';
+            document.getElementById('stats').style.display = 'none';
             
             // Gestion de la photo personnalisée
             var customImageData = item.image || null;
