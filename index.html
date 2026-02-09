@@ -377,6 +377,141 @@
             color: white;
         }
         
+        .search-container {
+            margin-bottom: 20px;
+            padding: 0;
+        }
+        
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            font-size: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+        
+        .search-input::placeholder {
+            color: #9ca3af;
+        }
+        
+        .clear-search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+        
+        .clear-search-btn:hover {
+            background: #dc2626;
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .clear-search-btn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+        
+        .search-results-info {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .search-history {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .search-history-title {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .search-history-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .search-history-item {
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .search-history-item:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .search-history-item-text {
+            flex: 1;
+        }
+        
+        .search-history-item-remove {
+            font-size: 11px;
+            opacity: 0.6;
+            font-weight: bold;
+        }
+        
+        .search-history-item:hover .search-history-item-remove {
+            opacity: 1;
+        }
+        
+        .search-highlight {
+            background: #fef08a;
+            font-weight: 600;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
         .items {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -1615,6 +1750,15 @@
 
         <div id="form" class="form"></div>
 
+        <div class="search-container">
+            <div class="search-wrapper">
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Rechercher un produit...">
+                <button id="clearSearch" class="clear-search-btn" style="display: none;">✕</button>
+            </div>
+            <div id="searchResults" class="search-results-info" style="display: none;"></div>
+            <div id="searchHistory" class="search-history" style="display: none;"></div>
+        </div>
+
         <div id="filters" class="filters">
             <button class="filter-btn active" data-f="all">🔵 Tous</button>
             <button class="filter-btn" data-f="fresh">✅ Frais</button>
@@ -2033,6 +2177,12 @@
         }
         
         function updateUILanguage() {
+            // Update search input placeholder
+            var searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.placeholder = currentLang === 'fr' ? '🔍 Rechercher un produit...' : '🔍 Search for a product...';
+            }
+            
             // Update action buttons
             var btnScan = document.getElementById('btnScan');
             var btnManual = document.getElementById('btnManual');
@@ -2206,11 +2356,55 @@
         var items = [];
         var currentFilter = 'all';
         var currentEmplacement = 'all';
+        var currentSearchTerm = '';
+        var searchHistory = [];
+        var maxSearchHistory = 5;
         var currentBarcode = null;
         var currentProductData = null;
         var lastScannedCode = null;
         var scanConfidenceCount = {};
         var scanningActive = false;
+        
+        // Charger l'historique de recherche depuis localStorage
+        try {
+            var storedHistory = localStorage.getItem('search-history');
+            if (storedHistory) searchHistory = JSON.parse(storedHistory);
+        } catch(e) {}
+        
+        // Fonction pour mettre en surbrillance le texte recherché (ignore les accents)
+        function highlightText(text, searchTerm) {
+            if (!searchTerm || !text) return text;
+            
+            var searchLen = searchTerm.length;
+            var searchNoAccent = removeAccents(searchTerm.toLowerCase());
+            
+            var result = '';
+            var i = 0;
+            
+            while (i < text.length) {
+                // Vérifier si on a une correspondance à cette position
+                var substring = text.substr(i, searchLen);
+                var substringNoAccent = removeAccents(substring.toLowerCase());
+                
+                if (substringNoAccent === searchNoAccent) {
+                    // Correspondance trouvée - ajouter avec surbrillance
+                    result += '<span class="search-highlight">' + substring + '</span>';
+                    i += searchLen;
+                } else {
+                    // Pas de correspondance - ajouter le caractère normalement
+                    result += text.charAt(i);
+                    i++;
+                }
+            }
+            
+            return result;
+        }
+        
+        // Fonction pour enlever les accents
+        function removeAccents(str) {
+            if (!str) return '';
+            return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        }
 
         // Charger les données
         try {
@@ -2328,9 +2522,14 @@
             var outOfStock = 0;
             var toRenew = 0;
             
-            for (var i = 0; i < items.length; i++) {
-                var days = getDays(items[i].datePeremption);
-                var qty = getQuantity(items[i].quantite);
+            // Filtrer par emplacement actuel
+            var filteredByLocation = items.filter(function(item) {
+                return currentEmplacement === 'all' || (item.emplacement || 'frigo') === currentEmplacement;
+            });
+            
+            for (var i = 0; i < filteredByLocation.length; i++) {
+                var days = getDays(filteredByLocation[i].datePeremption);
+                var qty = getQuantity(filteredByLocation[i].quantite);
                 
                 // Vérifier le stock
                 if (qty === 0) {
@@ -2338,7 +2537,7 @@
                 }
                 
                 // Vérifier "à renouveler"
-                if (items[i].aRenouveler) {
+                if (filteredByLocation[i].aRenouveler) {
                     toRenew++;
                 }
                 
@@ -2527,12 +2726,17 @@
         window.viewUrgentProducts = viewUrgentProducts;
 
         function renderStats() {
-            var total = items.length;
+            // Filtrer les items par emplacement actuel
+            var filteredByLocation = items.filter(function(item) {
+                return currentEmplacement === 'all' || (item.emplacement || 'frigo') === currentEmplacement;
+            });
+            
+            var total = filteredByLocation.length;
             var exp = 0, soon = 0, outOfStock = 0;
             
-            for (var i = 0; i < items.length; i++) {
-                var d = getDays(items[i].datePeremption);
-                var qty = getQuantity(items[i].quantite);
+            for (var i = 0; i < filteredByLocation.length; i++) {
+                var d = getDays(filteredByLocation[i].datePeremption);
+                var qty = getQuantity(filteredByLocation[i].quantite);
                 
                 if (qty === 0) outOfStock++;
                 if (d !== null && d < 0) exp++;
@@ -2546,17 +2750,6 @@
         }
 
         function renderItems() {
-            console.log('🔍 DEBUG renderItems - Total items:', items.length);
-            console.log('🔍 Current filter:', currentFilter, '| Current emplacement:', currentEmplacement);
-            
-            // Compter les emplacements
-            var emplacementCounts = {};
-            items.forEach(function(item) {
-                var empl = item.emplacement || 'frigo';
-                emplacementCounts[empl] = (emplacementCounts[empl] || 0) + 1;
-            });
-            console.log('🔍 Emplacements:', emplacementCounts);
-            
             var filtered = items.filter(function(item) {
                 var d = getDays(item.datePeremption);
                 var qty = getQuantity(item.quantite);
@@ -2571,15 +2764,17 @@
                 
                 var emplacementMatch = currentEmplacement === 'all' || (item.emplacement || 'frigo') === currentEmplacement;
                 
-                // Debug pour les produits du congélateur
-                if ((item.emplacement || 'frigo') === 'congelateur') {
-                    console.log('❄️ Produit congélateur:', item.nom, '| statusMatch:', statusMatch, '| emplacementMatch:', emplacementMatch, '| emplacement:', item.emplacement);
+                // Filtre de recherche
+                var searchMatch = true;
+                if (currentSearchTerm) {
+                    var searchLower = removeAccents(currentSearchTerm.toLowerCase());
+                    var nomLower = removeAccents((item.nom || '').toLowerCase());
+                    var barcodeLower = (item.barcode || '').toLowerCase();
+                    searchMatch = nomLower.includes(searchLower) || barcodeLower.includes(searchLower);
                 }
                 
-                return statusMatch && emplacementMatch;
+                return statusMatch && emplacementMatch && searchMatch;
             });
-            
-            console.log('✅ Filtered items:', filtered.length);
             
             var itemsEl = document.getElementById('items');
             var emptyEl = document.getElementById('empty');
@@ -2602,9 +2797,9 @@
                         html += '<img src="' + item.image + '" class="item-image">';
                     }
                     html += '<div class="item-content">' +
-                            '<div class="item-name">' + item.nom + '</div>';
+                            '<div class="item-name">' + highlightText(item.nom, currentSearchTerm) + '</div>';
                     if (item.barcode) {
-                        html += '<div class="barcode-badge">📊 ' + item.barcode + '</div>';
+                        html += '<div class="barcode-badge">📊 ' + highlightText(item.barcode, currentSearchTerm) + '</div>';
                     }
                     if (item.emplacement) {
                         var empl = getEmplacementInfo(item.emplacement);
@@ -2679,6 +2874,19 @@
                         changeQuantity(id, 1);
                     };
                 }
+            }
+            
+            // Afficher le compteur de résultats si recherche active
+            var resultsInfo = document.getElementById('searchResults');
+            if (currentSearchTerm && filtered.length > 0) {
+                var count = filtered.length;
+                var text = currentLang === 'fr' 
+                    ? '✓ ' + count + ' produit' + (count > 1 ? 's' : '') + ' trouvé' + (count > 1 ? 's' : '')
+                    : '✓ ' + count + ' product' + (count > 1 ? 's' : '') + ' found';
+                resultsInfo.textContent = text;
+                resultsInfo.style.display = 'block';
+            } else {
+                resultsInfo.style.display = 'none';
             }
         }
 
@@ -2899,7 +3107,7 @@
             suggestedDate.setDate(suggestedDate.getDate() + 7);
             var suggestedDateStr = suggestedDate.toISOString().split('T')[0];
             
-            var html = '<h3>➕ ' + (currentLang === 'fr' ? 'Ajouter au frigo' : 'Add to fridge') + '</h3>';
+            var html = '<h3>➕ ' + (currentLang === 'fr' ? 'Ajouter un produit' : 'Add product') + '</h3>';
             
             if (productData.barcode) {
                 html += '<div class="barcode-badge">📊 ' + (currentLang === 'fr' ? 'Code-barres: ' : 'Barcode: ') + productData.barcode + '</div>';
@@ -2963,7 +3171,7 @@
                     '<span style="flex: 1;">📝 ' + (currentLang === 'fr' ? 'À renouveler (ajouter à la liste de courses)' : 'To renew (add to shopping list)') + '</span>' +
                     '</label>' +
                     '</div>' +
-                    '<button class="btn" id="btnAdd" style="background:#667eea;font-size:18px;padding:15px;margin-top:10px">✓ ' + (currentLang === 'fr' ? 'Ajouter au frigo' : 'Add to fridge') + '</button>' +
+                    '<button class="btn" id="btnAdd" style="background:#667eea;font-size:18px;padding:15px;margin-top:10px">✓ ' + (currentLang === 'fr' ? 'Ajouter' : 'Add') + '</button>' +
                     '<button class="btn" id="btnCancel" style="background:#ccc;color:#333;font-size:18px;padding:15px">✕ ' + t('form.cancel') + '</button>';
             
             form.innerHTML = html;
@@ -3796,7 +4004,7 @@
                 html = '<div style="text-align: center; padding: 40px; color: #666;">' +
                        '<div style="font-size: 3em; margin-bottom: 20px;">🍳</div>' +
                        '<h3>' + (currentLang === 'fr' ? 'Aucune recette disponible' : 'No recipes available') + '</h3>' +
-                       '<p>' + (currentLang === 'fr' ? 'Ajoutez des produits dans votre frigo pour voir des suggestions de recettes !' : 'Add products to your fridge to see recipe suggestions!') + '</p>' +
+                       '<p>' + (currentLang === 'fr' ? 'Ajoutez des produits pour voir des suggestions de recettes !' : 'Add products to see recipe suggestions!') + '</p>' +
                        '</div>';
             } else {
                 recipesWithMatch.forEach(function(item) {
@@ -4362,9 +4570,138 @@
                     filterEmplBtns[j].classList.remove('active');
                 }
                 this.classList.add('active');
+                renderStats();  // Mettre à jour les compteurs
+                checkUrgentProducts();  // Mettre à jour la bannière d'alerte
                 renderItems();
             };
         }
+
+        // === FONCTIONS DE RECHERCHE ===
+        
+        function saveSearchHistory() {
+            try {
+                localStorage.setItem('search-history', JSON.stringify(searchHistory));
+            } catch(e) {}
+        }
+        
+        function addToSearchHistory(term) {
+            if (!term || term.length < 2) return;
+            
+            // Supprimer si existe déjà
+            searchHistory = searchHistory.filter(function(h) { return h !== term; });
+            
+            // Ajouter au début
+            searchHistory.unshift(term);
+            
+            // Limiter à maxSearchHistory
+            if (searchHistory.length > maxSearchHistory) {
+                searchHistory = searchHistory.slice(0, maxSearchHistory);
+            }
+            
+            saveSearchHistory();
+        }
+        
+        function renderSearchHistory() {
+            var historyEl = document.getElementById('searchHistory');
+            
+            if (searchHistory.length === 0) {
+                historyEl.style.display = 'none';
+                return;
+            }
+            
+            var title = currentLang === 'fr' ? '🕒 Recherches récentes' : '🕒 Recent searches';
+            
+            var html = '<div class="search-history-title">' + title + '</div>' +
+                      '<div class="search-history-items">';
+            
+            searchHistory.forEach(function(term) {
+                html += '<div class="search-history-item" onclick="selectSearchHistory(\'' + term.replace(/'/g, "\\'") + '\')">' +
+                       '<span class="search-history-item-text">' + term + '</span>' +
+                       '<span class="search-history-item-remove" onclick="event.stopPropagation(); removeFromHistory(\'' + term.replace(/'/g, "\\'") + '\')">✕</span>' +
+                       '</div>';
+            });
+            
+            html += '</div>';
+            historyEl.innerHTML = html;
+            historyEl.style.display = 'block';
+        }
+        
+        function selectSearchHistory(term) {
+            document.getElementById('searchInput').value = term;
+            currentSearchTerm = term;
+            renderItems();
+            document.getElementById('searchHistory').style.display = 'none';
+            document.getElementById('clearSearch').style.display = 'block';
+        }
+        
+        function removeFromHistory(term) {
+            searchHistory = searchHistory.filter(function(h) { return h !== term; });
+            saveSearchHistory();
+            renderSearchHistory();
+        }
+        
+        // Rendre les fonctions globales
+        window.selectSearchHistory = selectSearchHistory;
+        window.removeFromHistory = removeFromHistory;
+        
+        // Champ de recherche
+        var searchInput = document.getElementById('searchInput');
+        var clearBtn = document.getElementById('clearSearch');
+        var historyEl = document.getElementById('searchHistory');
+        
+        searchInput.addEventListener('input', function(e) {
+            var value = e.target.value.trim();
+            currentSearchTerm = value;
+            
+            // Afficher/cacher le bouton clear
+            clearBtn.style.display = value ? 'flex' : 'none';
+            
+            renderItems();
+        });
+        
+        searchInput.addEventListener('focus', function() {
+            if (!currentSearchTerm) {
+                renderSearchHistory();
+            }
+        });
+        
+        searchInput.addEventListener('blur', function() {
+            // Attendre un peu avant de cacher pour permettre les clics
+            setTimeout(function() {
+                historyEl.style.display = 'none';
+            }, 200);
+        });
+        
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && currentSearchTerm) {
+                addToSearchHistory(currentSearchTerm);
+                searchInput.blur();
+            }
+            if (e.key === 'Escape') {
+                searchInput.value = '';
+                currentSearchTerm = '';
+                clearBtn.style.display = 'none';
+                renderItems();
+                searchInput.blur();
+            }
+        });
+        
+        clearBtn.onclick = function() {
+            searchInput.value = '';
+            currentSearchTerm = '';
+            clearBtn.style.display = 'none';
+            renderItems();
+            searchInput.focus();
+        };
+        
+        // Raccourci clavier Ctrl+F / Cmd+F
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                searchInput.focus();
+                searchInput.select();
+            }
+        });
 
         // Boutons
         document.getElementById('btnScan').onclick = startScanner;
