@@ -21,11 +21,13 @@
             min-height: 100vh;
             padding: 20px;
             color: #333;
+            overflow-x: hidden;
         }
         
         .container {
             max-width: 800px;
             margin: 0 auto;
+            padding: 0 15px;
         }
         
         .header {
@@ -55,12 +57,47 @@
             }
         }
         
+        /* Mobile - iPhone et Android */
         @media (max-width: 599px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 0 5px;
+            }
             .filters {
                 grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
             }
             .filters-emplacement {
                 grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+            .filter-btn, .filter-empl-btn {
+                padding: 8px 2px;
+                font-size: 0.7em;
+            }
+        }
+        
+        /* Très petit écran - iPhone SE, petits Android */
+        @media (max-width: 380px) {
+            body {
+                padding: 8px;
+            }
+            .container {
+                padding: 0 2px;
+            }
+            .filters {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+            .filters-emplacement {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+            .filter-btn, .filter-empl-btn {
+                padding: 8px 4px;
+                font-size: 0.65em;
             }
         }
         
@@ -353,6 +390,8 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             font-size: 0.75em;
             text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .filter-btn.active {
@@ -379,6 +418,8 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             font-size: 0.85em;
             text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .filter-empl-btn.active {
