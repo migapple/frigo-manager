@@ -1917,6 +1917,7 @@
                     Viande: "Viande",
                     Poisson: "Poisson",
                     Produits_laitiers: "Produits laitiers",
+                    Viennoiseries: "Viennoiseries",
                     Boissons: "Boissons",
                     Surgelés: "Surgelés",
                     Conserves: "Conserves",
@@ -2090,6 +2091,7 @@
                     Viande: "Meat",
                     Poisson: "Fish",
                     Produits_laitiers: "Dairy products",
+                    Viennoiseries: "Pastries",
                     Boissons: "Beverages",
                     Surgelés: "Frozen",
                     Conserves: "Canned goods",
@@ -3222,6 +3224,8 @@
                     '<option value="viande"' + (productData.categorie === 'viande' ? ' selected' : '') + '>🥩 ' + t('categories.Viande') + '</option>' +
                     '<option value="poisson"' + (productData.categorie === 'poisson' ? ' selected' : '') + '>🐟 ' + t('categories.Poisson') + '</option>' +
                     '<option value="produit_laitier"' + (productData.categorie === 'produit_laitier' ? ' selected' : '') + '>🥛 ' + t('categories.Produits_laitiers') + '</option>' +
+                    '<option value="viennoiseries"' + (productData.categorie === 'viennoiseries' ? ' selected' : '') + '>🥐 ' + t('categories.Viennoiseries') + '</option>' +
+                    '<option value="conserves"' + (productData.categorie === 'conserves' ? ' selected' : '') + '>🥫 ' + t('categories.Conserves') + '</option>' +
                     '<option value="boisson"' + (productData.categorie === 'boisson' ? ' selected' : '') + '>🥤 ' + t('categories.Boissons') + '</option>' +
                     '<option value="autre"' + (productData.categorie === 'autre' || !productData.categorie ? ' selected' : '') + '>📦 ' + t('categories.Autre') + '</option>' +
                     '</select>' +
@@ -4512,6 +4516,8 @@
                     '<option value="viande"' + (item.categorie === 'viande' ? ' selected' : '') + '>🥩 Viande</option>' +
                     '<option value="poisson"' + (item.categorie === 'poisson' ? ' selected' : '') + '>🐟 Poisson</option>' +
                     '<option value="produit_laitier"' + (item.categorie === 'produit_laitier' ? ' selected' : '') + '>🥛 Produit laitier</option>' +
+                    '<option value="viennoiseries"' + (item.categorie === 'viennoiseries' ? ' selected' : '') + '>🥐 Viennoiseries</option>' +
+                    '<option value="conserves"' + (item.categorie === 'conserves' ? ' selected' : '') + '>🥫 Conserves</option>' +
                     '<option value="boisson"' + (item.categorie === 'boisson' ? ' selected' : '') + '>🥤 Boisson</option>' +
                     '<option value="autre"' + (item.categorie === 'autre' || !item.categorie ? ' selected' : '') + '>📦 Autre</option>' +
                     '</select>' +
