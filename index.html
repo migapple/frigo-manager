@@ -74,8 +74,12 @@
                 gap: 6px;
             }
             .filter-btn, .filter-empl-btn {
-                padding: 8px 2px;
-                font-size: 0.7em;
+                padding: 8px 4px;
+                font-size: 0.8em;
+            }
+            /* Cacher les emojis sur mobile */
+            .btn-emoji {
+                display: none;
             }
         }
         
@@ -97,7 +101,11 @@
             }
             .filter-btn, .filter-empl-btn {
                 padding: 8px 4px;
-                font-size: 0.65em;
+                font-size: 0.75em;
+            }
+            /* Cacher les emojis sur mobile */
+            .btn-emoji {
+                display: none;
             }
         }
         
@@ -1810,21 +1818,21 @@
         </div>
 
         <div id="filters" class="filters">
-            <button class="filter-btn active" data-f="all">🔵 Tous</button>
-            <button class="filter-btn" data-f="fresh">✅ Frais</button>
-            <button class="filter-btn" data-f="soon">⚠️ Urgent</button>
-            <button class="filter-btn" data-f="expired">❌ Périmés</button>
-            <button class="filter-btn" data-f="out_of_stock">📦 Épuisés</button>
-            <button class="filter-btn" data-f="to_renew">📝 À renouveler</button>
+            <button class="filter-btn active" data-f="all"><span class="btn-emoji">🔵</span> Tous</button>
+            <button class="filter-btn" data-f="fresh"><span class="btn-emoji">✅</span> Frais</button>
+            <button class="filter-btn" data-f="soon"><span class="btn-emoji">⚠️</span> Urgent</button>
+            <button class="filter-btn" data-f="expired"><span class="btn-emoji">❌</span> Périmés</button>
+            <button class="filter-btn" data-f="out_of_stock"><span class="btn-emoji">📦</span> Épuisés</button>
+            <button class="filter-btn" data-f="to_renew"><span class="btn-emoji">📝</span> À renouveler</button>
         </div>
 
         <div id="filtersEmplacement" class="filters-emplacement">
-            <button class="filter-empl-btn active" data-empl="all">📍 Tous</button>
-            <button class="filter-empl-btn" data-empl="frigo">🧊 Frigo</button>
-            <button class="filter-empl-btn" data-empl="congelateur">❄️ Congélo</button>
-            <button class="filter-empl-btn" data-empl="placard">🚪 Placard</button>
-            <button class="filter-empl-btn" data-empl="cave">🍷 Cave</button>
-            <button class="filter-empl-btn" data-empl="corbeille">🧺 Corbeille</button>
+            <button class="filter-empl-btn active" data-empl="all"><span class="btn-emoji">📍</span> Tous</button>
+            <button class="filter-empl-btn" data-empl="frigo"><span class="btn-emoji">🧊</span> Frigo</button>
+            <button class="filter-empl-btn" data-empl="congelateur"><span class="btn-emoji">❄️</span> Congélo</button>
+            <button class="filter-empl-btn" data-empl="placard"><span class="btn-emoji">🚪</span> Placard</button>
+            <button class="filter-empl-btn" data-empl="cave"><span class="btn-emoji">🍷</span> Cave</button>
+            <button class="filter-empl-btn" data-empl="corbeille"><span class="btn-emoji">🧺</span> Corbeille</button>
         </div>
 
         <div id="items" class="items"></div>
@@ -2267,7 +2275,7 @@
                 {emoji: '📝', key: 'renew'}
             ];
             for (var i = 0; i < filters.length && i < filterData.length; i++) {
-                filters[i].textContent = filterData[i].emoji + ' ' + t('filters.' + filterData[i].key);
+                filters[i].innerHTML = '<span class="btn-emoji">' + filterData[i].emoji + '</span> ' + t('filters.' + filterData[i].key);
             }
             
             // Update location filters
@@ -2281,7 +2289,7 @@
                 {emoji: '🧺', key: 'corbeille'}
             ];
             for (var i = 0; i < locationFilters.length && i < locationData.length; i++) {
-                locationFilters[i].textContent = locationData[i].emoji + ' ' + t('locations.' + locationData[i].key);
+                locationFilters[i].innerHTML = '<span class="btn-emoji">' + locationData[i].emoji + '</span> ' + t('locations.' + locationData[i].key);
             }
             
             // Update empty state
