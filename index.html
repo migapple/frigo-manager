@@ -67,15 +67,19 @@
             }
             .filters {
                 grid-template-columns: repeat(3, 1fr);
-                gap: 6px;
+                gap: 8px;
             }
             .filters-emplacement {
                 grid-template-columns: repeat(3, 1fr);
-                gap: 6px;
+                gap: 8px;
             }
             .filter-btn, .filter-empl-btn {
                 padding: 8px 4px;
-                font-size: 0.8em;
+                font-size: 0.72em;
+                white-space: normal;
+                line-height: 1.25;
+                min-height: 48px;
+                word-wrap: break-word;
             }
             /* Cacher les emojis sur mobile */
             .btn-emoji {
@@ -92,16 +96,20 @@
                 padding: 0 2px;
             }
             .filters {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(3, 1fr);
                 gap: 6px;
             }
             .filters-emplacement {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(3, 1fr);
                 gap: 6px;
             }
             .filter-btn, .filter-empl-btn {
-                padding: 8px 4px;
-                font-size: 0.75em;
+                padding: 7px 3px;
+                font-size: 0.68em;
+                white-space: normal;
+                line-height: 1.25;
+                min-height: 48px;
+                word-wrap: break-word;
             }
             /* Cacher les emojis sur mobile */
             .btn-emoji {
@@ -388,18 +396,23 @@
         }
         
         .filter-btn {
-            padding: 10px 4px;
+            padding: 8px 4px;
             border: none;
             border-radius: 10px;
             background: white;
             font-weight: 600;
             cursor: pointer;
-            white-space: nowrap;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             font-size: 0.75em;
             text-align: center;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal;
+            line-height: 1.2;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         
         .filter-btn.active {
@@ -416,18 +429,23 @@
         }
         
         .filter-empl-btn {
-            padding: 10px 8px;
+            padding: 8px 4px;
             border: none;
             border-radius: 10px;
             background: white;
             font-weight: 600;
             cursor: pointer;
-            white-space: nowrap;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             font-size: 0.85em;
             text-align: center;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal;
+            line-height: 1.2;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         
         .filter-empl-btn.active {
