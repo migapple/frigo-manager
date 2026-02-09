@@ -2546,6 +2546,17 @@
         }
 
         function renderItems() {
+            console.log('🔍 DEBUG renderItems - Total items:', items.length);
+            console.log('🔍 Current filter:', currentFilter, '| Current emplacement:', currentEmplacement);
+            
+            // Compter les emplacements
+            var emplacementCounts = {};
+            items.forEach(function(item) {
+                var empl = item.emplacement || 'frigo';
+                emplacementCounts[empl] = (emplacementCounts[empl] || 0) + 1;
+            });
+            console.log('🔍 Emplacements:', emplacementCounts);
+            
             var filtered = items.filter(function(item) {
                 var d = getDays(item.datePeremption);
                 var qty = getQuantity(item.quantite);
@@ -2560,8 +2571,15 @@
                 
                 var emplacementMatch = currentEmplacement === 'all' || (item.emplacement || 'frigo') === currentEmplacement;
                 
+                // Debug pour les produits du congélateur
+                if ((item.emplacement || 'frigo') === 'congelateur') {
+                    console.log('❄️ Produit congélateur:', item.nom, '| statusMatch:', statusMatch, '| emplacementMatch:', emplacementMatch, '| emplacement:', item.emplacement);
+                }
+                
                 return statusMatch && emplacementMatch;
             });
+            
+            console.log('✅ Filtered items:', filtered.length);
             
             var itemsEl = document.getElementById('items');
             var emptyEl = document.getElementById('empty');
@@ -2954,6 +2972,7 @@
             
             // Gestion de la photo personnalisée
             var customImageData = productData.image || null;
+            var savedBarcode = productData.barcode || null; // Sauvegarder le barcode dans la portée
             
             // Gestion de la quantité avec boutons +/-
             var quantityInput = document.getElementById('formQuantite');
@@ -3021,7 +3040,7 @@
                     aRenouveler: document.getElementById('formRenouveler').checked,
                     dateAjout: new Date().toISOString().split('T')[0],
                     image: customImageData,
-                    barcode: productData.barcode || null
+                    barcode: savedBarcode
                 };
                 
                 items.unshift(newItem);
