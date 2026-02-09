@@ -2926,7 +2926,7 @@
                 var deleteBtns = itemsEl.querySelectorAll('.btn-delete');
                 for (var i = 0; i < deleteBtns.length; i++) {
                     deleteBtns[i].onclick = function() {
-                        var id = parseInt(this.getAttribute('data-id'));
+                        var id = parseFloat(this.getAttribute('data-id'));
                         if (confirm('Supprimer ce produit ?')) {
                             items = items.filter(function(it) { return it.id !== id; });
                             saveItems();
@@ -2939,7 +2939,7 @@
                 var editBtns = itemsEl.querySelectorAll('.btn-edit');
                 for (var i = 0; i < editBtns.length; i++) {
                     editBtns[i].onclick = function() {
-                        var id = parseInt(this.getAttribute('data-id'));
+                        var id = parseFloat(this.getAttribute('data-id'));
                         editItem(id);
                     };
                 }
@@ -2948,7 +2948,7 @@
                 var minusBtns = itemsEl.querySelectorAll('.btn-qty-minus');
                 for (var i = 0; i < minusBtns.length; i++) {
                     minusBtns[i].onclick = function() {
-                        var id = parseInt(this.getAttribute('data-id'));
+                        var id = parseFloat(this.getAttribute('data-id'));
                         changeQuantity(id, -1);
                     };
                 }
@@ -2957,7 +2957,7 @@
                 var plusBtns = itemsEl.querySelectorAll('.btn-qty-plus');
                 for (var i = 0; i < plusBtns.length; i++) {
                     plusBtns[i].onclick = function() {
-                        var id = parseInt(this.getAttribute('data-id'));
+                        var id = parseFloat(this.getAttribute('data-id'));
                         changeQuantity(id, 1);
                     };
                 }
@@ -3328,7 +3328,7 @@
                 var dateValue = document.getElementById('formDate').value;
                 
                 var newItem = {
-                    id: Date.now(),
+                    id: Date.now() + Math.random(),
                     nom: nom,
                     datePeremption: dateValue || null,
                     categorie: document.getElementById('formCategorie').value,
