@@ -3212,11 +3212,13 @@
             html += '<div class="form-group">';
             if (productData.image) {
                 html += '<img src="' + productData.image + '" class="preview-img" id="previewImage">';
+                html += '<button type="button" class="btn" id="btnRemovePhoto" style="background:#ef4444;padding:10px;font-size:14px;margin:5px 0;">✕ ' + (currentLang === 'fr' ? 'Supprimer la photo' : 'Remove photo') + '</button>';
             } else {
                 html += '<div id="previewImage" class="preview-placeholder">📷 ' + (currentLang === 'fr' ? 'Aucune photo' : 'No photo') + '</div>';
             }
             html += '<input type="file" id="customPhoto" accept="image/*" capture="environment" style="display: none;">';
             html += '<label for="customPhoto" class="btn" style="background:#f59e0b;padding:12px;font-size:16px;margin:10px 0;">📸 ' + (productData.image ? (currentLang === 'fr' ? 'Changer' : 'Change') : (currentLang === 'fr' ? 'Prendre' : 'Take')) + ' ' + (currentLang === 'fr' ? 'la photo' : 'photo') + '</label>';
+            html += '<div class="date-suggestion" style="margin-top: 5px;">💡 ' + (currentLang === 'fr' ? 'La photo augmente la taille de stockage' : 'Photo increases storage size') + '</div>';
             html += '</div>';
             
             html += '<div class="form-group">' +
@@ -3281,6 +3283,20 @@
             var customImageData = productData.image || null;
             var savedBarcode = productData.barcode || null; // Sauvegarder le barcode dans la portée
             
+            // Bouton pour supprimer la photo (si elle existe)
+            var btnRemovePhoto = document.getElementById('btnRemovePhoto');
+            if (btnRemovePhoto) {
+                btnRemovePhoto.onclick = function() {
+                    if (confirm(currentLang === 'fr' ? 'Supprimer la photo ?\nCela économisera de l\'espace de stockage.' : 'Remove photo?\nThis will save storage space.')) {
+                        customImageData = null;
+                        var preview = document.getElementById('previewImage');
+                        preview.outerHTML = '<div id="previewImage" class="preview-placeholder">📷 ' + (currentLang === 'fr' ? 'Aucune photo' : 'No photo') + '</div>';
+                        document.querySelector('label[for="customPhoto"]').innerHTML = '📸 ' + (currentLang === 'fr' ? 'Prendre la photo' : 'Take photo');
+                        btnRemovePhoto.style.display = 'none';
+                    }
+                };
+            }
+            
             // Gestion de la quantité avec boutons +/-
             var quantityInput = document.getElementById('formQuantite');
             document.getElementById('btnPlus').onclick = function() {
@@ -3320,10 +3336,26 @@
                     if (preview.tagName === 'IMG') {
                         preview.src = customImageData;
                     } else {
-                        preview.outerHTML = '<img src="' + customImageData + '" class="preview-img" id="previewImage">';
+                        var photoLabel = document.querySelector('label[for="customPhoto"]');
+                        preview.outerHTML = '<img src="' + customImageData + '" class="preview-img" id="previewImage">' +
+                            '<button type="button" class="btn" id="btnRemovePhoto" style="background:#ef4444;padding:10px;font-size:14px;margin:5px 0;">✕ ' + (currentLang === 'fr' ? 'Supprimer la photo' : 'Remove photo') + '</button>';
+                        
+                        // Ajouter l'event listener au nouveau bouton
+                        var newBtnRemove = document.getElementById('btnRemovePhoto');
+                        if (newBtnRemove) {
+                            newBtnRemove.onclick = function() {
+                                if (confirm(currentLang === 'fr' ? 'Supprimer la photo ?\nCela économisera de l\'espace de stockage.' : 'Remove photo?\nThis will save storage space.')) {
+                                    customImageData = null;
+                                    var preview = document.getElementById('previewImage');
+                                    preview.outerHTML = '<div id="previewImage" class="preview-placeholder">📷 ' + (currentLang === 'fr' ? 'Aucune photo' : 'No photo') + '</div>';
+                                    document.querySelector('label[for="customPhoto"]').innerHTML = '📸 ' + (currentLang === 'fr' ? 'Prendre la photo' : 'Take photo');
+                                    newBtnRemove.style.display = 'none';
+                                }
+                            };
+                        }
                     }
                     // Changer le texte du bouton
-                    document.querySelector('label[for="customPhoto"]').innerHTML = '📸 Changer la photo';
+                    document.querySelector('label[for="customPhoto"]').innerHTML = '📸 ' + (currentLang === 'fr' ? 'Changer la photo' : 'Change photo');
                 };
                 reader.readAsDataURL(file);
             });
@@ -4506,11 +4538,13 @@
             html += '<div class="form-group">';
             if (item.image) {
                 html += '<img src="' + item.image + '" class="preview-img" id="previewImage">';
+                html += '<button type="button" class="btn" id="btnRemovePhoto" style="background:#ef4444;padding:10px;font-size:14px;margin:5px 0;">✕ Supprimer la photo</button>';
             } else {
                 html += '<div id="previewImage" class="preview-placeholder">📷 Aucune photo</div>';
             }
             html += '<input type="file" id="customPhoto" accept="image/*" capture="environment" style="display: none;">';
             html += '<label for="customPhoto" class="btn" style="background:#f59e0b;padding:12px;font-size:16px;margin:10px 0;">📸 ' + (item.image ? 'Changer' : 'Prendre') + ' la photo</label>';
+            html += '<div class="date-suggestion" style="margin-top: 5px;">💡 La photo augmente la taille de stockage</div>';
             html += '</div>';
             
             html += '<div class="form-group">' +
@@ -4574,6 +4608,20 @@
             // Gestion de la photo personnalisée
             var customImageData = item.image || null;
             
+            // Bouton pour supprimer la photo (si elle existe)
+            var btnRemovePhoto = document.getElementById('btnRemovePhoto');
+            if (btnRemovePhoto) {
+                btnRemovePhoto.onclick = function() {
+                    if (confirm('Supprimer la photo ?\nCela économisera de l\'espace de stockage.')) {
+                        customImageData = null;
+                        var preview = document.getElementById('previewImage');
+                        preview.outerHTML = '<div id="previewImage" class="preview-placeholder">📷 Aucune photo</div>';
+                        document.querySelector('label[for="customPhoto"]').innerHTML = '📸 Prendre la photo';
+                        btnRemovePhoto.style.display = 'none';
+                    }
+                };
+            }
+            
             // Gestion de la quantité avec boutons +/-
             var quantityInput = document.getElementById('formQuantite');
             document.getElementById('btnPlus').onclick = function() {
@@ -4613,7 +4661,22 @@
                     if (preview.tagName === 'IMG') {
                         preview.src = customImageData;
                     } else {
-                        preview.outerHTML = '<img src="' + customImageData + '" class="preview-img" id="previewImage">';
+                        preview.outerHTML = '<img src="' + customImageData + '" class="preview-img" id="previewImage">' +
+                            '<button type="button" class="btn" id="btnRemovePhoto" style="background:#ef4444;padding:10px;font-size:14px;margin:5px 0;">✕ Supprimer la photo</button>';
+                        
+                        // Ajouter l'event listener au nouveau bouton
+                        var newBtnRemove = document.getElementById('btnRemovePhoto');
+                        if (newBtnRemove) {
+                            newBtnRemove.onclick = function() {
+                                if (confirm('Supprimer la photo ?\nCela économisera de l\'espace de stockage.')) {
+                                    customImageData = null;
+                                    var preview = document.getElementById('previewImage');
+                                    preview.outerHTML = '<div id="previewImage" class="preview-placeholder">📷 Aucune photo</div>';
+                                    document.querySelector('label[for="customPhoto"]').innerHTML = '📸 Prendre la photo';
+                                    newBtnRemove.style.display = 'none';
+                                }
+                            };
+                        }
                     }
                     document.querySelector('label[for="customPhoto"]').innerHTML = '📸 Changer la photo';
                 };
