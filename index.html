@@ -2131,6 +2131,12 @@
 
         <div id="form" class="form"></div>
 
+        <!-- Zone de debug visible (iOS) -->
+        <div id="debugZone" style="background: #fee; border: 2px solid #f00; padding: 10px; margin: 10px 0; border-radius: 8px; display: none;">
+            <div style="font-weight: bold; color: #f00; margin-bottom: 5px;">🐛 DEBUG iOS</div>
+            <div id="debugLog" style="font-size: 12px; font-family: monospace; color: #333;"></div>
+        </div>
+
         <div class="search-container">
             <div class="search-wrapper">
                 <input type="search" id="searchInput" class="search-input" 
@@ -5509,15 +5515,26 @@
         var clearBtn = document.getElementById('clearSearch');
         var historyEl = document.getElementById('searchHistory');
         
+        // Test que les éléments existent
+        if (!searchInput) alert('❌ searchInput introuvable');
+        if (!searchBtn) alert('❌ searchBtn introuvable');
+        if (!clearBtn) alert('❌ clearBtn introuvable');
+        
         // Fonction de recherche réutilisable
         function handleSearch() {
+            alert('✅ handleSearch() appelée !');
+            
             var value = searchInput.value.trim();
             currentSearchTerm = value;
+            
+            alert('🔍 Valeur recherchée: "' + value + '"');
             
             // Afficher/cacher le bouton clear
             clearBtn.style.display = value ? 'flex' : 'none';
             
+            alert('📋 Appel de renderItems()...');
             renderItems();
+            alert('✅ renderItems() terminé !');
             
             // Ajouter à l'historique si recherche non vide
             if (value) {
@@ -5527,6 +5544,7 @@
         
         // BOUTON GO - Recherche manuelle (parfait pour iOS)
         searchBtn.onclick = function() {
+            alert('🎯 Bouton GO cliqué !');
             handleSearch();
             searchInput.blur(); // Fermer le clavier sur mobile
         };
