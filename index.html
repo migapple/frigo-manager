@@ -833,22 +833,26 @@
         /* Badges de santé */
         .health-badges {
             display: flex !important;
-            flex-wrap: wrap;
+            flex-wrap: nowrap; /* Une seule ligne ! */
+            gap: 3px;
             margin: 10px 0;
             width: 100%;
+            overflow-x: auto; /* Scroll horizontal si vraiment trop large */
+            -webkit-overflow-scrolling: touch;
         }
         
         .health-badge {
             display: inline-block !important;
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 0.8em;
+            padding: 4px 8px; /* Réduit de 10px à 8px */
+            border-radius: 12px;
+            font-size: 0.7em; /* Réduit de 0.8em à 0.7em */
             font-weight: 700;
             color: white;
             text-transform: uppercase;
             visibility: visible !important;
             opacity: 1 !important;
-            margin: 2px;
+            white-space: nowrap; /* Empêche le texte de passer à la ligne */
+            flex-shrink: 0; /* Empêche les badges de rétrécir */
         }
         
         /* Nutri-Score */
