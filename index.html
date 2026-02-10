@@ -1701,6 +1701,12 @@
                 </div>
                 
                 <div class="settings-section">
+                    <h4>📊 Informations santé</h4>
+                    <button class="btn" onclick="showHealthGuide()" style="background: #059669; margin-bottom: 10px;">📚 Comprendre les scores</button>
+                    <p style="font-size: 0.85em; color: #666; margin: 10px 0;">Nutri-Score, NOVA, Additifs, Eco-Score expliqués</p>
+                </div>
+                
+                <div class="settings-section">
                     <h4>🗑️ Données</h4>
                     <button class="btn" onclick="confirmDeleteAll()" style="background: #ef4444;">Supprimer toutes les données</button>
                     <p style="font-size: 0.85em; color: #666; margin: 10px 0;">Attention : cette action est irréversible</p>
@@ -1733,6 +1739,154 @@
         </div>
 
         <div id="alertBanner" class="alert-banner"></div>
+        
+        <!-- Modal Guide Santé -->
+        <div id="healthGuide" class="settings-menu">
+            <div class="settings-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+                <h3 style="margin-top: 0; color: #667eea;">📚 Comprendre les Scores de Santé</h3>
+                
+                <!-- Nutri-Score -->
+                <div class="settings-section">
+                    <h4 style="color: #038141;">🥗 Nutri-Score</h4>
+                    <p style="font-size: 0.9em; margin-bottom: 15px;">Évalue la qualité nutritionnelle globale</p>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="health-badge nutri-a" style="width: 50px; text-align: center;">A</div>
+                            <span style="font-size: 0.9em;">Excellente qualité nutritionnelle</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="health-badge nutri-b" style="width: 50px; text-align: center;">B</div>
+                            <span style="font-size: 0.9em;">Bonne qualité nutritionnelle</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="health-badge nutri-c" style="width: 50px; text-align: center;">C</div>
+                            <span style="font-size: 0.9em;">Qualité nutritionnelle moyenne</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="health-badge nutri-d" style="width: 50px; text-align: center;">D</div>
+                            <span style="font-size: 0.9em;">Mauvaise qualité nutritionnelle</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="health-badge nutri-e" style="width: 50px; text-align: center;">E</div>
+                            <span style="font-size: 0.9em;">Très mauvaise qualité nutritionnelle</span>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.85em; color: #666; margin-top: 10px; background: #f3f4f6; padding: 10px; border-radius: 8px;">
+                        <strong>💡 Astuce :</strong> Privilégiez les produits A et B. Le Nutri-Score prend en compte les nutriments positifs (fibres, protéines, fruits/légumes) et négatifs (sucres, graisses saturées, sel, calories).
+                    </p>
+                </div>
+                
+                <!-- NOVA -->
+                <div class="settings-section">
+                    <h4 style="color: #038141;">🔬 NOVA Group</h4>
+                    <p style="font-size: 0.9em; margin-bottom: 15px;">Niveau de transformation du produit</p>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="health-badge nova-1" style="width: 50px; text-align: center;">1</div>
+                            <span style="font-size: 0.9em;">Aliments bruts (fruits, légumes, viande)</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="health-badge nova-2" style="width: 50px; text-align: center;">2</div>
+                            <span style="font-size: 0.9em;">Ingrédients culinaires (huile, beurre)</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="health-badge nova-3" style="width: 50px; text-align: center;">3</div>
+                            <span style="font-size: 0.9em;">Aliments transformés (conserves, pain)</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="health-badge nova-4" style="width: 50px; text-align: center;">4</div>
+                            <span style="font-size: 0.9em;">Ultra-transformés (sodas, plats préparés)</span>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.85em; color: #666; margin-top: 10px; background: #f3f4f6; padding: 10px; border-radius: 8px;">
+                        <strong>💡 Astuce :</strong> Limitez les produits NOVA 4. Les aliments ultra-transformés contiennent souvent beaucoup d'additifs et peu de nutriments essentiels.
+                    </p>
+                </div>
+                
+                <!-- Additifs -->
+                <div class="settings-section">
+                    <h4 style="color: #6b7280;">⚗️ Additifs</h4>
+                    <p style="font-size: 0.9em; margin-bottom: 15px;">Nombre d'additifs dans le produit</p>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="health-badge" style="background: #038141; width: 80px; text-align: center;">0</div>
+                            <span style="font-size: 0.9em;">Sans additif - Idéal</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="health-badge additives-badge" style="width: 80px; text-align: center;">1-5</div>
+                            <span style="font-size: 0.9em;">Quelques additifs - Acceptable</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="health-badge additives-high" style="width: 80px; text-align: center;">6+</div>
+                            <span style="font-size: 0.9em;">Beaucoup d'additifs - À limiter</span>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.85em; color: #666; margin-top: 10px; background: #f3f4f6; padding: 10px; border-radius: 8px;">
+                        <strong>💡 Astuce :</strong> Les additifs (E100, E200, etc.) sont des colorants, conservateurs, émulsifiants... Tous ne sont pas dangereux, mais moins il y en a, mieux c'est !
+                    </p>
+                </div>
+                
+                <!-- Eco-Score -->
+                <div class="settings-section">
+                    <h4 style="color: #059669;">🌍 Eco-Score</h4>
+                    <p style="font-size: 0.9em; margin-bottom: 15px;">Impact environnemental du produit</p>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="health-badge eco-a" style="width: 50px; text-align: center;">A</div>
+                            <span style="font-size: 0.9em;">Très faible impact environnemental</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="health-badge eco-b" style="width: 50px; text-align: center;">B</div>
+                            <span style="font-size: 0.9em;">Faible impact environnemental</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="health-badge eco-c" style="width: 50px; text-align: center;">C</div>
+                            <span style="font-size: 0.9em;">Impact environnemental moyen</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="health-badge eco-d" style="width: 50px; text-align: center;">D</div>
+                            <span style="font-size: 0.9em;">Impact environnemental élevé</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="health-badge eco-e" style="width: 50px; text-align: center;">E</div>
+                            <span style="font-size: 0.9em;">Très fort impact environnemental</span>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.85em; color: #666; margin-top: 10px; background: #f3f4f6; padding: 10px; border-radius: 8px;">
+                        <strong>💡 Astuce :</strong> L'Eco-Score prend en compte les émissions CO2, le transport, l'emballage et l'origine des ingrédients. Favorisez les produits locaux et de saison !
+                    </p>
+                </div>
+                
+                <!-- Exemples -->
+                <div class="settings-section" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #22c55e;">
+                    <h4 style="color: #15803d;">✅ Exemples de Bons Produits</h4>
+                    <div style="font-size: 0.9em; color: #166534;">
+                        <div style="margin: 8px 0;">🍎 <strong>Pommes :</strong> Nutri A, NOVA 1, 0 additif</div>
+                        <div style="margin: 8px 0;">🥕 <strong>Carottes :</strong> Nutri A, NOVA 1, 0 additif</div>
+                        <div style="margin: 8px 0;">🥛 <strong>Yaourt nature :</strong> Nutri A, NOVA 1, 0 additif</div>
+                        <div style="margin: 8px 0;">🍋 <strong>Lentilles :</strong> Nutri A, NOVA 1, 0 additif</div>
+                    </div>
+                </div>
+                
+                <div class="settings-section" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 2px solid #ef4444;">
+                    <h4 style="color: #b91c1c;">❌ Exemples à Limiter</h4>
+                    <div style="font-size: 0.9em; color: #991b1b;">
+                        <div style="margin: 8px 0;">🥤 <strong>Sodas :</strong> Nutri E, NOVA 4, 5+ additifs</div>
+                        <div style="margin: 8px 0;">🍟 <strong>Chips :</strong> Nutri E, NOVA 4, 8+ additifs</div>
+                        <div style="margin: 8px 0;">🍫 <strong>Barres chocolatées :</strong> Nutri E, NOVA 4, 10+ additifs</div>
+                        <div style="margin: 8px 0;">🌭 <strong>Nuggets :</strong> Nutri E, NOVA 4, 12+ additifs</div>
+                    </div>
+                </div>
+                
+                <div style="background: #eff6ff; padding: 15px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #3b82f6;">
+                    <p style="font-size: 0.9em; color: #1e40af; margin: 0;">
+                        <strong>ℹ️ Source des données :</strong> Open Food Facts - Base de données collaborative de 1,8 million de produits utilisée par Yuka et d'autres applications.
+                    </p>
+                </div>
+                
+                <button class="btn" onclick="closeHealthGuide()" style="background: #667eea; color: white; margin-top: 20px; width: 100%;">✓ J'ai compris</button>
+            </div>
+        </div>
         
         <div id="notificationPrompt" class="notification-prompt" style="display: none;">
             <div class="notification-prompt-content">
@@ -3638,6 +3792,17 @@
         function toggleSettings() {
             var menu = document.getElementById('settingsMenu');
             menu.classList.toggle('active');
+        }
+        
+        function showHealthGuide() {
+            // Fermer le menu des paramètres
+            document.getElementById('settingsMenu').classList.remove('active');
+            // Ouvrir le guide
+            document.getElementById('healthGuide').classList.add('active');
+        }
+        
+        function closeHealthGuide() {
+            document.getElementById('healthGuide').classList.remove('active');
         }
         
         // === FONCTIONS EXPORT/IMPORT RECETTES CSV ===
