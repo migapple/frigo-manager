@@ -2771,36 +2771,51 @@
         var lastSearchTime = 0;
         
         function doSearch() {
-            // Éviter les appels multiples rapides (debounce 300ms)
-            var now = Date.now();
-            if (now - lastSearchTime < 300) {
-                return; // Ignorer si moins de 300ms depuis le dernier appel
+            try {
+                alert('🎯 doSearch() START');
+                
+                // Éviter les appels multiples rapides (debounce 300ms)
+                var now = Date.now();
+                if (now - lastSearchTime < 300) {
+                    return; // Ignorer si moins de 300ms depuis le dernier appel
+                }
+                lastSearchTime = now;
+                
+                var input = document.getElementById('searchInput');
+                var clearBtn = document.getElementById('clearSearch');
+                
+                if (!input) {
+                    alert('❌ Input pas trouvé');
+                    return;
+                }
+                
+                var value = input.value.trim();
+                currentSearchTerm = value;
+                
+                alert('🔍 Recherche: "' + value + '"');
+                
+                // Afficher le bouton clear
+                if (clearBtn) {
+                    clearBtn.style.display = value ? 'flex' : 'none';
+                }
+                
+                // Lancer la recherche
+                alert('📋 AVANT renderItems()');
+                renderItems();
+                alert('✅ APRÈS renderItems()');
+                
+                // Ajouter à l'historique
+                if (value) {
+                    addToSearchHistory(value);
+                }
+                
+                // Fermer le clavier
+                input.blur();
+                
+                alert('✅ doSearch() TERMINÉ !');
+            } catch (error) {
+                alert('❌ ERREUR dans doSearch:\n' + error.message);
             }
-            lastSearchTime = now;
-            
-            var input = document.getElementById('searchInput');
-            var clearBtn = document.getElementById('clearSearch');
-            
-            if (!input) return;
-            
-            var value = input.value.trim();
-            currentSearchTerm = value;
-            
-            // Afficher le bouton clear
-            if (clearBtn) {
-                clearBtn.style.display = value ? 'flex' : 'none';
-            }
-            
-            // Lancer la recherche
-            renderItems();
-            
-            // Ajouter à l'historique
-            if (value) {
-                addToSearchHistory(value);
-            }
-            
-            // Fermer le clavier
-            input.blur();
         }
         
         function clearSearchNow() {
@@ -3200,6 +3215,7 @@
         }
 
         function renderItems() {
+            try {
             var filtered = items.filter(function(item) {
                 var d = getDays(item.datePeremption);
                 var qty = getQuantity(item.quantite);
@@ -3383,6 +3399,9 @@
                 resultsInfo.style.display = 'block';
             } else {
                 resultsInfo.style.display = 'none';
+            }
+            } catch (error) {
+                alert('❌ ERREUR dans renderItems:\n' + error.message + '\n\nStack: ' + error.stack);
             }
         }
 
