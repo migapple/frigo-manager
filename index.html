@@ -103,6 +103,11 @@
             .btn-emoji {
                 display: none;
             }
+            /* Bouton GO plus compact sur mobile */
+            .search-btn {
+                padding: 15px 20px;
+                font-size: 16px;
+            }
         }
         
         /* Très petit écran - iPhone SE, petits Android */
@@ -486,13 +491,15 @@
         }
         
         .search-wrapper {
-            position: relative;
+            display: flex;
+            gap: 10px;
             width: 100%;
+            align-items: center;
         }
         
         .search-input {
-            width: 100%;
-            padding: 15px 50px 15px 20px;
+            flex: 1;
+            padding: 15px 20px;
             font-size: 16px;
             border: 2px solid #e5e7eb;
             border-radius: 12px;
@@ -512,18 +519,33 @@
             color: #9ca3af;
         }
         
+        .search-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+        }
+        
+        .search-btn:active {
+            transform: scale(0.95);
+            background: #5568d3;
+        }
+        
         .clear-search-btn {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
             background: #ef4444;
             color: white;
             border: none;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            font-size: 16px;
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -2111,7 +2133,14 @@
 
         <div class="search-container">
             <div class="search-wrapper">
-                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Rechercher un produit...">
+                <input type="search" id="searchInput" class="search-input" 
+                       placeholder="🔍 Rechercher..." 
+                       autocomplete="off" 
+                       autocorrect="off" 
+                       autocapitalize="off" 
+                       spellcheck="false"
+                       inputmode="search">
+                <button id="searchButton" class="search-btn">GO</button>
                 <button id="clearSearch" class="clear-search-btn" style="display: none;">✕</button>
             </div>
             <div id="searchResults" class="search-results-info" style="display: none;"></div>
@@ -3117,8 +3146,6 @@
         }
 
         function renderItems() {
-            console.log('📋 renderItems appelé - Recherche:', currentSearchTerm, '- Nombre items:', items.length);
-            
             var filtered = items.filter(function(item) {
                 var d = getDays(item.datePeremption);
                 var qty = getQuantity(item.quantite);
@@ -3144,8 +3171,6 @@
                 
                 return statusMatch && emplacementMatch && searchMatch;
             });
-            
-            console.log('🔍 Résultats après filtrage:', filtered.length, 'items trouvés');
             
             var itemsEl = document.getElementById('items');
             var emptyEl = document.getElementById('empty');
@@ -5480,20 +5505,47 @@
         
         // Champ de recherche
         var searchInput = document.getElementById('searchInput');
+        var searchBtn = document.getElementById('searchButton');
         var clearBtn = document.getElementById('clearSearch');
         var historyEl = document.getElementById('searchHistory');
         
-        searchInput.addEventListener('input', function(e) {
-            var value = e.target.value.trim();
+        // Fonction de recherche réutilisable
+        function handleSearch() {
+            var value = searchInput.value.trim();
             currentSearchTerm = value;
-            
-            console.log('🔍 Recherche:', value);
             
             // Afficher/cacher le bouton clear
             clearBtn.style.display = value ? 'flex' : 'none';
             
             renderItems();
-        });
+            
+            // Ajouter à l'historique si recherche non vide
+            if (value) {
+                addToSearchHistory(value);
+            }
+        }
+        
+        // BOUTON GO - Recherche manuelle (parfait pour iOS)
+        searchBtn.onclick = function() {
+            handleSearch();
+            searchInput.blur(); // Fermer le clavier sur mobile
+        };
+        
+        // Multiples event listeners pour compatibilité iOS (gardés pour Desktop)
+        searchInput.addEventListener('input', handleSearch);      // Desktop + Android
+        searchInput.addEventListener('keyup', handleSearch);      // iOS clavier virtuel
+        searchInput.addEventListener('change', handleSearch);     // iOS quand le champ change
+        searchInput.addEventListener('search', handleSearch);     // iOS search input
+        
+        // Polling pour iOS (backup si les events ne marchent pas)
+        var lastSearchValue = '';
+        setInterval(function() {
+            var currentValue = searchInput.value.trim();
+            if (currentValue !== lastSearchValue) {
+                lastSearchValue = currentValue;
+                handleSearch();
+            }
+        }, 300); // Vérifier toutes les 300ms
         
         searchInput.addEventListener('focus', function() {
             if (!currentSearchTerm) {
@@ -5509,9 +5561,10 @@
         });
         
         searchInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && currentSearchTerm) {
-                addToSearchHistory(currentSearchTerm);
-                searchInput.blur();
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Empêcher le submit
+                handleSearch();
+                searchInput.blur(); // Fermer le clavier
             }
             if (e.key === 'Escape') {
                 searchInput.value = '';
