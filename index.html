@@ -5195,9 +5195,8 @@
             
             if (item.barcode) {
                 html += '<div class="barcode-badge clickable" id="barcodeBadge" style="display: inline-block;">📊 ' + item.barcode + '</div>';
-                if (!item.image) {
-                    html += '<div class="date-suggestion" style="margin-top: 5px;">💡 Cliquez sur le code-barres pour récupérer photo + scores santé</div>';
-                }
+                // Toujours afficher le message pour indiquer que le code-barres est cliquable
+                html += '<div class="date-suggestion" style="margin-top: 5px;">💡 Cliquez sur le code-barres pour récupérer photo + scores santé</div>';
             }
             
             html += '<div class="form-group">';
