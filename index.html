@@ -651,7 +651,7 @@
         .item-card {
             background: white;
             border-radius: 15px;
-            overflow: hidden;
+            overflow: visible;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             border: 3px solid transparent;
         }
@@ -676,6 +676,7 @@
             height: 180px;
             object-fit: cover;
             background: #f0f0f0;
+            border-radius: 15px 15px 0 0;
         }
         
         .item-content {
@@ -831,20 +832,23 @@
         
         /* Badges de santé */
         .health-badges {
-            display: flex;
+            display: flex !important;
             flex-wrap: wrap;
-            gap: 5px;
             margin: 10px 0;
+            width: 100%;
         }
         
         .health-badge {
-            display: inline-block;
+            display: inline-block !important;
             padding: 4px 10px;
             border-radius: 15px;
             font-size: 0.8em;
             font-weight: 700;
             color: white;
             text-transform: uppercase;
+            visibility: visible !important;
+            opacity: 1 !important;
+            margin: 2px;
         }
         
         /* Nutri-Score */
@@ -878,8 +882,10 @@
         
         /* Badge inconnu */
         .health-badge-unknown {
-            background: #d1d5db;
-            color: #6b7280;
+            background: #d1d5db !important;
+            color: #6b7280 !important;
+            display: inline-block !important;
+            visibility: visible !important;
         }
         
         .alert-banner {
@@ -5348,22 +5354,41 @@
                                         
                                         // Mettre à jour l'aperçu
                                         var preview = document.getElementById('previewImage');
-                                        preview.outerHTML = '<img src="' + customImageData + '" class="preview-img" id="previewImage">' +
-                                            '<button type="button" class="btn" id="btnRemovePhoto" style="background:#ef4444;padding:10px;font-size:14px;margin:5px 0;">✕ Supprimer la photo</button>';
+                                        var existingBtn = document.getElementById('btnRemovePhoto');
                                         
-                                        // Réattacher l'event listener au nouveau bouton
-                                        var newBtnRemove = document.getElementById('btnRemovePhoto');
-                                        if (newBtnRemove) {
-                                            newBtnRemove.onclick = function() {
-                                                if (confirm('Supprimer la photo ?\nCela économisera de l\'espace de stockage.')) {
-                                                    customImageData = null;
-                                                    var preview = document.getElementById('previewImage');
-                                                    preview.outerHTML = '<div id="previewImage" class="preview-placeholder">📷 Aucune photo</div>';
-                                                    document.querySelector('label[for="customPhoto"]').innerHTML = '📸 Prendre la photo';
-                                                    newBtnRemove.style.display = 'none';
-                                                }
-                                            };
+                                        // Si preview est une image, juste changer le src
+                                        if (preview.tagName === 'IMG') {
+                                            preview.src = customImageData;
+                                        } else {
+                                            // Sinon (c'était un placeholder), remplacer par une image
+                                            preview.outerHTML = '<img src="' + customImageData + '" class="preview-img" id="previewImage">';
                                         }
+                                        
+                                        // Créer ou afficher le bouton supprimer
+                                        if (!existingBtn) {
+                                            // Créer le bouton s'il n'existe pas
+                                            var btn = document.createElement('button');
+                                            btn.type = 'button';
+                                            btn.className = 'btn';
+                                            btn.id = 'btnRemovePhoto';
+                                            btn.style.cssText = 'background:#ef4444;padding:10px;font-size:14px;margin:5px 0;';
+                                            btn.textContent = '✕ Supprimer la photo';
+                                            document.getElementById('previewImage').parentNode.insertBefore(btn, document.getElementById('customPhoto'));
+                                            existingBtn = btn;
+                                        } else {
+                                            existingBtn.style.display = 'block';
+                                        }
+                                        
+                                        // Attacher l'event listener
+                                        existingBtn.onclick = function() {
+                                            if (confirm('Supprimer la photo ?\nCela économisera de l\'espace de stockage.')) {
+                                                customImageData = null;
+                                                var preview = document.getElementById('previewImage');
+                                                preview.outerHTML = '<div id="previewImage" class="preview-placeholder">📷 Aucune photo</div>';
+                                                document.querySelector('label[for="customPhoto"]').innerHTML = '📸 Prendre la photo';
+                                                this.style.display = 'none';
+                                            }
+                                        };
                                         
                                         // Changer le texte du bouton photo
                                         document.querySelector('label[for="customPhoto"]').innerHTML = '📸 Changer la photo';
