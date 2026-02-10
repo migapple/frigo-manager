@@ -931,13 +931,30 @@
         
         .renouveler-badge {
             display: inline-block;
-            background: #f59e0b;
-            color: white;
+            background: #e5e7eb;
+            color: #6b7280;
             padding: 5px 12px;
             border-radius: 20px;
             font-size: 0.9em;
             font-weight: 600;
             margin: 5px 5px 5px 0;
+            transition: all 0.2s;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .renouveler-badge.active {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .renouveler-badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .renouveler-badge:active {
+            transform: scale(0.95);
         }
         
         .quantity-controls {
@@ -2939,10 +2956,10 @@
                         html += '<div class="quantity-badge">📦 ' + (currentLang === 'fr' ? 'Quantité: ' : 'Quantity: ') + qty + '</div>';
                     }
                     
-                    // Afficher le badge "À renouveler"
-                    if (item.aRenouveler) {
-                        html += '<div class="renouveler-badge">📝 À renouveler</div>';
-                    }
+                    // Afficher le badge "À renouveler" (cliquable)
+                    html += '<div class="renouveler-badge ' + (item.aRenouveler ? 'active' : '') + '" data-id="' + item.id + '">';
+                    html += item.aRenouveler ? '📝 À renouveler' : '☐ À renouveler';
+                    html += '</div>';
                     
                     html += '<div class="item-info">📅 Ajouté: ' + new Date(item.dateAjout).toLocaleDateString('fr-FR') + '</div>' +
                             '<div class="item-info">⏰ Expire: ' + (item.datePeremption ? new Date(item.datePeremption).toLocaleDateString('fr-FR') : 'Non indiqué') + '</div>' +
@@ -2999,6 +3016,15 @@
                         changeQuantity(id, 1);
                     };
                 }
+                
+                // Badges "À renouveler" cliquables
+                var renouvelerBadges = itemsEl.querySelectorAll('.renouveler-badge');
+                for (var i = 0; i < renouvelerBadges.length; i++) {
+                    renouvelerBadges[i].onclick = function() {
+                        var id = parseFloat(this.getAttribute('data-id'));
+                        toggleRenouveler(id);
+                    };
+                }
             }
             
             // Afficher le compteur de résultats si recherche active
@@ -3041,6 +3067,17 @@
             
             // Mettre à jour la quantité
             item.quantite = newQty;
+            saveItems();
+            renderAll();
+        }
+        
+        function toggleRenouveler(itemId) {
+            var item = items.find(function(it) { return it.id === itemId; });
+            if (!item) return;
+            
+            // Basculer l'état "À renouveler"
+            item.aRenouveler = !item.aRenouveler;
+            
             saveItems();
             renderAll();
         }
@@ -3232,6 +3269,13 @@
             suggestedDate.setDate(suggestedDate.getDate() + 7);
             var suggestedDateStr = suggestedDate.toISOString().split('T')[0];
             
+            // Emplacement par défaut : utiliser le filtre actuel si sélectionné
+            var defaultEmplacement = productData.emplacement;
+            if (!defaultEmplacement) {
+                // Si un filtre d'emplacement spécifique est actif, l'utiliser
+                defaultEmplacement = (currentEmplacement !== 'all') ? currentEmplacement : 'frigo';
+            }
+            
             var html = '<h3>➕ ' + (currentLang === 'fr' ? 'Ajouter un produit' : 'Add product') + '</h3>';
             
             if (productData.barcode) {
@@ -3279,12 +3323,12 @@
                     '<div class="form-group">' +
                     '<label for="formEmplacement">' + t('form.location') + '</label>' +
                     '<select id="formEmplacement">' +
-                    '<option value="frigo"' + (productData.emplacement === 'frigo' || !productData.emplacement ? ' selected' : '') + '>🧊 ' + t('locations.frigo') + '</option>' +
-                    '<option value="congelateur"' + (productData.emplacement === 'congelateur' ? ' selected' : '') + '>❄️ ' + t('locations.congelateur') + '</option>' +
-                    '<option value="placard"' + (productData.emplacement === 'placard' ? ' selected' : '') + '>🚪 ' + t('locations.placard') + '</option>' +
-                    '<option value="cave"' + (productData.emplacement === 'cave' ? ' selected' : '') + '>🍷 ' + (currentLang === 'fr' ? 'Cave' : 'Cellar') + '</option>' +
-                    '<option value="corbeille"' + (productData.emplacement === 'corbeille' ? ' selected' : '') + '>🧺 ' + (currentLang === 'fr' ? 'Corbeille' : 'Basket') + '</option>' +
-                    '<option value="autre_emplacement"' + (productData.emplacement === 'autre_emplacement' ? ' selected' : '') + '>📍 ' + t('locations.autre') + '</option>' +
+                    '<option value="frigo"' + (defaultEmplacement === 'frigo' ? ' selected' : '') + '>🧊 ' + t('locations.frigo') + '</option>' +
+                    '<option value="congelateur"' + (defaultEmplacement === 'congelateur' ? ' selected' : '') + '>❄️ ' + t('locations.congelateur') + '</option>' +
+                    '<option value="placard"' + (defaultEmplacement === 'placard' ? ' selected' : '') + '>🚪 ' + t('locations.placard') + '</option>' +
+                    '<option value="cave"' + (defaultEmplacement === 'cave' ? ' selected' : '') + '>🍷 ' + (currentLang === 'fr' ? 'Cave' : 'Cellar') + '</option>' +
+                    '<option value="corbeille"' + (defaultEmplacement === 'corbeille' ? ' selected' : '') + '>🧺 ' + (currentLang === 'fr' ? 'Corbeille' : 'Basket') + '</option>' +
+                    '<option value="autre_emplacement"' + (defaultEmplacement === 'autre_emplacement' ? ' selected' : '') + '>📍 ' + t('locations.autre') + '</option>' +
                     '</select>' +
                     '</div>' +
                     '<div class="form-group">' +
