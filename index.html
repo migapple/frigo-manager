@@ -5140,6 +5140,9 @@
             document.getElementById('stats').style.display = 'grid';
             currentBarcode = null;
             currentProductData = null;
+            
+            // Rafraîchir l'affichage pour montrer les changements (photo, scores, etc.)
+            renderAll();
         }
         
         function editItem(itemId) {
@@ -5275,8 +5278,18 @@
             // Event listener pour cliquer sur le code-barres et récupérer la photo + scores
             var barcodeBadge = document.getElementById('barcodeBadge');
             if (barcodeBadge && item.barcode) {
+                var fetchInProgress = false; // Empêcher les clics multiples
+                
                 barcodeBadge.onclick = function() {
+                    // Empêcher les clics multiples
+                    if (fetchInProgress) {
+                        alert('⏳ Récupération en cours...\n\nVeuillez patienter.');
+                        return;
+                    }
+                    
                     if (confirm('Récupérer les données depuis la base de données ?\n\n• Photo du produit\n• Scores de santé (Nutri-Score, NOVA, Additifs, Eco-Score)\n\n⏳ Patientez pendant le chargement...')) {
+                        fetchInProgress = true; // Bloquer les autres clics
+                        
                         // Afficher un loader visible
                         var badge = document.getElementById('barcodeBadge');
                         var originalText = badge.innerHTML;
@@ -5371,16 +5384,18 @@
                                         // IMPORTANT : Sauvegarder automatiquement les modifications
                                         saveItems();
                                         alert('✅ Données récupérées et sauvegardées !\n\n' + updates.join('\n'));
-                                        // Rafraîchir l'affichage si le formulaire est fermé
-                                        renderAll();
+                                        // NE PAS rafraîchir ici - attendre que l'utilisateur ferme le formulaire
+                                        // renderAll(); ← SUPPRIMÉ pour éviter les conflits
                                     } else {
                                         alert('⚠️ Aucune donnée supplémentaire disponible.');
                                     }
+                                    fetchInProgress = false; // Débloquer
                                 } else {
                                     badge.innerHTML = originalText;
                                     badge.style.background = originalBg;
                                     badge.style.animation = '';
                                     alert('❌ Produit non trouvé dans la base de données.');
+                                    fetchInProgress = false; // Débloquer
                                 }
                             })
                             .catch(function(error) {
@@ -5388,6 +5403,7 @@
                                 badge.innerHTML = originalText;
                                 badge.style.background = originalBg;
                                 badge.style.animation = '';
+                                fetchInProgress = false; // Débloquer
                                 alert('❌ Erreur lors de la récupération des données.\n\nVérifiez votre connexion Internet.');
                                 console.error(error);
                             });
