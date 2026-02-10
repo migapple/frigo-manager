@@ -1717,7 +1717,7 @@
                     <div style="text-align: center; margin: 15px 0;">
                         <div style="font-size: 3em; margin-bottom: 10px;">🧊</div>
                         <div style="font-size: 1.2em; font-weight: bold; color: #0369a1; margin-bottom: 5px;">Frigo Manager</div>
-                        <div style="font-size: 0.9em; color: #64748b; margin-bottom: 15px;">Version 1.0</div>
+                        <div style="font-size: 0.9em; color: #64748b; margin-bottom: 15px;">Version 1.2</div>
                     </div>
                     <div style="background: white; padding: 15px; border-radius: 10px; margin: 10px 0;">
                         <div style="font-size: 0.95em; color: #334155; margin-bottom: 8px;">
@@ -2223,7 +2223,7 @@
                     deleteAll: "Supprimer toutes les données",
                     deleteWarning: "Attention : cette action est irréversible",
                     about: "À propos",
-                    version: "Version 1.0",
+                    version: "Version 1.2",
                     developer: "Développé par :",
                     powered: "Réalisé à l'aide d'",
                     copyright: "Tous droits réservés",
@@ -2397,7 +2397,7 @@
                     deleteAll: "Delete all data",
                     deleteWarning: "Warning: this action is irreversible",
                     about: "About",
-                    version: "Version 1.0",
+                    version: "Version 1.2",
                     developer: "Developed by:",
                     powered: "Powered by",
                     copyright: "All rights reserved",
@@ -3149,7 +3149,7 @@
                     }
                     
                     // Afficher les badges de santé
-                    if (item.nutriScore || item.novaGroup || item.additives || item.ecoScore) {
+                    if (item.nutriScore || item.novaGroup || item.additives !== undefined || item.ecoScore) {
                         html += '<div class="health-badges">';
                         
                         // Nutri-Score
@@ -3435,6 +3435,28 @@
                     
                     if (data.status === 1 && data.product) {
                         var product = data.product;
+                        
+                        // Eco-Score : essayer plusieurs champs possibles
+                        var ecoScore = null;
+                        if (product.ecoscore_grade) {
+                            ecoScore = product.ecoscore_grade.toUpperCase();
+                        } else if (product.ecoscoreGrade) {
+                            ecoScore = product.ecoscoreGrade.toUpperCase();
+                        } else if (product.ecoscore_score !== undefined && product.ecoscore_score !== null) {
+                            // Convertir le score numérique en lettre
+                            if (product.ecoscore_score >= 80) {
+                                ecoScore = 'A';
+                            } else if (product.ecoscore_score >= 60) {
+                                ecoScore = 'B';
+                            } else if (product.ecoscore_score >= 40) {
+                                ecoScore = 'C';
+                            } else if (product.ecoscore_score >= 20) {
+                                ecoScore = 'D';
+                            } else if (product.ecoscore_score >= 0) {
+                                ecoScore = 'E';
+                            }
+                        }
+                        
                         currentProductData = {
                             nom: product.product_name || product.generic_name || 'Produit inconnu',
                             image: product.image_url || product.image_front_url || null,
@@ -3443,7 +3465,7 @@
                             nutriScore: product.nutriscore_grade ? product.nutriscore_grade.toUpperCase() : null,
                             novaGroup: product.nova_group || null,
                             additives: product.additives_n || 0,
-                            ecoScore: product.ecoscore_grade ? product.ecoscore_grade.toUpperCase() : null
+                            ecoScore: ecoScore
                         };
                         showForm(currentProductData);
                     } else {
