@@ -2145,9 +2145,10 @@
                        autocorrect="off" 
                        autocapitalize="off" 
                        spellcheck="false"
-                       inputmode="search">
-                <button id="searchButton" class="search-btn">GO</button>
-                <button id="clearSearch" class="clear-search-btn" style="display: none;">✕</button>
+                       inputmode="search"
+                       onkeydown="if(event.key==='Enter'){event.preventDefault();doSearch();}">
+                <button id="searchButton" class="search-btn" onclick="doSearch()">GO</button>
+                <button id="clearSearch" class="clear-search-btn" style="display: none;" onclick="clearSearchNow()">✕</button>
             </div>
             <div id="searchResults" class="search-results-info" style="display: none;"></div>
             <div id="searchHistory" class="search-history" style="display: none;"></div>
@@ -2766,6 +2767,49 @@
         var lastScannedCode = null;
         var scanConfidenceCount = {};
         var scanningActive = false;
+        
+        // FONCTIONS GLOBALES POUR ONCLICK HTML (iOS-friendly)
+        function doSearch() {
+            alert('🎯 doSearch() appelée !');
+            
+            var input = document.getElementById('searchInput');
+            var clearBtn = document.getElementById('clearSearch');
+            
+            if (!input) {
+                alert('❌ Input introuvable !');
+                return;
+            }
+            
+            var value = input.value.trim();
+            currentSearchTerm = value;
+            
+            alert('🔍 Recherche: "' + value + '"');
+            
+            // Afficher le bouton clear
+            if (clearBtn) {
+                clearBtn.style.display = value ? 'flex' : 'none';
+            }
+            
+            // Lancer la recherche
+            alert('📋 Appel renderItems()...');
+            renderItems();
+            alert('✅ Terminé !');
+            
+            // Fermer le clavier
+            input.blur();
+        }
+        
+        function clearSearchNow() {
+            var input = document.getElementById('searchInput');
+            var clearBtn = document.getElementById('clearSearch');
+            
+            if (input) input.value = '';
+            currentSearchTerm = '';
+            if (clearBtn) clearBtn.style.display = 'none';
+            
+            renderItems();
+            if (input) input.focus();
+        }
         
         // Charger l'historique de recherche depuis localStorage
         try {
@@ -5515,6 +5559,9 @@
         var clearBtn = document.getElementById('clearSearch');
         var historyEl = document.getElementById('searchHistory');
         
+        /* 
+        DÉSACTIVÉ - On utilise onclick HTML à la place
+        
         // Test que les éléments existent
         if (!searchInput) alert('❌ searchInput introuvable');
         if (!searchBtn) alert('❌ searchBtn introuvable');
@@ -5548,22 +5595,10 @@
             handleSearch();
             searchInput.blur(); // Fermer le clavier sur mobile
         };
+        */
         
-        // Multiples event listeners pour compatibilité iOS (gardés pour Desktop)
-        searchInput.addEventListener('input', handleSearch);      // Desktop + Android
-        searchInput.addEventListener('keyup', handleSearch);      // iOS clavier virtuel
-        searchInput.addEventListener('change', handleSearch);     // iOS quand le champ change
-        searchInput.addEventListener('search', handleSearch);     // iOS search input
-        
-        // Polling pour iOS (backup si les events ne marchent pas)
-        var lastSearchValue = '';
-        setInterval(function() {
-            var currentValue = searchInput.value.trim();
-            if (currentValue !== lastSearchValue) {
-                lastSearchValue = currentValue;
-                handleSearch();
-            }
-        }, 300); // Vérifier toutes les 300ms
+        // Plus d'event listeners JavaScript - On utilise onclick HTML directement
+        // (Plus fiable sur iOS)
         
         searchInput.addEventListener('focus', function() {
             if (!currentSearchTerm) {
@@ -5578,28 +5613,13 @@
             }, 200);
         });
         
+        // Note: Enter est géré par onkeydown dans le HTML
+        // Escape pour annuler
         searchInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault(); // Empêcher le submit
-                handleSearch();
-                searchInput.blur(); // Fermer le clavier
-            }
             if (e.key === 'Escape') {
-                searchInput.value = '';
-                currentSearchTerm = '';
-                clearBtn.style.display = 'none';
-                renderItems();
-                searchInput.blur();
+                clearSearchNow();
             }
         });
-        
-        clearBtn.onclick = function() {
-            searchInput.value = '';
-            currentSearchTerm = '';
-            clearBtn.style.display = 'none';
-            renderItems();
-            searchInput.focus();
-        };
         
         // Raccourci clavier Ctrl+F / Cmd+F
         document.addEventListener('keydown', function(e) {
