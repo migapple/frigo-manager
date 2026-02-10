@@ -798,6 +798,52 @@
             margin: 5px 5px 5px 0;
         }
         
+        /* Badges de santé */
+        .health-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 10px 0;
+        }
+        
+        .health-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 700;
+            color: white;
+            text-transform: uppercase;
+        }
+        
+        /* Nutri-Score */
+        .nutri-a { background: #038141; }
+        .nutri-b { background: #85bb2f; }
+        .nutri-c { background: #fecb02; color: #333; }
+        .nutri-d { background: #ee8100; }
+        .nutri-e { background: #e63e11; }
+        
+        /* Eco-Score */
+        .eco-a { background: #038141; }
+        .eco-b { background: #85bb2f; }
+        .eco-c { background: #fecb02; color: #333; }
+        .eco-d { background: #ee8100; }
+        .eco-e { background: #e63e11; }
+        
+        /* NOVA Group */
+        .nova-1 { background: #038141; }
+        .nova-2 { background: #85bb2f; }
+        .nova-3 { background: #ee8100; }
+        .nova-4 { background: #e63e11; }
+        
+        /* Additives */
+        .additives-badge {
+            background: #6b7280;
+        }
+        .additives-high {
+            background: #ef4444;
+        }
+        
         .alert-banner {
             background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
             color: white;
@@ -2948,6 +2994,36 @@
                         html += '<div class="emplacement-badge">' + empl.emoji + ' ' + empl.text + '</div>';
                     }
                     
+                    // Afficher les badges de santé
+                    if (item.nutriScore || item.novaGroup || item.additives || item.ecoScore) {
+                        html += '<div class="health-badges">';
+                        
+                        // Nutri-Score
+                        if (item.nutriScore) {
+                            html += '<div class="health-badge nutri-' + item.nutriScore.toLowerCase() + '">Nutri-Score ' + item.nutriScore + '</div>';
+                        }
+                        
+                        // NOVA Group
+                        if (item.novaGroup) {
+                            var novaText = ['Brut', 'Peu transformé', 'Transformé', 'Ultra-transformé'][item.novaGroup - 1];
+                            html += '<div class="health-badge nova-' + item.novaGroup + '">NOVA ' + item.novaGroup + '</div>';
+                        }
+                        
+                        // Additifs
+                        if (item.additives !== undefined && item.additives !== null) {
+                            var additivesClass = item.additives > 5 ? 'additives-high' : 'additives-badge';
+                            var additivesText = item.additives === 0 ? 'Sans additif' : item.additives + ' additif' + (item.additives > 1 ? 's' : '');
+                            html += '<div class="health-badge ' + additivesClass + '">' + additivesText + '</div>';
+                        }
+                        
+                        // Eco-Score
+                        if (item.ecoScore) {
+                            html += '<div class="health-badge eco-' + item.ecoScore.toLowerCase() + '">Eco-Score ' + item.ecoScore + '</div>';
+                        }
+                        
+                        html += '</div>';
+                    }
+                    
                     // Afficher la quantité
                     var qty = getQuantity(item.quantite);
                     if (qty === 0) {
@@ -3209,7 +3285,11 @@
                             nom: product.product_name || product.generic_name || 'Produit inconnu',
                             image: product.image_url || product.image_front_url || null,
                             categorie: detectCategory(product),
-                            barcode: barcode
+                            barcode: barcode,
+                            nutriScore: product.nutriscore_grade ? product.nutriscore_grade.toUpperCase() : null,
+                            novaGroup: product.nova_group || null,
+                            additives: product.additives_n || 0,
+                            ecoScore: product.ecoscore_grade ? product.ecoscore_grade.toUpperCase() : null
                         };
                         showForm(currentProductData);
                     } else {
@@ -3358,6 +3438,10 @@
             // Gestion de la photo personnalisée
             var customImageData = productData.image || null;
             var savedBarcode = productData.barcode || null; // Sauvegarder le barcode dans la portée
+            var savedNutriScore = productData.nutriScore || null;
+            var savedNovaGroup = productData.novaGroup || null;
+            var savedAdditives = productData.additives !== undefined ? productData.additives : null;
+            var savedEcoScore = productData.ecoScore || null;
             
             // Bouton pour supprimer la photo (si elle existe)
             var btnRemovePhoto = document.getElementById('btnRemovePhoto');
@@ -3529,7 +3613,11 @@
                     aRenouveler: document.getElementById('formRenouveler').checked,
                     dateAjout: new Date().toISOString().split('T')[0],
                     image: customImageData,
-                    barcode: savedBarcode
+                    barcode: savedBarcode,
+                    nutriScore: savedNutriScore,
+                    novaGroup: savedNovaGroup,
+                    additives: savedAdditives,
+                    ecoScore: savedEcoScore
                 };
                 
                 items.unshift(newItem);
