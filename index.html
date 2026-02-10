@@ -3571,9 +3571,19 @@
                         // Eco-Score : essayer plusieurs champs possibles
                         var ecoScore = null;
                         if (product.ecoscore_grade) {
-                            ecoScore = product.ecoscore_grade.toUpperCase();
+                            var ecoValue = product.ecoscore_grade.toUpperCase();
+                            // Nettoyer les valeurs bizarres comme "A-PLUS" → "A"
+                            ecoValue = ecoValue.replace('-PLUS', '').replace('-MINUS', '').trim();
+                            // Vérifier que c'est une lettre A-F valide
+                            if (ecoValue.match(/^[A-F]$/) && ecoValue !== 'NOT-APPLICABLE' && ecoValue !== 'UNKNOWN') {
+                                ecoScore = ecoValue;
+                            }
                         } else if (product.ecoscoreGrade) {
-                            ecoScore = product.ecoscoreGrade.toUpperCase();
+                            var ecoValue2 = product.ecoscoreGrade.toUpperCase();
+                            ecoValue2 = ecoValue2.replace('-PLUS', '').replace('-MINUS', '').trim();
+                            if (ecoValue2.match(/^[A-F]$/) && ecoValue2 !== 'NOT-APPLICABLE' && ecoValue2 !== 'UNKNOWN') {
+                                ecoScore = ecoValue2;
+                            }
                         } else if (product.ecoscore_score !== undefined && product.ecoscore_score !== null) {
                             // Convertir le score numérique en lettre
                             if (product.ecoscore_score >= 80) {
@@ -3589,12 +3599,22 @@
                             }
                         }
                         
+                        // Nettoyer Nutri-Score
+                        var nutriValue = null;
+                        if (product.nutriscore_grade) {
+                            var nutriTemp = product.nutriscore_grade.toUpperCase();
+                            // Ignorer les valeurs non valides
+                            if (nutriTemp !== 'NOT-APPLICABLE' && nutriTemp !== 'UNKNOWN' && nutriTemp !== 'NOT-KNOWN' && nutriTemp.match(/^[A-E]$/)) {
+                                nutriValue = nutriTemp;
+                            }
+                        }
+                        
                         currentProductData = {
                             nom: product.product_name || product.generic_name || 'Produit inconnu',
                             image: product.image_url || product.image_front_url || null,
                             categorie: detectCategory(product),
                             barcode: barcode,
-                            nutriScore: product.nutriscore_grade ? product.nutriscore_grade.toUpperCase() : null,
+                            nutriScore: nutriValue,
                             novaGroup: product.nova_group || null,
                             additives: product.additives_n || 0,
                             ecoScore: ecoScore
@@ -3856,8 +3876,12 @@
                                     
                                     // Récupérer Nutri-Score
                                     if (product.nutriscore_grade) {
-                                        savedNutriScore = product.nutriscore_grade.toUpperCase();
-                                        updates.push('Nutri-Score ' + savedNutriScore);
+                                        var nutriTemp = product.nutriscore_grade.toUpperCase();
+                                        // Ignorer les valeurs non valides
+                                        if (nutriTemp !== 'NOT-APPLICABLE' && nutriTemp !== 'UNKNOWN' && nutriTemp !== 'NOT-KNOWN' && nutriTemp.match(/^[A-E]$/)) {
+                                            savedNutriScore = nutriTemp;
+                                            updates.push('Nutri-Score ' + savedNutriScore);
+                                        }
                                     }
                                     
                                     // Récupérer NOVA
@@ -3875,7 +3899,13 @@
                                     // Récupérer Eco-Score
                                     var ecoScore = null;
                                     if (product.ecoscore_grade) {
-                                        ecoScore = product.ecoscore_grade.toUpperCase();
+                                        var ecoValue = product.ecoscore_grade.toUpperCase();
+                                        // Nettoyer les valeurs bizarres comme "A-PLUS" → "A"
+                                        ecoValue = ecoValue.replace('-PLUS', '').replace('-MINUS', '').trim();
+                                        // Vérifier que c'est une lettre A-F valide
+                                        if (ecoValue.match(/^[A-F]$/) && ecoValue !== 'NOT-APPLICABLE' && ecoValue !== 'UNKNOWN') {
+                                            ecoScore = ecoValue;
+                                        }
                                     } else if (product.ecoscore_score !== undefined && product.ecoscore_score !== null) {
                                         if (product.ecoscore_score >= 80) ecoScore = 'A';
                                         else if (product.ecoscore_score >= 60) ecoScore = 'B';
@@ -5343,8 +5373,12 @@
                                     
                                     // Récupérer Nutri-Score
                                     if (product.nutriscore_grade) {
-                                        item.nutriScore = product.nutriscore_grade.toUpperCase();
-                                        updates.push('Nutri-Score ' + item.nutriScore);
+                                        var nutriValue = product.nutriscore_grade.toUpperCase();
+                                        // Ignorer les valeurs non valides
+                                        if (nutriValue !== 'NOT-APPLICABLE' && nutriValue !== 'UNKNOWN' && nutriValue !== 'NOT-KNOWN') {
+                                            item.nutriScore = nutriValue;
+                                            updates.push('Nutri-Score ' + item.nutriScore);
+                                        }
                                     }
                                     
                                     // Récupérer NOVA
@@ -5362,7 +5396,13 @@
                                     // Récupérer Eco-Score
                                     var ecoScore = null;
                                     if (product.ecoscore_grade) {
-                                        ecoScore = product.ecoscore_grade.toUpperCase();
+                                        var ecoValue = product.ecoscore_grade.toUpperCase();
+                                        // Nettoyer les valeurs bizarres comme "A-PLUS" → "A"
+                                        ecoValue = ecoValue.replace('-PLUS', '').replace('-MINUS', '').trim();
+                                        // Ignorer les valeurs non valides
+                                        if (ecoValue !== 'NOT-APPLICABLE' && ecoValue !== 'UNKNOWN' && ecoValue !== 'NOT-KNOWN' && ecoValue.match(/^[A-F]$/)) {
+                                            ecoScore = ecoValue;
+                                        }
                                     } else if (product.ecoscore_score !== undefined && product.ecoscore_score !== null) {
                                         if (product.ecoscore_score >= 80) ecoScore = 'A';
                                         else if (product.ecoscore_score >= 60) ecoScore = 'B';
