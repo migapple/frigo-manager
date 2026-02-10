@@ -3640,7 +3640,6 @@
             var savedNovaGroup = productData.novaGroup || null;
             var savedAdditives = productData.additives !== undefined ? productData.additives : null;
             var savedEcoScore = productData.ecoScore || null;
-            var savedEcoScore = productData.ecoScore || null;
             
             // Bouton pour supprimer la photo (si elle existe)
             var btnRemovePhoto = document.getElementById('btnRemovePhoto');
@@ -3785,8 +3784,8 @@
                                     
                                     if (updates.length > 0) {
                                         var successMsg = currentLang === 'fr' ? 
-                                            '✅ Données récupérées !\n\n' + updates.join('\n') :
-                                            '✅ Data retrieved!\n\n' + updates.join('\n');
+                                            '✅ Données récupérées !\n\n' + updates.join('\n') + '\n\n💾 Cliquez sur "Ajouter" pour sauvegarder le produit.' :
+                                            '✅ Data retrieved!\n\n' + updates.join('\n') + '\n\n💾 Click "Add" to save the product.';
                                         alert(successMsg);
                                     } else {
                                         var noDataMsg = currentLang === 'fr' ?
@@ -5258,7 +5257,11 @@
                                     badge.style.animation = '';
                                     
                                     if (updates.length > 0) {
-                                        alert('✅ Données récupérées !\n\n' + updates.join('\n') + '\n\n💾 Cliquez sur "Enregistrer" pour sauvegarder.');
+                                        // IMPORTANT : Sauvegarder automatiquement les modifications
+                                        saveItems();
+                                        alert('✅ Données récupérées et sauvegardées !\n\n' + updates.join('\n'));
+                                        // Rafraîchir l'affichage si le formulaire est fermé
+                                        renderAll();
                                     } else {
                                         alert('⚠️ Aucune donnée supplémentaire disponible.');
                                     }
@@ -5331,6 +5334,8 @@
                     items[index].quantite = parseInt(document.getElementById('formQuantite').value) || 0;
                     items[index].aRenouveler = document.getElementById('formRenouveler').checked;
                     items[index].image = customImageData;
+                    // Préserver les données de santé (ne pas les écraser)
+                    // items[index].nutriScore, novaGroup, additives, ecoScore, barcode restent inchangés
                 }
                 
                 saveItems();
