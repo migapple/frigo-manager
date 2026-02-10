@@ -379,8 +379,17 @@
         }
         
         .btn-manual-entry {
-            background: white;
-            color: #333;
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            padding: 15px 25px;
+            border: 2px solid white;
+        }
+        
+        .btn-manual-entry:hover {
+            background: #5568d3;
+            transform: scale(1.05);
         }
         
         .loading {
@@ -829,6 +838,7 @@
         .eco-c { background: #fecb02; color: #333; }
         .eco-d { background: #ee8100; }
         .eco-e { background: #e63e11; }
+        .eco-f { background: #b91c1c; } /* Rouge très foncé - pire que E */
         
         /* NOVA Group */
         .nova-1 { background: #038141; }
@@ -3107,6 +3117,8 @@
         }
 
         function renderItems() {
+            console.log('📋 renderItems appelé - Recherche:', currentSearchTerm, '- Nombre items:', items.length);
+            
             var filtered = items.filter(function(item) {
                 var d = getDays(item.datePeremption);
                 var qty = getQuantity(item.quantite);
@@ -3132,6 +3144,8 @@
                 
                 return statusMatch && emplacementMatch && searchMatch;
             });
+            
+            console.log('🔍 Résultats après filtrage:', filtered.length, 'items trouvés');
             
             var itemsEl = document.getElementById('items');
             var emptyEl = document.getElementById('empty');
@@ -3368,8 +3382,25 @@
             }, function(err) {
                 if (err) {
                     console.error(err);
-                    alert(t('messages.noCamera'));
-                    stopScanner();
+                    
+                    // Afficher un message d'erreur plus clair avec le bouton saisie manuelle
+                    var scannerInstructions = document.querySelector('.scanner-instructions');
+                    if (scannerInstructions) {
+                        scannerInstructions.innerHTML = 
+                            '<div style="color: #ef4444; font-size: 1.2em; padding: 20px;">' +
+                            '⚠️ Caméra non accessible<br>' +
+                            '<span style="font-size: 0.9em;">Utilisez la saisie manuelle ci-dessous</span>' +
+                            '</div>';
+                    }
+                    
+                    // Rendre le bouton saisie manuelle encore plus visible
+                    var btnManual = document.getElementById('btnManualFromScanner');
+                    if (btnManual) {
+                        btnManual.style.background = '#10b981';
+                        btnManual.style.fontSize = '1.3em';
+                        btnManual.style.animation = 'pulse 1.5s infinite';
+                    }
+                    
                     return;
                 }
                 Quagga.start();
@@ -3489,6 +3520,7 @@
                             additives: product.additives_n || 0,
                             ecoScore: ecoScore
                         };
+                        
                         showForm(currentProductData);
                     } else {
                         alert(t('messages.productNotFound'));
@@ -3559,7 +3591,7 @@
             if (productData.barcode) {
                 html += '<div class="barcode-badge clickable" id="barcodeBadgeAdd" style="display: inline-block;">📊 ' + (currentLang === 'fr' ? 'Code-barres: ' : 'Barcode: ') + productData.barcode + '</div>';
                 if (!productData.image) {
-                    html += '<div class="date-suggestion" style="margin-top: 5px;">💡 ' + (currentLang === 'fr' ? 'Cliquez sur le code-barres pour récupérer la photo' : 'Click barcode to retrieve photo') + '</div>';
+                    html += '<div class="date-suggestion" style="margin-top: 5px;">💡 ' + (currentLang === 'fr' ? 'Cliquez sur le code-barres pour récupérer photo + scores santé' : 'Click barcode to retrieve photo + health scores') + '</div>';
                 }
             }
             
@@ -5042,7 +5074,7 @@
             if (item.barcode) {
                 html += '<div class="barcode-badge clickable" id="barcodeBadge" style="display: inline-block;">📊 ' + item.barcode + '</div>';
                 if (!item.image) {
-                    html += '<div class="date-suggestion" style="margin-top: 5px;">💡 Cliquez sur le code-barres pour récupérer la photo</div>';
+                    html += '<div class="date-suggestion" style="margin-top: 5px;">💡 Cliquez sur le code-barres pour récupérer photo + scores santé</div>';
                 }
             }
             
@@ -5454,6 +5486,8 @@
         searchInput.addEventListener('input', function(e) {
             var value = e.target.value.trim();
             currentSearchTerm = value;
+            
+            console.log('🔍 Recherche:', value);
             
             // Afficher/cacher le bouton clear
             clearBtn.style.display = value ? 'flex' : 'none';
