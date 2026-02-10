@@ -2145,8 +2145,7 @@
                        autocorrect="off" 
                        autocapitalize="off" 
                        spellcheck="false"
-                       inputmode="search"
-                       onkeydown="if(event.key==='Enter'){event.preventDefault();doSearch();}">
+                       inputmode="search">
                 <button id="searchButton" class="search-btn" onclick="doSearch()">GO</button>
                 <button id="clearSearch" class="clear-search-btn" style="display: none;" onclick="clearSearchNow()">✕</button>
             </div>
@@ -2769,21 +2768,23 @@
         var scanningActive = false;
         
         // FONCTIONS GLOBALES POUR ONCLICK HTML (iOS-friendly)
+        var lastSearchTime = 0;
+        
         function doSearch() {
-            alert('🎯 doSearch() appelée !');
+            // Éviter les appels multiples rapides (debounce 300ms)
+            var now = Date.now();
+            if (now - lastSearchTime < 300) {
+                return; // Ignorer si moins de 300ms depuis le dernier appel
+            }
+            lastSearchTime = now;
             
             var input = document.getElementById('searchInput');
             var clearBtn = document.getElementById('clearSearch');
             
-            if (!input) {
-                alert('❌ Input introuvable !');
-                return;
-            }
+            if (!input) return;
             
             var value = input.value.trim();
             currentSearchTerm = value;
-            
-            alert('🔍 Recherche: "' + value + '"');
             
             // Afficher le bouton clear
             if (clearBtn) {
@@ -2791,9 +2792,12 @@
             }
             
             // Lancer la recherche
-            alert('📋 Appel renderItems()...');
             renderItems();
-            alert('✅ Terminé !');
+            
+            // Ajouter à l'historique
+            if (value) {
+                addToSearchHistory(value);
+            }
             
             // Fermer le clavier
             input.blur();
@@ -5597,31 +5601,10 @@
         };
         */
         
-        // Plus d'event listeners JavaScript - On utilise onclick HTML directement
-        // (Plus fiable sur iOS)
+        // AUCUN event listener - Seulement onclick HTML
+        // (Recherche déclenchée UNIQUEMENT par le bouton GO)
         
-        searchInput.addEventListener('focus', function() {
-            if (!currentSearchTerm) {
-                renderSearchHistory();
-            }
-        });
-        
-        searchInput.addEventListener('blur', function() {
-            // Attendre un peu avant de cacher pour permettre les clics
-            setTimeout(function() {
-                historyEl.style.display = 'none';
-            }, 200);
-        });
-        
-        // Note: Enter est géré par onkeydown dans le HTML
-        // Escape pour annuler
-        searchInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                clearSearchNow();
-            }
-        });
-        
-        // Raccourci clavier Ctrl+F / Cmd+F
+        // Raccourci clavier Ctrl+F / Cmd+F pour focus
         document.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
                 e.preventDefault();
