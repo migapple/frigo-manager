@@ -1,0 +1,175 @@
+FRIGO MANAGER - CONTRAT DE LICENCE UTILISATEUR FINAL (CLUF)
+============================================================
+
+Version 1.0 - Février 2026
+© Michel Garlandat
+
+---
+
+1. OCTROI DE LICENCE
+
+Ce Contrat de Licence Utilisateur Final ("Licence") vous accorde le droit d'utiliser l'application Frigo Manager ("Logiciel") selon les conditions suivantes :
+
+a) UTILISATIONS AUTORISÉES :
+   ✓ Utilisation sur tous vos appareils personnels (ordinateurs, smartphones, tablettes)
+   ✓ Modification du code source pour votre usage personnel
+   ✓ Utilisation dans un contexte commercial (restaurant, magasin, entreprise)
+   ✓ Création de sauvegardes et de copies pour usage personnel
+
+b) UTILISATIONS INTERDITES :
+   ✗ Revendre, redistribuer ou transférer le Logiciel à des tiers
+   ✗ Supprimer ou modifier les mentions de copyright et les crédits de l'auteur
+   ✗ Sous-licencier ou louer le Logiciel
+   ✗ Inclure le Logiciel dans un autre produit destiné à la revente
+   ✗ Utiliser le Logiciel à des fins illégales
+
+---
+
+2. PROPRIÉTÉ INTELLECTUELLE
+
+Le Logiciel reste la propriété exclusive de Michel Garlandat. Cette Licence ne vous transfère aucun droit de propriété intellectuelle.
+
+a) Le code source, le design et tous les matériaux sont protégés par le droit d'auteur.
+b) Le nom "Frigo Manager" et le logo sont la propriété de l'auteur.
+c) Vous ne pouvez pas revendiquer la paternité du Logiciel.
+
+---
+
+3. SUPPORT ET MISES À JOUR
+
+a) MISES À JOUR GRATUITES : Vous avez droit à toutes les mises à jour pendant 1 an à compter de la date d'achat.
+b) SUPPORT PAR EMAIL : Le support technique est fourni par email avec réponse sous 48h ouvrables.
+c) Support non garanti : Le support est fourni en "meilleur effort" sans garantie de délai de réponse.
+
+---
+
+4. DONNÉES ET CONFIDENTIALITÉ
+
+a) STOCKAGE LOCAL : Toutes vos données sont stockées localement sur votre appareil.
+b) AUCUNE COLLECTE : Le Logiciel ne collecte, ne transmet ni ne stocke vos données personnelles sur des serveurs externes.
+c) VOTRE RESPONSABILITÉ : Vous êtes responsable de la sauvegarde régulière de vos données.
+d) APIS EXTERNES : Le Logiciel utilise des APIs tierces (Open Food Facts) pour les informations produits. Ces services ont leurs propres politiques de confidentialité.
+
+---
+
+5. EXCLUSION DE GARANTIE
+
+LE LOGICIEL EST FOURNI "TEL QUEL" SANS GARANTIE D'AUCUNE SORTE, EXPRESSE OU IMPLICITE.
+
+a) Aucune garantie que le Logiciel répondra à vos besoins spécifiques.
+b) Aucune garantie que le Logiciel fonctionnera sans interruption ni erreur.
+c) Aucune garantie concernant l'exactitude des informations récupérées via les APIs externes.
+
+---
+
+6. LIMITATION DE RESPONSABILITÉ
+
+DANS LA MESURE MAXIMALE PERMISE PAR LA LOI :
+
+a) L'auteur ne pourra être tenu responsable de tout dommage direct, indirect, accessoire ou consécutif découlant de l'utilisation ou de l'impossibilité d'utiliser le Logiciel.
+b) L'auteur ne pourra être tenu responsable de la perte de données, de la perte de profits ou de l'interruption d'activité.
+c) Votre seul recours est de cesser d'utiliser le Logiciel.
+
+---
+
+7. APIS EXTERNES
+
+Le Logiciel utilise les services externes suivants :
+
+a) OPEN FOOD FACTS (https://world.openfoodfacts.org)
+   - Licence : Open Database License (ODbL)
+   - Usage : Informations et images des produits
+   - Politique de confidentialité : https://world.openfoodfacts.org/privacy
+
+Vous reconnaissez que ces services peuvent modifier leurs conditions ou devenir indisponibles à tout moment.
+
+---
+
+8. MODIFICATIONS DU CODE
+
+a) USAGE PERSONNEL : Vous pouvez modifier le code source pour vos besoins personnels.
+b) PAS DE REDISTRIBUTION : Vous ne pouvez pas distribuer vos versions modifiées.
+c) PAS DE SUPPORT : L'auteur ne fournit pas de support pour les versions modifiées.
+d) AUCUNE RESPONSABILITÉ : L'auteur n'est pas responsable des problèmes causés par vos modifications.
+
+---
+
+9. RÉSILIATION
+
+Cette Licence est effective jusqu'à sa résiliation.
+
+a) RÉSILIATION AUTOMATIQUE : La Licence se termine automatiquement si vous violez l'une de ses conditions.
+b) RÉSILIATION VOLONTAIRE : Vous pouvez résilier cette Licence à tout moment en supprimant le Logiciel.
+c) EFFETS DE LA RÉSILIATION : Lors de la résiliation, vous devez cesser toute utilisation du Logiciel et supprimer toutes les copies.
+
+---
+
+10. MISES À JOUR DE LA LICENCE
+
+L'auteur se réserve le droit de modifier cette Licence pour les futures versions du Logiciel. Les modifications ne s'appliqueront pas rétroactivement aux versions déjà achetées.
+
+---
+
+11. LOI APPLICABLE
+
+Cette Licence est régie par le droit français.
+
+Tout litige relatif à cette Licence sera soumis aux tribunaux compétents de France.
+
+---
+
+12. INTÉGRALITÉ DE L'ACCORD
+
+Cette Licence constitue l'intégralité de l'accord entre vous et l'auteur concernant le Logiciel et remplace toutes les communications antérieures.
+
+---
+
+13. DIVISIBILITÉ
+
+Si une disposition de cette Licence est jugée invalide ou inapplicable, les autres dispositions resteront pleinement en vigueur.
+
+---
+
+14. CONTACT
+
+Pour toute question concernant cette Licence :
+
+Email : votre-email@exemple.com
+Site web : https://votre-site.com
+
+---
+
+EN UTILISANT LE LOGICIEL, VOUS RECONNAISSEZ AVOIR LU, COMPRIS ET ACCEPTÉ D'ÊTRE LIÉ PAR LES TERMES DE CETTE LICENCE.
+
+---
+
+RÉSUMÉ EN TERMES SIMPLES :
+
+✓ VOUS POUVEZ :
+  - Utiliser sur tous vos appareils
+  - Modifier pour vous-même
+  - Utiliser dans votre entreprise
+
+✗ VOUS NE POUVEZ PAS :
+  - Revendre ou redistribuer
+  - Retirer les crédits de l'auteur
+  - Revendiquer comme votre œuvre
+
+📧 SUPPORT :
+  - Email sous 48h
+  - Mises à jour gratuites pendant 1 an
+
+🔒 VOS DONNÉES :
+  - Stockées localement uniquement
+  - Vous contrôlez tout
+  - Sauvegardez régulièrement
+
+---
+
+Merci de respecter ces conditions !
+
+Michel Garlandat
+Développeur Frigo Manager
+
+Dernière mise à jour : Février 2026
+Version : 1.0
