@@ -2776,6 +2776,101 @@
         var lastScannedCode = null;
         var scanConfidenceCount = {};
         var scanningActive = false;
+
+                // === DURÉES DE CONSERVATION (en jours) ===
+        var dureeConservation = {
+            'fruit': {
+                'frigo': 7,
+                'congelateur': 365,
+                'placard': 3,
+                'cave': 14,
+                'corbeille': 5,
+                'autre_emplacement': 5
+            },
+            'legume': {
+                'frigo': 7,
+                'congelateur': 365,
+                'placard': 5,
+                'cave': 30,
+                'corbeille': 7,
+                'autre_emplacement': 5
+            },
+            'viande': {
+                'frigo': 3,
+                'congelateur': 180,
+                'placard': 1,
+                'cave': 2,
+                'corbeille': 2,
+                'autre_emplacement': 2
+            },
+            'poisson': {
+                'frigo': 2,
+                'congelateur': 90,
+                'placard': 1,
+                'cave': 1,
+                'corbeille': 1,
+                'autre_emplacement': 1
+            },
+            'produit_laitier': {
+                'frigo': 7,
+                'congelateur': 90,
+                'placard': 1,
+                'cave': 3,
+                'corbeille': 3,
+                'autre_emplacement': 3
+            },
+            'viennoiseries': {
+                'frigo': 5,
+                'congelateur': 90,
+                'placard': 3,
+                'cave': 3,
+                'corbeille': 3,
+                'autre_emplacement': 3
+            },
+            'conserves': {
+                'frigo': 180,
+                'congelateur': 730,
+                'placard': 730,
+                'cave': 1095,
+                'corbeille': 365,
+                'autre_emplacement': 365
+            },
+            'boisson': {
+                'frigo': 90,
+                'congelateur': 180,
+                'placard': 365,
+                'cave': 730,
+                'corbeille': 180,
+                'autre_emplacement': 180
+            },
+            'autre': {
+                'frigo': 14,
+                'congelateur': 180,
+                'placard': 90,
+                'cave': 180,
+                'corbeille': 30,
+                'autre_emplacement': 30
+            }
+        };
+        
+        // Fonction pour calculer la nouvelle date selon emplacement + catégorie
+        function calculerNouvelleDate(categorie, emplacement) {
+            var duree = (dureeConservation[categorie] && dureeConservation[categorie][emplacement]) 
+                       || dureeConservation['autre']['frigo']; // Valeur par défaut
+            
+            var nouvelleDate = new Date();
+            nouvelleDate.setDate(nouvelleDate.getDate() + duree);
+            return nouvelleDate.toISOString().split('T')[0];
+        }
+        
+        // Fonction pour afficher les durées en texte lisible
+        function afficherDuree(jours) {
+            if (jours < 7) return jours + ' jour' + (jours > 1 ? 's' : '');
+            if (jours < 30) return Math.round(jours / 7) + ' semaine' + (jours > 13 ? 's' : '');
+            if (jours < 365) return Math.round(jours / 30) + ' mois';
+            return Math.round(jours / 365) + ' an' + (jours > 730 ? 's' : '');
+        }
+
         
         // FONCTIONS GLOBALES POUR ONCLICK HTML (iOS-friendly)
         var lastSearchTime = 0;
@@ -3683,10 +3778,10 @@
             productData = productData || {};
             var form = document.getElementById('form');
             
-            // Date suggérée : dans 7 jours
-            var suggestedDate = new Date();
-            suggestedDate.setDate(suggestedDate.getDate() + 7);
-            var suggestedDateStr = suggestedDate.toISOString().split('T')[0];
+           // Date suggérée : calcul automatique selon catégorie + emplacement
+            var categorie = productData.categorie || 'autre';
+            var emplacement = defaultEmplacement;
+            var suggestedDate = calculerNouvelleDate(categorie, emplacement);
             
             // Emplacement par défaut : utiliser le filtre actuel si sélectionné
             var defaultEmplacement = productData.emplacement;
