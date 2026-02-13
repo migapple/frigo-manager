@@ -72,13 +72,13 @@
                 padding: 0 70px; /* Plus d'espace pour les boutons */
             }
             .language-selector {
-                top: 10px; /* Descendre un peu le bouton */
+                top: 55px; /* Aligné avec le sous-titre "Scanner de code-barres" */
                 left: 8px;
                 font-size: 12px;
                 padding: 6px 10px;
             }
             .settings-btn {
-                top: 10px; /* Même hauteur que le bouton de langue */
+                top: 55px; /* Même hauteur que le bouton de langue */
                 right: 8px;
                 font-size: 20px;
                 padding: 6px 10px;
@@ -142,7 +142,7 @@
         
         .language-selector {
             position: absolute;
-            top: 5px;
+            top: 50px; /* Aligné avec le sous-titre "Scanner de code-barres" */
             left: 5px;
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid white;
@@ -165,7 +165,7 @@
         
         .settings-btn {
             position: absolute;
-            top: 5px;
+            top: 50px; /* Même hauteur que le bouton de langue */
             right: 5px;
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid white;
@@ -448,8 +448,10 @@
         }
         
         .filter-btn.active {
-            background: #667eea;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+            transform: translateY(-2px);
         }
         
         .filters-emplacement {
@@ -1774,7 +1776,8 @@
                     <div style="text-align: center; margin: 15px 0;">
                         <div style="font-size: 3em; margin-bottom: 10px;">🧊</div>
                         <div style="font-size: 1.2em; font-weight: bold; color: #0369a1; margin-bottom: 5px;">Frigo Manager</div>
-                        <div style="font-size: 0.9em; color: #64748b; margin-bottom: 15px;">Version 1.2</div>
+                        <div style="font-size: 0.9em; color: #64748b; margin-bottom: 10px;" id="versionDisplay">Version 2.1.0</div>
+                        <button class="btn" onclick="showChangelog()" style="background: #0ea5e9; padding: 8px 16px; font-size: 0.85em; margin-bottom: 10px;">🎉 Quoi de neuf ?</button>
                     </div>
                     <div style="background: white; padding: 15px; border-radius: 10px; margin: 10px 0;">
                         <div style="font-size: 0.95em; color: #334155; margin-bottom: 8px;">
@@ -1942,6 +1945,13 @@
                 </div>
                 
                 <button class="btn" onclick="closeHealthGuide()" style="background: #667eea; color: white; margin-top: 20px; width: 100%;">✓ J'ai compris</button>
+            </div>
+        </div>
+        
+        <!-- Modal Changelog "Quoi de neuf" -->
+        <div id="changelogModal" class="settings-menu">
+            <div class="settings-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;" id="changelogContent">
+                <!-- Le contenu sera généré dynamiquement par JavaScript -->
             </div>
         </div>
         
@@ -2544,6 +2554,71 @@
         };
         
         var currentLang = localStorage.getItem('language') || 'fr';
+        
+        // === SYSTÈME DE VERSION ===
+        var APP_VERSION = '2.1.1';
+        var VERSION_DATE = '2026-02-13';
+        var CHANGELOG = {
+            '2.1.1': {
+                date: '2026-02-13',
+                changes: {
+                    fr: [
+                        '🎨 Alignement des boutons langue/paramètres avec le sous-titre sur iPhone',
+                        '📱 Amélioration de l\'ergonomie mobile'
+                    ],
+                    en: [
+                        '🎨 Aligned language/settings buttons with subtitle on iPhone',
+                        '📱 Improved mobile ergonomics'
+                    ]
+                }
+            },
+            '2.1.0': {
+                date: '2026-02-13',
+                changes: {
+                    fr: [
+                        '✨ Modification des recettes par défaut (crée une copie)',
+                        '📊 Export Excel inclut maintenant les scores santé',
+                        '🎨 Couleur du bouton "Tous" améliorée (rouge visible)',
+                        '⏰ Calcul automatique des dates de péremption',
+                        '🔄 Recalcul en temps réel des dates',
+                        '📋 Table complète des durées de conservation'
+                    ],
+                    en: [
+                        '✨ Edit default recipes (creates a copy)',
+                        '📊 Excel export now includes health scores',
+                        '🎨 Improved "All" button color (visible red)',
+                        '⏰ Automatic expiration date calculation',
+                        '🔄 Real-time date recalculation',
+                        '📋 Complete storage duration table'
+                    ]
+                }
+            },
+            '2.0.0': {
+                date: '2026-02-11',
+                changes: {
+                    fr: [
+                        '🎯 Calcul intelligent des dates selon catégorie et emplacement',
+                        '🏥 Sauvegarde des scores santé (Nutri-Score, NOVA, Eco-Score)',
+                        '📱 Mode PWA amélioré',
+                        '🌍 Support multilingue FR/EN'
+                    ],
+                    en: [
+                        '🎯 Smart date calculation by category and location',
+                        '🏥 Health scores saved (Nutri-Score, NOVA, Eco-Score)',
+                        '📱 Improved PWA mode',
+                        '🌍 Multilingual support FR/EN'
+                    ]
+                }
+            }
+        };
+        
+        function getVersionInfo() {
+            return {
+                version: APP_VERSION,
+                date: VERSION_DATE,
+                changelog: CHANGELOG[APP_VERSION].changes[currentLang]
+            };
+        }
         
         function t(key) {
             var keys = key.split('.');
@@ -4156,6 +4231,46 @@
             document.getElementById('healthGuide').classList.remove('active');
         }
         
+        function showChangelog() {
+            // Fermer le menu des paramètres
+            document.getElementById('settingsMenu').classList.remove('active');
+            
+            // Générer le contenu du changelog
+            var html = '<h3 style="margin-top: 0; color: #667eea;">🎉 Quoi de neuf ?</h3>';
+            
+            // Parcourir toutes les versions du changelog
+            for (var version in CHANGELOG) {
+                var versionData = CHANGELOG[version];
+                var changes = versionData.changes[currentLang];
+                var isLatest = version === APP_VERSION;
+                
+                html += '<div class="settings-section" style="' + (isLatest ? 'background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border: 2px solid #3b82f6;' : '') + '">';
+                html += '<h4 style="color: ' + (isLatest ? '#1e40af' : '#667eea') + ';">';
+                if (isLatest) html += '✨ ';
+                html += 'Version ' + version;
+                if (isLatest) html += ' (Actuelle)';
+                html += '</h4>';
+                html += '<p style="font-size: 0.85em; color: #64748b; margin-bottom: 10px;">📅 ' + versionData.date + '</p>';
+                html += '<ul style="margin: 10px 0; padding-left: 20px; font-size: 0.9em;">';
+                
+                changes.forEach(function(change) {
+                    html += '<li style="margin: 8px 0; color: #334155;">' + change + '</li>';
+                });
+                
+                html += '</ul></div>';
+            }
+            
+            html += '<button class="btn" onclick="closeChangelog()" style="background: #667eea; color: white; margin-top: 20px;">✕ Fermer</button>';
+            
+            // Afficher dans une modal
+            document.getElementById('changelogContent').innerHTML = html;
+            document.getElementById('changelogModal').classList.add('active');
+        }
+        
+        function closeChangelog() {
+            document.getElementById('changelogModal').classList.remove('active');
+        }
+        
         // === FONCTIONS EXPORT/IMPORT RECETTES CSV ===
         
         function exportRecipesCSV() {
@@ -4341,7 +4456,11 @@
                         'Catégorie': item.categorie || '',
                         'Emplacement': item.emplacement || '',
                         'Quantité': item.quantite || 0,
-                        'À renouveler': item.aRenouveler ? 'Oui' : 'Non'
+                        'À renouveler': item.aRenouveler ? 'Oui' : 'Non',
+                        'Nutri-Score': item.nutriScore || '',
+                        'NOVA': item.novaGroup || '',
+                        'Additifs': item.additives !== undefined && item.additives !== null ? item.additives : '',
+                        'Eco-Score': item.ecoScore || ''
                     };
                 });
                 
@@ -4360,7 +4479,11 @@
                     {wch: 15},  // Catégorie
                     {wch: 15},  // Emplacement
                     {wch: 10},  // Quantité
-                    {wch: 12}   // À renouveler
+                    {wch: 12},  // À renouveler
+                    {wch: 12},  // Nutri-Score
+                    {wch: 8},   // NOVA
+                    {wch: 10},  // Additifs
+                    {wch: 12}   // Eco-Score
                 ];
                 ws['!cols'] = wscols;
                 
@@ -4430,6 +4553,10 @@
                             emplacement: row['Emplacement'] || 'frigo',
                             quantite: parseInt(row['Quantité']) || 1,
                             aRenouveler: row['À renouveler'] === 'Oui',
+                            nutriScore: row['Nutri-Score'] || null,
+                            novaGroup: row['NOVA'] ? parseInt(row['NOVA']) : null,
+                            additives: row['Additifs'] !== undefined && row['Additifs'] !== '' ? parseInt(row['Additifs']) : null,
+                            ecoScore: row['Eco-Score'] || null,
                             image: null
                         };
                     });
@@ -4988,13 +5115,17 @@
             
             html += '</ol></div>';
             
-            // Ajouter les boutons modifier/supprimer si c'est une recette utilisateur
+            // Afficher les boutons pour TOUTES les recettes
+            // Les recettes par défaut seront copiées en recettes utilisateur lors de la modification
+            html += '<div class="recipe-actions-bar">' +
+                   '<button class="btn" onclick="editRecipe(' + recipeId + ')" style="background: #f59e0b; flex: 1;">' + t('recipes.edit') + '</button>';
+            
+            // Bouton supprimer seulement pour les recettes utilisateur (pas les recettes par défaut)
             if (isUserRecipe) {
-                html += '<div class="recipe-actions-bar">' +
-                       '<button class="btn" onclick="editRecipe(' + recipeId + ')" style="background: #f59e0b; flex: 1;">' + t('recipes.edit') + '</button>' +
-                       '<button class="btn" onclick="deleteRecipe(' + recipeId + ')" style="background: #ef4444; flex: 1;">' + t('recipes.deleteBtn') + '</button>' +
-                       '</div>';
+                html += '<button class="btn" onclick="deleteRecipe(' + recipeId + ')" style="background: #ef4444; flex: 1;">' + t('recipes.deleteBtn') + '</button>';
             }
+            
+            html += '</div>';
             
             document.getElementById('recipeDetailBody').innerHTML = html;
             document.getElementById('recipeDetailModal').classList.add('active');
@@ -5173,16 +5304,39 @@
         }
         
         function editRecipe(recipeId) {
-            var recipe = userRecipes.find(function(r) { return r.id === recipeId; });
+            var allRecipes = getAllRecipes();
+            var recipe = allRecipes.find(function(r) { return r.id === recipeId; });
             if (!recipe) return;
             
-            currentEditingRecipeId = recipeId;
+            var isUserRecipe = recipeId >= 1000;
+            
+            // Si c'est une recette par défaut, on va la dupliquer en recette utilisateur
+            if (!isUserRecipe) {
+                // Informer l'utilisateur
+                var message = currentLang === 'fr' 
+                    ? '💡 Cette recette par défaut sera copiée.\n\nVos modifications créeront une nouvelle recette personnalisée.\n\nContinuer ?' 
+                    : '💡 This default recipe will be copied.\n\nYour changes will create a new custom recipe.\n\nContinue?';
+                
+                if (!confirm(message)) {
+                    return;
+                }
+                
+                // Créer un nouvel ID pour la copie
+                currentEditingRecipeId = null; // Cela créera une nouvelle recette
+            } else {
+                currentEditingRecipeId = recipeId;
+            }
             
             // Fermer le détail
             closeRecipeDetail();
             
             // Remplir le formulaire
-            document.getElementById('createRecipeTitle').textContent = currentLang === 'fr' ? '✏️ Modifier la recette' : '✏️ Edit recipe';
+            var title = currentLang === 'fr' ? '✏️ Modifier la recette' : '✏️ Edit recipe';
+            if (!isUserRecipe) {
+                title = currentLang === 'fr' ? '📋 Copie de la recette' : '📋 Copy recipe';
+            }
+            document.getElementById('createRecipeTitle').textContent = title;
+            
             document.getElementById('recipeNameInput').value = recipe.name;
             document.getElementById('recipeIconInput').value = recipe.icon;
             document.getElementById('selectedEmoji').textContent = recipe.icon;
@@ -5824,6 +5978,9 @@
         // Initialisation
         renderAll();
         setLanguage(currentLang); // Initialize language
+        
+        // Afficher la version
+        document.getElementById('versionDisplay').textContent = 'Version ' + APP_VERSION;
     </script>
 </body>
 </html>
