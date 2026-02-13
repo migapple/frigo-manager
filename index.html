@@ -2791,9 +2791,24 @@
         var currentLang = localStorage.getItem('language') || 'fr';
         
         // === SYSTÈME DE VERSION ===
-        var APP_VERSION = '2.1.5';
+        var APP_VERSION = '2.1.6';
         var VERSION_DATE = '2026-02-13';
         var CHANGELOG = {
+            '2.1.6': {
+                date: '2026-02-13',
+                changes: {
+                    fr: [
+                        '🐛 Correction erreur "can\'t find variable: notification" lors de l\'import Excel',
+                        '✅ Vérification de la disponibilité de l\'API Notification avant utilisation',
+                        '🔒 Protection contre les navigateurs ne supportant pas les notifications'
+                    ],
+                    en: [
+                        '🐛 Fixed "can\'t find variable: notification" error during Excel import',
+                        '✅ Check Notification API availability before use',
+                        '🔒 Protection against browsers not supporting notifications'
+                    ]
+                }
+            },
             '2.1.5': {
                 date: '2026-02-13',
                 changes: {
@@ -3396,6 +3411,11 @@
         }
         
         function sendNotification(title, body, urgentCount) {
+            // Vérifier si l'API Notification est supportée
+            if (typeof Notification === 'undefined') {
+                return;
+            }
+            
             if (Notification.permission === "granted") {
                 var notification = new Notification(title, {
                     body: body,
@@ -3484,14 +3504,14 @@
                 
                 // Afficher le prompt de notification si pas encore répondu
                 var notificationAsked = localStorage.getItem('notification-asked');
-                if (!notificationAsked && Notification.permission === 'default') {
+                if (!notificationAsked && typeof Notification !== 'undefined' && Notification.permission === 'default') {
                     setTimeout(function() {
                         document.getElementById('notificationPrompt').classList.add('show');
                     }, 1000);
                 }
                 
                 // Envoyer une notification si déjà autorisé
-                if (Notification.permission === 'granted') {
+                if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
                     var notifTitle = currentLang === 'fr' ? '⚠️ Frigo Manager' : '⚠️ Fridge Manager';
                     var notifBody = '';
                     
