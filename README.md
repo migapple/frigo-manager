@@ -1,8 +1,8 @@
-# 🧊 Frigo Manager v2
+# 🧊 Frigo Manager v2.1
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.1.5-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Language](https://img.shields.io/badge/language-JavaScript-yellow.svg)
 
@@ -14,11 +14,24 @@
 
 ---
 
-## ✨ Nouveautés v2.0
+## ✨ Nouveautés v2.1
+
+### 🔄 Recalcul Automatique en Temps Réel
+La version 2.1 améliore le calcul des dates avec un **recalcul automatique instantané** :
+- Changez la catégorie → La date se recalcule ✨
+- Changez l'emplacement → La date se recalcule ✨
+- Fonctionne dans l'ajout ET la modification de produits
+
+### 📋 Table des Durées Intégrée
+Consultez facilement toutes les durées de conservation :
+- Accessible via ⚙️ Paramètres → 📋 Table des durées
+- 54 combinaisons affichées (9 catégories × 6 emplacements)
+- Codes couleur pour identification rapide
+- Conseils de conservation inclus
 
 ### 🎯 Calcul Automatique des Dates de Péremption
 
-La version 2 introduit un **système intelligent** qui calcule automatiquement les dates de péremption selon :
+Le système intelligent calcule automatiquement les dates selon :
 - 📍 **L'emplacement** (frigo, congélateur, placard, cave)
 - 🏷️ **La catégorie** (viande, poisson, fruits, légumes, etc.)
 
