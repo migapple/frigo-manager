@@ -102,6 +102,7 @@ Le système **recalcule automatiquement** la date quand vous changez l'emplaceme
 - ✅ Basées sur vos produits disponibles
 - ✅ Priorise les produits proches de la péremption
 - ✅ Suggestions personnalisées
+- ✅ Ajout de vos propres recettes
 
 ### 📊 Export/Import
 - ✅ Export Excel (.xlsx)
