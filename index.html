@@ -72,13 +72,13 @@
                 padding: 0 70px; /* Plus d'espace pour les boutons */
             }
             .language-selector {
-                top: 10px; /* Descendre un peu le bouton */
+                top: 55px; /* Aligné avec le sous-titre "Scanner de code-barres" */
                 left: 8px;
                 font-size: 12px;
                 padding: 6px 10px;
             }
             .settings-btn {
-                top: 10px; /* Même hauteur que le bouton de langue */
+                top: 55px; /* Même hauteur que le bouton de langue */
                 right: 8px;
                 font-size: 20px;
                 padding: 6px 10px;
@@ -142,7 +142,7 @@
         
         .language-selector {
             position: absolute;
-            top: 5px;
+            top: 50px; /* Aligné avec le sous-titre "Scanner de code-barres" */
             left: 5px;
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid white;
@@ -165,7 +165,7 @@
         
         .settings-btn {
             position: absolute;
-            top: 5px;
+            top: 50px; /* Même hauteur que le bouton de langue */
             right: 5px;
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid white;
@@ -448,8 +448,10 @@
         }
         
         .filter-btn.active {
-            background: #667eea;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+            transform: translateY(-2px);
         }
         
         .filters-emplacement {
@@ -1760,6 +1762,7 @@
                 <div class="settings-section">
                     <h4>📊 Informations santé</h4>
                     <button class="btn" onclick="showHealthGuide()" style="background: #059669; margin-bottom: 10px;">📚 Comprendre les scores</button>
+                    <button class="btn" onclick="showDurationTable()" style="background: #0ea5e9; margin-bottom: 10px;">📋 Table des durées</button>
                     <p style="font-size: 0.85em; color: #666; margin: 10px 0;">Nutri-Score, NOVA, Additifs, Eco-Score expliqués</p>
                 </div>
                 
@@ -1774,7 +1777,8 @@
                     <div style="text-align: center; margin: 15px 0;">
                         <div style="font-size: 3em; margin-bottom: 10px;">🧊</div>
                         <div style="font-size: 1.2em; font-weight: bold; color: #0369a1; margin-bottom: 5px;">Frigo Manager</div>
-                        <div style="font-size: 0.9em; color: #64748b; margin-bottom: 15px;">Version 1.2</div>
+                        <div style="font-size: 0.9em; color: #64748b; margin-bottom: 10px;" id="versionDisplay">Version 2.1.0</div>
+                        <button class="btn" onclick="showChangelog()" style="background: #0ea5e9; padding: 8px 16px; font-size: 0.85em; margin-bottom: 10px;">🎉 Quoi de neuf ?</button>
                     </div>
                     <div style="background: white; padding: 15px; border-radius: 10px; margin: 10px 0;">
                         <div style="font-size: 0.95em; color: #334155; margin-bottom: 8px;">
@@ -1942,6 +1946,247 @@
                 </div>
                 
                 <button class="btn" onclick="closeHealthGuide()" style="background: #667eea; color: white; margin-top: 20px; width: 100%;">✓ J'ai compris</button>
+            </div>
+        </div>
+        
+        
+        <!-- Modal Table des Durées -->
+        <div id="durationTableModal" class="settings-menu">
+            <div class="settings-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+                <h3 style="margin-top: 0; color: #667eea;">📋 Table des Durées de Conservation</h3>
+                
+                <p style="font-size: 0.95em; color: #64748b; margin-bottom: 20px; background: #eff6ff; padding: 15px; border-radius: 10px; border-left: 4px solid #3b82f6;">
+                    <strong>ℹ️ Comment ça fonctionne :</strong><br>
+                    Lorsque vous ajoutez un produit, l'application calcule automatiquement la date de péremption selon sa <strong>catégorie</strong> et son <strong>emplacement</strong>. Vous pouvez toujours modifier cette date manuellement.
+                </p>
+                
+                <!-- Fruits -->
+                <div class="settings-section">
+                    <h4 style="color: #059669;">🍎 Fruits</h4>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.9em;">
+                            <thead>
+                                <tr style="background: #f3f4f6;">
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #e5e7eb;">Emplacement</th>
+                                    <th style="padding: 10px; text-align: center; border: 1px solid #e5e7eb;">Durée</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🧊 Frigo</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">7 jours</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">❄️ Congélateur</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #0284c7;">1 an (365 jours)</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🚪 Placard</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">3 jours</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">🍷 Cave</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">14 jours</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🧺 Corbeille</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">5 jours</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">📍 Autre</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">7 jours</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Légumes -->
+                <div class="settings-section">
+                    <h4 style="color: #059669;">🥕 Légumes</h4>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.9em;">
+                            <thead>
+                                <tr style="background: #f3f4f6;">
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #e5e7eb;">Emplacement</th>
+                                    <th style="padding: 10px; text-align: center; border: 1px solid #e5e7eb;">Durée</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🧊 Frigo</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">7 jours</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">❄️ Congélateur</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #0284c7;">1 an (365 jours)</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🚪 Placard</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">5 jours</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">🍷 Cave</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #059669;">1 mois (30 jours)</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🧺 Corbeille</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">5 jours</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">📍 Autre</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">7 jours</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Viande -->
+                <div class="settings-section">
+                    <h4 style="color: #dc2626;">🥩 Viande</h4>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.9em;">
+                            <thead>
+                                <tr style="background: #f3f4f6;">
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #e5e7eb;">Emplacement</th>
+                                    <th style="padding: 10px; text-align: center; border: 1px solid #e5e7eb;">Durée</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🧊 Frigo</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; color: #dc2626; font-weight: bold;">3 jours ⚠️</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">❄️ Congélateur</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #0284c7;">6 mois (180 jours)</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🚪 Placard</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; color: #dc2626; font-weight: bold;">1 jour ⚠️</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">🍷 Cave</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">2 jours</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🧺 Corbeille</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; color: #dc2626; font-weight: bold;">1 jour ⚠️</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">📍 Autre</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">2 jours</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Poisson -->
+                <div class="settings-section">
+                    <h4 style="color: #0284c7;">🐟 Poisson</h4>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.9em;">
+                            <thead>
+                                <tr style="background: #f3f4f6;">
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #e5e7eb;">Emplacement</th>
+                                    <th style="padding: 10px; text-align: center; border: 1px solid #e5e7eb;">Durée</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🧊 Frigo</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; color: #dc2626; font-weight: bold;">2 jours ⚠️</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">❄️ Congélateur</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #0284c7;">3 mois (90 jours)</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🚪 Placard</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; color: #dc2626; font-weight: bold;">1 jour ⚠️</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">🍷 Cave</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; color: #dc2626; font-weight: bold;">1 jour ⚠️</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🧺 Corbeille</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; color: #dc2626; font-weight: bold;">1 jour ⚠️</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">📍 Autre</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; color: #dc2626; font-weight: bold;">1 jour ⚠️</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Produits laitiers -->
+                <div class="settings-section">
+                    <h4 style="color: #0ea5e9;">🥛 Produits laitiers</h4>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.9em;">
+                            <thead>
+                                <tr style="background: #f3f4f6;">
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #e5e7eb;">Emplacement</th>
+                                    <th style="padding: 10px; text-align: center; border: 1px solid #e5e7eb;">Durée</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🧊 Frigo</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">7 jours</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">❄️ Congélateur</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #0284c7;">3 mois (90 jours)</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🚪 Placard</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; color: #dc2626; font-weight: bold;">1 jour ⚠️</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">🍷 Cave</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">3 jours</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🧺 Corbeille</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">3 jours</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">📍 Autre</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">5 jours</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Viennoiseries -->
+                <div class="settings-section">
+                    <h4 style="color: #f59e0b;">🥐 Viennoiseries</h4>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.9em;">
+                            <thead>
+                                <tr style="background: #f3f4f6;">
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #e5e7eb;">Emplacement</th>
+                                    <th style="padding: 10px; text-align: center; border: 1px solid #e5e7eb;">Durée</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🧊 Frigo</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">5 jours</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">❄️ Congélateur</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #0284c7;">3 mois (90 jours)</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🚪 Placard</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">3 jours</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">🍷 Cave</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">3 jours</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🧺 Corbeille</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">3 jours</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">📍 Autre</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">3 jours</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Conserves -->
+                <div class="settings-section">
+                    <h4 style="color: #6b7280;">🥫 Conserves</h4>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.9em;">
+                            <thead>
+                                <tr style="background: #f3f4f6;">
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #e5e7eb;">Emplacement</th>
+                                    <th style="padding: 10px; text-align: center; border: 1px solid #e5e7eb;">Durée</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🧊 Frigo</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #059669;">6 mois (180 jours)</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">❄️ Congélateur</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #0284c7;">2 ans (730 jours)</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🚪 Placard</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #059669;">2 ans (730 jours)</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">🍷 Cave</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #059669;">3 ans (1095 jours)</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🧺 Corbeille</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #059669;">1 an (365 jours)</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">📍 Autre</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #059669;">1 an (365 jours)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Boissons -->
+                <div class="settings-section">
+                    <h4 style="color: #8b5cf6;">🥤 Boissons</h4>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.9em;">
+                            <thead>
+                                <tr style="background: #f3f4f6;">
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #e5e7eb;">Emplacement</th>
+                                    <th style="padding: 10px; text-align: center; border: 1px solid #e5e7eb;">Durée</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🧊 Frigo</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #059669;">3 mois (90 jours)</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">❄️ Congélateur</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #0284c7;">6 mois (180 jours)</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🚪 Placard</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #059669;">1 an (365 jours)</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">🍷 Cave</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #059669;">2 ans (730 jours)</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🧺 Corbeille</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #059669;">6 mois (180 jours)</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">📍 Autre</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #059669;">1 an (365 jours)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Autre -->
+                <div class="settings-section">
+                    <h4 style="color: #6b7280;">📦 Autre</h4>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.9em;">
+                            <thead>
+                                <tr style="background: #f3f4f6;">
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #e5e7eb;">Emplacement</th>
+                                    <th style="padding: 10px; text-align: center; border: 1px solid #e5e7eb;">Durée</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🧊 Frigo</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">14 jours</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">❄️ Congélateur</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #0284c7;">6 mois (180 jours)</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🚪 Placard</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #059669;">3 mois (90 jours)</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">🍷 Cave</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb; font-weight: bold; color: #059669;">6 mois (180 jours)</td></tr>
+                                <tr><td style="padding: 8px; border: 1px solid #e5e7eb;">🧺 Corbeille</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">14 jours</td></tr>
+                                <tr style="background: #f9fafb;"><td style="padding: 8px; border: 1px solid #e5e7eb;">📍 Autre</td><td style="padding: 8px; text-align: center; border: 1px solid #e5e7eb;">30 jours</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div style="background: #fef3c7; padding: 15px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #f59e0b;">
+                    <p style="font-size: 0.9em; color: #78350f; margin: 0;">
+                        <strong>⚠️ Important :</strong> Ces durées sont des recommandations moyennes. Vérifiez toujours l'aspect, l'odeur et la texture du produit avant consommation. En cas de doute, jetez le produit.
+                    </p>
+                </div>
+                
+                <div style="background: #dcfce7; padding: 15px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #059669;">
+                    <p style="font-size: 0.9em; color: #166534; margin: 0;">
+                        <strong>💡 Astuce :</strong> Le congélateur ❄️ permet de conserver presque tous les aliments beaucoup plus longtemps. N'hésitez pas à congeler ce que vous ne consommerez pas rapidement !
+                    </p>
+                </div>
+                
+                <button class="btn" onclick="closeDurationTable()" style="background: #667eea; color: white; margin-top: 20px; width: 100%;">✓ J'ai compris</button>
+            </div>
+        </div>
+        
+        <!-- Modal Changelog "Quoi de neuf" -->
+        <div id="changelogModal" class="settings-menu">
+            <div class="settings-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;" id="changelogContent">
+                <!-- Le contenu sera généré dynamiquement par JavaScript -->
             </div>
         </div>
         
@@ -2545,6 +2790,144 @@
         
         var currentLang = localStorage.getItem('language') || 'fr';
         
+        // === SYSTÈME DE VERSION ===
+        var APP_VERSION = '2.1.6';
+        var VERSION_DATE = '2026-02-13';
+        var CHANGELOG = {
+            '2.1.6': {
+                date: '2026-02-13',
+                changes: {
+                    fr: [
+                        '🐛 Correction erreur "can\'t find variable: notification" lors de l\'import Excel',
+                        '✅ Vérification de la disponibilité de l\'API Notification avant utilisation',
+                        '🔒 Protection contre les navigateurs ne supportant pas les notifications'
+                    ],
+                    en: [
+                        '🐛 Fixed "can\'t find variable: notification" error during Excel import',
+                        '✅ Check Notification API availability before use',
+                        '🔒 Protection against browsers not supporting notifications'
+                    ]
+                }
+            },
+            '2.1.5': {
+                date: '2026-02-13',
+                changes: {
+                    fr: [
+                        '🐛 Correction du recalcul automatique de la date de péremption',
+                        '✨ La date se recalcule maintenant quand vous changez la catégorie ou l\'emplacement',
+                        '⚡ Fonctionne dans l\'ajout ET la modification de produits'
+                    ],
+                    en: [
+                        '🐛 Fixed automatic expiry date recalculation',
+                        '✨ Date now recalculates when you change category or location',
+                        '⚡ Works in both add and edit modes'
+                    ]
+                }
+            },
+            '2.1.4': {
+                date: '2026-02-13',
+                changes: {
+                    fr: [
+                        '✨ Ajout de la table des durées de conservation dans les paramètres',
+                        '📋 Visualisation complète des 54 combinaisons (9 catégories × 6 emplacements)',
+                        '💡 Conseils et astuces de conservation'
+                    ],
+                    en: [
+                        '✨ Added storage duration table in settings',
+                        '📋 Complete view of 54 combinations (9 categories × 6 locations)',
+                        '💡 Storage tips and tricks'
+                    ]
+                }
+            },
+            '2.1.3': {
+                date: '2026-02-13',
+                changes: {
+                    fr: [
+                        '🐛 Les produits à quantité 0 n\'apparaissent plus dans "Frais", "Urgent" et "Périmés"',
+                        '✅ Les produits épuisés apparaissent uniquement dans le filtre "Épuisé"'
+                    ],
+                    en: [
+                        '🐛 Items with quantity 0 no longer appear in "Fresh", "Urgent" and "Expired"',
+                        '✅ Out of stock items only appear in "Out of stock" filter'
+                    ]
+                }
+            },
+            '2.1.2': {
+                date: '2026-02-13',
+                changes: {
+                    fr: [
+                        '🐛 Correction du bouton "Saisie manuelle"',
+                        '🔧 Correction de l\'ordre des variables dans showForm()',
+                        '✅ Sécurisation de l\'initialisation des boutons'
+                    ],
+                    en: [
+                        '🐛 Fixed "Manual entry" button',
+                        '🔧 Fixed variable order in showForm()',
+                        '✅ Secured button initialization'
+                    ]
+                }
+            },
+            '2.1.1': {
+                date: '2026-02-13',
+                changes: {
+                    fr: [
+                        '🎨 Alignement des boutons langue/paramètres avec le sous-titre sur iPhone',
+                        '📱 Amélioration de l\'ergonomie mobile'
+                    ],
+                    en: [
+                        '🎨 Aligned language/settings buttons with subtitle on iPhone',
+                        '📱 Improved mobile ergonomics'
+                    ]
+                }
+            },
+            '2.1.0': {
+                date: '2026-02-13',
+                changes: {
+                    fr: [
+                        '✨ Modification des recettes par défaut (crée une copie)',
+                        '📊 Export Excel inclut maintenant les scores santé',
+                        '🎨 Couleur du bouton "Tous" améliorée (rouge visible)',
+                        '⏰ Calcul automatique des dates de péremption',
+                        '🔄 Recalcul en temps réel des dates',
+                        '📋 Table complète des durées de conservation'
+                    ],
+                    en: [
+                        '✨ Edit default recipes (creates a copy)',
+                        '📊 Excel export now includes health scores',
+                        '🎨 Improved "All" button color (visible red)',
+                        '⏰ Automatic expiration date calculation',
+                        '🔄 Real-time date recalculation',
+                        '📋 Complete storage duration table'
+                    ]
+                }
+            },
+            '2.0.0': {
+                date: '2026-02-11',
+                changes: {
+                    fr: [
+                        '🎯 Calcul intelligent des dates selon catégorie et emplacement',
+                        '🏥 Sauvegarde des scores santé (Nutri-Score, NOVA, Eco-Score)',
+                        '📱 Mode PWA amélioré',
+                        '🌍 Support multilingue FR/EN'
+                    ],
+                    en: [
+                        '🎯 Smart date calculation by category and location',
+                        '🏥 Health scores saved (Nutri-Score, NOVA, Eco-Score)',
+                        '📱 Improved PWA mode',
+                        '🌍 Multilingual support FR/EN'
+                    ]
+                }
+            }
+        };
+        
+        function getVersionInfo() {
+            return {
+                version: APP_VERSION,
+                date: VERSION_DATE,
+                changelog: CHANGELOG[APP_VERSION].changes[currentLang]
+            };
+        }
+        
         function t(key) {
             var keys = key.split('.');
             var value = translations[currentLang];
@@ -2776,6 +3159,101 @@
         var lastScannedCode = null;
         var scanConfidenceCount = {};
         var scanningActive = false;
+
+                // === DURÉES DE CONSERVATION (en jours) ===
+        var dureeConservation = {
+            'fruit': {
+                'frigo': 7,
+                'congelateur': 365,
+                'placard': 3,
+                'cave': 14,
+                'corbeille': 5,
+                'autre_emplacement': 5
+            },
+            'legume': {
+                'frigo': 7,
+                'congelateur': 365,
+                'placard': 5,
+                'cave': 30,
+                'corbeille': 7,
+                'autre_emplacement': 5
+            },
+            'viande': {
+                'frigo': 3,
+                'congelateur': 180,
+                'placard': 1,
+                'cave': 2,
+                'corbeille': 2,
+                'autre_emplacement': 2
+            },
+            'poisson': {
+                'frigo': 2,
+                'congelateur': 90,
+                'placard': 1,
+                'cave': 1,
+                'corbeille': 1,
+                'autre_emplacement': 1
+            },
+            'produit_laitier': {
+                'frigo': 7,
+                'congelateur': 90,
+                'placard': 1,
+                'cave': 3,
+                'corbeille': 3,
+                'autre_emplacement': 3
+            },
+            'viennoiseries': {
+                'frigo': 5,
+                'congelateur': 90,
+                'placard': 3,
+                'cave': 3,
+                'corbeille': 3,
+                'autre_emplacement': 3
+            },
+            'conserves': {
+                'frigo': 180,
+                'congelateur': 730,
+                'placard': 730,
+                'cave': 1095,
+                'corbeille': 365,
+                'autre_emplacement': 365
+            },
+            'boisson': {
+                'frigo': 90,
+                'congelateur': 180,
+                'placard': 365,
+                'cave': 730,
+                'corbeille': 180,
+                'autre_emplacement': 180
+            },
+            'autre': {
+                'frigo': 14,
+                'congelateur': 180,
+                'placard': 90,
+                'cave': 180,
+                'corbeille': 30,
+                'autre_emplacement': 30
+            }
+        };
+        
+        // Fonction pour calculer la nouvelle date selon emplacement + catégorie
+        function calculerNouvelleDate(categorie, emplacement) {
+            var duree = (dureeConservation[categorie] && dureeConservation[categorie][emplacement]) 
+                       || dureeConservation['autre']['frigo']; // Valeur par défaut
+            
+            var nouvelleDate = new Date();
+            nouvelleDate.setDate(nouvelleDate.getDate() + duree);
+            return nouvelleDate.toISOString().split('T')[0];
+        }
+        
+        // Fonction pour afficher les durées en texte lisible
+        function afficherDuree(jours) {
+            if (jours < 7) return jours + ' jour' + (jours > 1 ? 's' : '');
+            if (jours < 30) return Math.round(jours / 7) + ' semaine' + (jours > 13 ? 's' : '');
+            if (jours < 365) return Math.round(jours / 30) + ' mois';
+            return Math.round(jours / 365) + ' an' + (jours > 730 ? 's' : '');
+        }
+
         
         // FONCTIONS GLOBALES POUR ONCLICK HTML (iOS-friendly)
         var lastSearchTime = 0;
@@ -2933,6 +3411,11 @@
         }
         
         function sendNotification(title, body, urgentCount) {
+            // Vérifier si l'API Notification est supportée
+            if (typeof Notification === 'undefined') {
+                return;
+            }
+            
             if (Notification.permission === "granted") {
                 var notification = new Notification(title, {
                     body: body,
@@ -3021,14 +3504,14 @@
                 
                 // Afficher le prompt de notification si pas encore répondu
                 var notificationAsked = localStorage.getItem('notification-asked');
-                if (!notificationAsked && Notification.permission === 'default') {
+                if (!notificationAsked && typeof Notification !== 'undefined' && Notification.permission === 'default') {
                     setTimeout(function() {
                         document.getElementById('notificationPrompt').classList.add('show');
                     }, 1000);
                 }
                 
                 // Envoyer une notification si déjà autorisé
-                if (Notification.permission === 'granted') {
+                if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
                     var notifTitle = currentLang === 'fr' ? '⚠️ Frigo Manager' : '⚠️ Fridge Manager';
                     var notifBody = '';
                     
@@ -3199,8 +3682,10 @@
                 var qty = getQuantity(filteredByLocation[i].quantite);
                 
                 if (qty === 0) outOfStock++;
-                if (d !== null && d < 0) exp++;
-                if (d !== null && d >= 0 && d <= 3) soon++;
+                //if (d !== null && d < 0) exp++;
+                //if (d !== null && d >= 0 && d <= 3) soon++;
+                if (d !== null && d < 0 && qty > 0) exp++;
+                if (d !== null && d >= 0 && d <= 3 && qty > 0) soon++;
             }
             
             var nums = document.querySelectorAll('.stat-card .number');
@@ -3216,9 +3701,9 @@
                 
                 var statusMatch = false;
                 if (currentFilter === 'all') statusMatch = true;
-                if (currentFilter === 'expired') statusMatch = d !== null && d < 0;
-                if (currentFilter === 'soon') statusMatch = d !== null && d >= 0 && d <= 3;
-                if (currentFilter === 'fresh') statusMatch = d === null || d > 3;
+                if (currentFilter === 'expired') statusMatch = d !== null && d < 0 && qty > 0; // Exclure quantité 0
+                if (currentFilter === 'soon') statusMatch = d !== null && d >= 0 && d <= 3 && qty > 0; // Exclure quantité 0
+                if (currentFilter === 'fresh') statusMatch = (d === null || d > 3) && qty > 0; // Exclure quantité 0
                 if (currentFilter === 'out_of_stock') statusMatch = qty === 0;
                 if (currentFilter === 'to_renew') statusMatch = item.aRenouveler === true;
                 
@@ -3683,17 +4168,18 @@
             productData = productData || {};
             var form = document.getElementById('form');
             
-            // Date suggérée : dans 7 jours
-            var suggestedDate = new Date();
-            suggestedDate.setDate(suggestedDate.getDate() + 7);
-            var suggestedDateStr = suggestedDate.toISOString().split('T')[0];
-            
             // Emplacement par défaut : utiliser le filtre actuel si sélectionné
             var defaultEmplacement = productData.emplacement;
             if (!defaultEmplacement) {
                 // Si un filtre d'emplacement spécifique est actif, l'utiliser
                 defaultEmplacement = (currentEmplacement !== 'all') ? currentEmplacement : 'frigo';
             }
+            
+           // Date suggérée : calcul automatique selon catégorie + emplacement
+            var categorie = productData.categorie || 'autre';
+            var emplacement = defaultEmplacement;
+            var suggestedDate = calculerNouvelleDate(categorie, emplacement);
+            var suggestedDateStr = suggestedDate || (productData.datePeremption || '');
             
             var html = '<h3>➕ ' + (currentLang === 'fr' ? 'Ajouter un produit' : 'Add product') + '</h3>';
             
@@ -4004,6 +4490,27 @@
                 reader.readAsDataURL(file);
             });
             
+            // Event listeners pour recalculer automatiquement la date lors du changement de catégorie ou d'emplacement
+            var formCategorie = document.getElementById('formCategorie');
+            var formEmplacement = document.getElementById('formEmplacement');
+            var formDate = document.getElementById('formDate');
+            
+            function recalculerDate() {
+                var categorie = formCategorie.value;
+                var emplacement = formEmplacement.value;
+                var nouvelleDate = calculerNouvelleDate(categorie, emplacement);
+                if (nouvelleDate) {
+                    formDate.value = nouvelleDate;
+                }
+            }
+            
+            if (formCategorie) {
+                formCategorie.addEventListener('change', recalculerDate);
+            }
+            if (formEmplacement) {
+                formEmplacement.addEventListener('change', recalculerDate);
+            }
+            
             document.getElementById('btnAdd').onclick = function() {
                 var nom = document.getElementById('formNom').value.trim();
                 if (!nom) {
@@ -4059,6 +4566,57 @@
         
         function closeHealthGuide() {
             document.getElementById('healthGuide').classList.remove('active');
+        }
+        
+        function showDurationTable() {
+            // Fermer le menu des paramètres
+            document.getElementById('settingsMenu').classList.remove('active');
+            // Ouvrir la table
+            document.getElementById('durationTableModal').classList.add('active');
+        }
+        
+        function closeDurationTable() {
+            document.getElementById('durationTableModal').classList.remove('active');
+        }
+        
+        function showChangelog() {
+            // Fermer le menu des paramètres
+            document.getElementById('settingsMenu').classList.remove('active');
+            
+            // Générer le contenu du changelog
+            var html = '<h3 style="margin-top: 0; color: #667eea;">🎉 Quoi de neuf ?</h3>';
+            
+            // Parcourir toutes les versions du changelog
+            for (var version in CHANGELOG) {
+                var versionData = CHANGELOG[version];
+                var changes = versionData.changes[currentLang];
+                var isLatest = version === APP_VERSION;
+                
+                html += '<div class="settings-section" style="' + (isLatest ? 'background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border: 2px solid #3b82f6;' : '') + '">';
+                html += '<h4 style="color: ' + (isLatest ? '#1e40af' : '#667eea') + ';">';
+                if (isLatest) html += '✨ ';
+                html += 'Version ' + version;
+                if (isLatest) html += ' (Actuelle)';
+                html += '</h4>';
+                html += '<p style="font-size: 0.85em; color: #64748b; margin-bottom: 10px;">📅 ' + versionData.date + '</p>';
+                html += '<ul style="margin: 10px 0; padding-left: 20px; font-size: 0.9em;">';
+                
+                changes.forEach(function(change) {
+                    html += '<li style="margin: 8px 0; color: #334155;">' + change + '</li>';
+                });
+                
+                html += '</ul></div>';
+            }
+            
+            html += '<button class="btn" onclick="closeChangelog()" style="background: #667eea; color: white; margin-top: 20px;">✕ Fermer</button>';
+            
+            // Afficher dans une modal
+            document.getElementById('changelogContent').innerHTML = html;
+            document.getElementById('changelogModal').classList.add('active');
+        }
+        
+        function closeChangelog() {
+            document.getElementById('changelogModal').classList.remove('active');
         }
         
         // === FONCTIONS EXPORT/IMPORT RECETTES CSV ===
@@ -4246,7 +4804,11 @@
                         'Catégorie': item.categorie || '',
                         'Emplacement': item.emplacement || '',
                         'Quantité': item.quantite || 0,
-                        'À renouveler': item.aRenouveler ? 'Oui' : 'Non'
+                        'À renouveler': item.aRenouveler ? 'Oui' : 'Non',
+                        'Nutri-Score': item.nutriScore || '',
+                        'NOVA': item.novaGroup || '',
+                        'Additifs': item.additives !== undefined && item.additives !== null ? item.additives : '',
+                        'Eco-Score': item.ecoScore || ''
                     };
                 });
                 
@@ -4265,7 +4827,11 @@
                     {wch: 15},  // Catégorie
                     {wch: 15},  // Emplacement
                     {wch: 10},  // Quantité
-                    {wch: 12}   // À renouveler
+                    {wch: 12},  // À renouveler
+                    {wch: 12},  // Nutri-Score
+                    {wch: 8},   // NOVA
+                    {wch: 10},  // Additifs
+                    {wch: 12}   // Eco-Score
                 ];
                 ws['!cols'] = wscols;
                 
@@ -4335,6 +4901,10 @@
                             emplacement: row['Emplacement'] || 'frigo',
                             quantite: parseInt(row['Quantité']) || 1,
                             aRenouveler: row['À renouveler'] === 'Oui',
+                            nutriScore: row['Nutri-Score'] || null,
+                            novaGroup: row['NOVA'] ? parseInt(row['NOVA']) : null,
+                            additives: row['Additifs'] !== undefined && row['Additifs'] !== '' ? parseInt(row['Additifs']) : null,
+                            ecoScore: row['Eco-Score'] || null,
                             image: null
                         };
                     });
@@ -4893,13 +5463,17 @@
             
             html += '</ol></div>';
             
-            // Ajouter les boutons modifier/supprimer si c'est une recette utilisateur
+            // Afficher les boutons pour TOUTES les recettes
+            // Les recettes par défaut seront copiées en recettes utilisateur lors de la modification
+            html += '<div class="recipe-actions-bar">' +
+                   '<button class="btn" onclick="editRecipe(' + recipeId + ')" style="background: #f59e0b; flex: 1;">' + t('recipes.edit') + '</button>';
+            
+            // Bouton supprimer seulement pour les recettes utilisateur (pas les recettes par défaut)
             if (isUserRecipe) {
-                html += '<div class="recipe-actions-bar">' +
-                       '<button class="btn" onclick="editRecipe(' + recipeId + ')" style="background: #f59e0b; flex: 1;">' + t('recipes.edit') + '</button>' +
-                       '<button class="btn" onclick="deleteRecipe(' + recipeId + ')" style="background: #ef4444; flex: 1;">' + t('recipes.deleteBtn') + '</button>' +
-                       '</div>';
+                html += '<button class="btn" onclick="deleteRecipe(' + recipeId + ')" style="background: #ef4444; flex: 1;">' + t('recipes.deleteBtn') + '</button>';
             }
+            
+            html += '</div>';
             
             document.getElementById('recipeDetailBody').innerHTML = html;
             document.getElementById('recipeDetailModal').classList.add('active');
@@ -5078,16 +5652,39 @@
         }
         
         function editRecipe(recipeId) {
-            var recipe = userRecipes.find(function(r) { return r.id === recipeId; });
+            var allRecipes = getAllRecipes();
+            var recipe = allRecipes.find(function(r) { return r.id === recipeId; });
             if (!recipe) return;
             
-            currentEditingRecipeId = recipeId;
+            var isUserRecipe = recipeId >= 1000;
+            
+            // Si c'est une recette par défaut, on va la dupliquer en recette utilisateur
+            if (!isUserRecipe) {
+                // Informer l'utilisateur
+                var message = currentLang === 'fr' 
+                    ? '💡 Cette recette par défaut sera copiée.\n\nVos modifications créeront une nouvelle recette personnalisée.\n\nContinuer ?' 
+                    : '💡 This default recipe will be copied.\n\nYour changes will create a new custom recipe.\n\nContinue?';
+                
+                if (!confirm(message)) {
+                    return;
+                }
+                
+                // Créer un nouvel ID pour la copie
+                currentEditingRecipeId = null; // Cela créera une nouvelle recette
+            } else {
+                currentEditingRecipeId = recipeId;
+            }
             
             // Fermer le détail
             closeRecipeDetail();
             
             // Remplir le formulaire
-            document.getElementById('createRecipeTitle').textContent = currentLang === 'fr' ? '✏️ Modifier la recette' : '✏️ Edit recipe';
+            var title = currentLang === 'fr' ? '✏️ Modifier la recette' : '✏️ Edit recipe';
+            if (!isUserRecipe) {
+                title = currentLang === 'fr' ? '📋 Copie de la recette' : '📋 Copy recipe';
+            }
+            document.getElementById('createRecipeTitle').textContent = title;
+            
             document.getElementById('recipeNameInput').value = recipe.name;
             document.getElementById('recipeIconInput').value = recipe.icon;
             document.getElementById('selectedEmoji').textContent = recipe.icon;
@@ -5512,6 +6109,27 @@
                 reader.readAsDataURL(file);
             });
             
+            // Event listeners pour recalculer automatiquement la date lors du changement de catégorie ou d'emplacement
+            var formCategorie = document.getElementById('formCategorie');
+            var formEmplacement = document.getElementById('formEmplacement');
+            var formDate = document.getElementById('formDate');
+            
+            function recalculerDate() {
+                var categorie = formCategorie.value;
+                var emplacement = formEmplacement.value;
+                var nouvelleDate = calculerNouvelleDate(categorie, emplacement);
+                if (nouvelleDate) {
+                    formDate.value = nouvelleDate;
+                }
+            }
+            
+            if (formCategorie) {
+                formCategorie.addEventListener('change', recalculerDate);
+            }
+            if (formEmplacement) {
+                formEmplacement.addEventListener('change', recalculerDate);
+            }
+            
             document.getElementById('btnUpdate').onclick = function() {
                 var nom = document.getElementById('formNom').value.trim();
                 if (!nom) {
@@ -5698,10 +6316,15 @@
         });
 
         // Boutons
-        document.getElementById('btnScan').onclick = startScanner;
-        document.getElementById('btnManual').onclick = function() { showForm(); };
-        document.getElementById('btnCloseScanner').onclick = stopScanner;
-        document.getElementById('btnManualFromScanner').onclick = function() {
+        var btnScan = document.getElementById('btnScan');
+        var btnManual = document.getElementById('btnManual');
+        var btnCloseScanner = document.getElementById('btnCloseScanner');
+        var btnManualFromScanner = document.getElementById('btnManualFromScanner');
+        
+        if (btnScan) btnScan.onclick = startScanner;
+        if (btnManual) btnManual.onclick = function() { showForm(); };
+        if (btnCloseScanner) btnCloseScanner.onclick = stopScanner;
+        if (btnManualFromScanner) btnManualFromScanner.onclick = function() {
             stopScanner();
             showForm();
         };
@@ -5729,6 +6352,9 @@
         // Initialisation
         renderAll();
         setLanguage(currentLang); // Initialize language
+        
+        // Afficher la version
+        document.getElementById('versionDisplay').textContent = 'Version ' + APP_VERSION;
     </script>
 </body>
 </html>
