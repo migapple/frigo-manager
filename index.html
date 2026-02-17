@@ -42,8 +42,10 @@
         }
         
         .header h1 {
-            font-size: 2em; /* Réduit pour mobile */
-            margin-bottom: 10px;
+            font-size: 1.3em;
+            margin-bottom: 5px;
+            margin-top: 30px; /* Descendre sous l'encoche */
+            line-height: 1.2;
         }
         
         .header p {
@@ -63,7 +65,7 @@
         /* Mobile - iPhone et Android */
         @media (max-width: 599px) {
             body {
-                padding: 10px;
+                padding: max(20px, env(safe-area-inset-top)) 20px 20px 20px;
             }
             .container {
                 padding: 0 5px;
@@ -72,7 +74,7 @@
                 padding: 0 70px; /* Plus d'espace pour les boutons */
             }
             .language-selector {
-                top: 55px; /* Aligné avec le sous-titre "Scanner de code-barres" */
+                top: 55px; /* Aligné avec le sous-titre "Scanner de code-barres intelligent" */
                 left: 8px;
                 font-size: 12px;
                 padding: 6px 10px;
@@ -142,7 +144,7 @@
         
         .language-selector {
             position: absolute;
-            top: 50px; /* Aligné avec le sous-titre "Scanner de code-barres" */
+            top: 0px; /* Aligné avec le sous-titre "Scanner de code-barres" */
             left: 5px;
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid white;
@@ -150,7 +152,7 @@
             font-size: 14px;
             font-weight: bold;
             padding: 8px 12px;
-            border-radius: 25px;
+            border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
@@ -165,7 +167,7 @@
         
         .settings-btn {
             position: absolute;
-            top: 50px; /* Même hauteur que le bouton de langue */
+            top: 0px; /* Même hauteur que le bouton de langue */
             right: 5px;
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid white;
@@ -495,8 +497,7 @@
         .search-wrapper {
             display: flex;
             gap: 10px;
-            width: 100%;
-            align-items: center;
+            position: relative; /* AJOUTER cette ligne */
         }
         
         .search-input {
@@ -545,15 +546,22 @@
             color: white;
             border: none;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            font-size: 18px;
+            width: 28px;
+            height: 28px;
+            font-size: 16px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
             font-weight: bold;
+            
+            /* Positionner DANS le champ */
+            position: absolute;
+            right: 100px; /* À gauche du bouton GO */
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
         }
         
         .clear-search-btn:hover {
@@ -936,8 +944,25 @@
         }
         
         .alert-banner-text {
-            font-size: 0.95em;
-            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            line-height: 1.5;
+        }
+        
+        .alert-banner-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 15px;
+            margin: 8px 0;
+        }
+
+        .alert-banner-item {
+            font-size: 0.9em;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .alert-banner-btn {
@@ -1738,13 +1763,15 @@
 <body>
     <div class="container">
         <div class="header">
-            <button class="language-selector" onclick="toggleLanguage()" id="langBtn">
-                <span id="langFlag">🇫🇷</span>
-                <span id="langCode">FR</span>
-            </button>
-            <h1 data-i18n="app.title">🧊 Frigo Manager</h1>
-            <p data-i18n="app.subtitle">Scanner de code-barres intelligent</p>
-            <button class="settings-btn" onclick="toggleSettings()">⚙️</button>
+            <div class="header-top">
+                <button class="language-selector" onclick="toggleLanguage()" id="langBtn">
+                    <span id="langFlag">🇫🇷</span>
+                    <span id="langCode">FR</span>
+                </button>
+                <h1 data-i18n="app.title">🧊 Frigo Manager</h1>
+                <button class="settings-btn" onclick="toggleSettings()">⚙️</button>
+            </div>
+            <p data-i18n="app.subtitle">Scanner de code-barres</p>
         </div>
 
         <div id="settingsMenu" class="settings-menu">
@@ -3484,8 +3511,8 @@
                     toRenew++;
                 }
                 
-                // Vérifier les dates
-                if (days !== null) {
+                // Vérifier les dates (exclure les produits avec quantité = 0)
+                if (days !== null && qty > 0) {
                     if (days < 0) expired++;
                     else if (days === 0) today++;
                     else if (days === 1) tomorrow++;
@@ -3561,6 +3588,19 @@
             }
         }
         
+        function formatAlertMessages(messages) {
+            if (messages.length <= 2) {
+                // Si 2 messages ou moins, tout sur une ligne
+                return messages.join(' • ');
+            }
+            
+            // Séparer après le 2ème message
+            var firstLine = messages.slice(0, 2).join(' • ');
+            var secondLine = messages.slice(2).join(' • ');
+            
+            return firstLine + '<br>' + secondLine;
+        }
+        
         function showAlertBanner(today, tomorrow, twoDays, expired, outOfStock, toRenew) {
             var banner = document.getElementById('alertBanner');
             var messages = [];
@@ -3573,11 +3613,12 @@
             // Alertes de stock en premier (le plus important)
             if (outOfStock > 0) {
                 if (currentLang === 'fr') {
-                    messages.push('📦 ' + outOfStock + ' produit' + (outOfStock > 1 ? 's' : '') + ' ÉPUISÉ' + (outOfStock > 1 ? 'S' : ''));
+                    messages.push('📦 ' + outOfStock + ' épuisé' + (outOfStock > 1 ? 's' : ''));
                 } else {
-                    messages.push('📦 ' + outOfStock + ' product' + (outOfStock > 1 ? 's' : '') + ' OUT OF STOCK');
+                    messages.push('📦 ' + outOfStock + ' out of stock' + (outOfStock > 1 ? 's' : ''));
                 }
             }
+            
             if (toRenew > 0) {
                 messages.push('📝 ' + toRenew + ' ' + t('alerts.toRenew'));
             }
@@ -3585,16 +3626,16 @@
             // Alertes de date
             if (expired > 0) {
                 if (currentLang === 'fr') {
-                    messages.push('❌ ' + expired + ' produit' + (expired > 1 ? 's périmés' : ' périmé'));
+                    messages.push('❌ ' + expired + ' périmé' + (expired > 1 ? 's' : ''));
                 } else {
-                    messages.push('❌ ' + expired + ' product' + (expired > 1 ? 's' : '') + ' expired');
+                    messages.push('❌ ' + expired + ' expired' + (expired > 1 ? 's' : ''));
                 }
             }
             if (today > 0) {
                 if (currentLang === 'fr') {
-                    messages.push('🔴 ' + today + ' expire' + (today > 1 ? 'nt' : '') + ' AUJOURD\'HUI');
+                    messages.push('🔴 ' + today + ' expire' + (today > 1 ? 'nt' : '') + ' aujourd\'hui');
                 } else {
-                    messages.push('🔴 ' + today + ' expire' + (today > 1 ? 's' : '') + ' TODAY');
+                    messages.push('🔴 ' + today + ' expire' + (today > 1 ? 's' : '') + ' today');
                 }
             }
             if (tomorrow > 0) {
@@ -3612,9 +3653,23 @@
                 }
             }
             
+            // Séparer les messages en 2 lignes de largeur égale
+            var line1 = [];
+            var line2 = [];
+
+            // Ligne 1 : Stock et À renouveler
+            if (outOfStock > 0) line1.push(messages.shift());
+            if (toRenew > 0) line1.push(messages.shift());
+
+            // Ligne 2 : Dates (périmés, aujourd'hui, demain, dans 2 jours)
+            line2 = messages; // Le reste des messages
+
             var html = '<div class="alert-banner-title">' + t('alerts.title') + '</div>' +
-                       '<div class="alert-banner-text">' + messages.join(' • ') + '</div>' +
-                       '<button class="alert-banner-btn" onclick="viewUrgentProducts()">' + t('alerts.viewProducts') + '</button>';
+                       '<div class="alert-banner-grid">' +
+                       (line1.concat(line2)).map(function(m) {
+                           return '<div class="alert-banner-item">' + m + '</div>';
+                       }).join('') +
+                       '</div>';
             
             banner.innerHTML = html;
             banner.classList.add('show');
@@ -3682,8 +3737,10 @@
                 var qty = getQuantity(filteredByLocation[i].quantite);
                 
                 if (qty === 0) outOfStock++;
-                if (d !== null && d < 0) exp++;
-                if (d !== null && d >= 0 && d <= 3) soon++;
+                //if (d !== null && d < 0) exp++;
+                //if (d !== null && d >= 0 && d <= 3) soon++;
+                if (d !== null && d < 0 && qty > 0) exp++;
+                if (d !== null && d >= 0 && d <= 3 && qty > 0) soon++;
             }
             
             var nums = document.querySelectorAll('.stat-card .number');
@@ -6263,47 +6320,6 @@
         var clearBtn = document.getElementById('clearSearch');
         var historyEl = document.getElementById('searchHistory');
         
-        /* 
-        DÉSACTIVÉ - On utilise onclick HTML à la place
-        
-        // Test que les éléments existent
-        if (!searchInput) alert('❌ searchInput introuvable');
-        if (!searchBtn) alert('❌ searchBtn introuvable');
-        if (!clearBtn) alert('❌ clearBtn introuvable');
-        
-        // Fonction de recherche réutilisable
-        function handleSearch() {
-            alert('✅ handleSearch() appelée !');
-            
-            var value = searchInput.value.trim();
-            currentSearchTerm = value;
-            
-            alert('🔍 Valeur recherchée: "' + value + '"');
-            
-            // Afficher/cacher le bouton clear
-            clearBtn.style.display = value ? 'flex' : 'none';
-            
-            alert('📋 Appel de renderItems()...');
-            renderItems();
-            alert('✅ renderItems() terminé !');
-            
-            // Ajouter à l'historique si recherche non vide
-            if (value) {
-                addToSearchHistory(value);
-            }
-        }
-        
-        // BOUTON GO - Recherche manuelle (parfait pour iOS)
-        searchBtn.onclick = function() {
-            alert('🎯 Bouton GO cliqué !');
-            handleSearch();
-            searchInput.blur(); // Fermer le clavier sur mobile
-        };
-        */
-        
-        // AUCUN event listener - Seulement onclick HTML
-        // (Recherche déclenchée UNIQUEMENT par le bouton GO)
-        
         // Raccourci clavier Ctrl+F / Cmd+F pour focus
         document.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
@@ -6353,6 +6369,32 @@
         
         // Afficher la version
         document.getElementById('versionDisplay').textContent = 'Version ' + APP_VERSION;
+    </script>
+    
+    <script>
+    // Afficher le bouton X pendant la saisie
+    (function() {
+        var searchInput = document.getElementById('searchInput');
+        var clearBtn = document.getElementById('clearSearch');
+        
+        if (searchInput && clearBtn) {
+            // Écouter plusieurs événements pour iOS
+            function updateClearButton() {
+                var value = searchInput.value.trim();
+                if (clearBtn) {
+                    clearBtn.style.display = value ? 'flex' : 'none';
+                }
+            }
+
+            searchInput.addEventListener('input', updateClearButton);
+            searchInput.addEventListener('keyup', updateClearButton);
+            searchInput.addEventListener('change', updateClearButton);
+            searchInput.addEventListener('paste', updateClearButton);
+
+            // Vérifier aussi au focus
+            searchInput.addEventListener('focus', updateClearButton);
+        }
+    })();
     </script>
 </body>
 </html>
