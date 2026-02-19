@@ -4678,7 +4678,9 @@
         
         function exportRecipesCSV() {
             try {
-                var allRecipes = getAllRecipes();
+                // Exporter seulement les recettes personnalisées
+                var userRecipes = JSON.parse(localStorage.getItem('userRecipes') || '[]');
+                var allRecipes = userRecipes;
                 
                 if (allRecipes.length === 0) {
                     alert('❌ Aucune recette à exporter');
