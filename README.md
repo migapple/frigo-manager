@@ -1,8 +1,8 @@
-# 🧊 Frigo Manager v2.1
+# 🧊 Frigo Manager v2.17
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-2.1.5-blue.svg)
+![Version](https://img.shields.io/badge/version-2.1.7-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Language](https://img.shields.io/badge/language-JavaScript-yellow.svg)
 
@@ -14,7 +14,13 @@
 
 ---
 
-## ✨ Nouveautés v2.1
+## ✨ Nouveautés v2.17
+
+### 🛒 Liste de Courses
+- Saisie numérique dans les nouvelles recettes
+
+### 📊 Export/Import
+- ✅ Sauvegardes dans le dossier Frigo-Manager
 
 ### 🔄 Recalcul Automatique en Temps Réel
 La version 2.1 améliore le calcul des dates avec un **recalcul automatique instantané** :
