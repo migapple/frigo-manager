@@ -10,6 +10,10 @@
     <link rel="icon" type="image/png" href="apple-touch-icon.png">
     <title>Frigo Manager - Scanner</title>
     <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.4/dist/quagga.min.js"></script>
+    <script>
+        // Import Capacitor plugins pour iOS
+        const { Share, Filesystem } = window.Capacitor ? window.Capacitor.Plugins : { Share: null, Filesystem: null };
+    </script>
     <style>
         * {
             margin: 0;
@@ -42,10 +46,8 @@
         }
         
         .header h1 {
-            font-size: 1.3em;
-            margin-bottom: 5px;
-            margin-top: 30px; /* Descendre sous l'encoche */
-            line-height: 1.2;
+            font-size: 2em; /* Réduit pour mobile */
+            margin-bottom: 10px;
         }
         
         .header p {
@@ -65,7 +67,7 @@
         /* Mobile - iPhone et Android */
         @media (max-width: 599px) {
             body {
-                padding: max(20px, env(safe-area-inset-top)) 20px 20px 20px;
+                padding: 10px;
             }
             .container {
                 padding: 0 5px;
@@ -74,7 +76,7 @@
                 padding: 0 70px; /* Plus d'espace pour les boutons */
             }
             .language-selector {
-                top: 55px; /* Aligné avec le sous-titre "Scanner de code-barres intelligent" */
+                top: 55px; /* Aligné avec le sous-titre "Scanner de code-barres" */
                 left: 8px;
                 font-size: 12px;
                 padding: 6px 10px;
@@ -144,7 +146,7 @@
         
         .language-selector {
             position: absolute;
-            top: 0px; /* Aligné avec le sous-titre "Scanner de code-barres" */
+            top: 50px; /* Aligné avec le sous-titre "Scanner de code-barres" */
             left: 5px;
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid white;
@@ -152,7 +154,7 @@
             font-size: 14px;
             font-weight: bold;
             padding: 8px 12px;
-            border-radius: 20px;
+            border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
@@ -167,7 +169,7 @@
         
         .settings-btn {
             position: absolute;
-            top: 0px; /* Même hauteur que le bouton de langue */
+            top: 50px; /* Même hauteur que le bouton de langue */
             right: 5px;
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid white;
@@ -497,6 +499,8 @@
         .search-wrapper {
             display: flex;
             gap: 10px;
+            width: 100%;
+            align-items: center;
             position: relative; /* AJOUTER cette ligne */
         }
         
@@ -556,9 +560,9 @@
             transition: all 0.2s;
             font-weight: bold;
             
-            /* Positionner DANS le champ */
+            /* Positionner DANS le champ de recherche */
             position: absolute;
-            right: 100px; /* À gauche du bouton GO */
+            right: 100px;
             top: 50%;
             transform: translateY(-50%);
             z-index: 10;
@@ -944,25 +948,12 @@
         }
         
         .alert-banner-text {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            line-height: 1.5;
-        }
-        
-        .alert-banner-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px 15px;
-            margin: 8px 0;
-        }
-
-        .alert-banner-item {
-            font-size: 0.9em;
+            font-size: 0.95em;
             color: white;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            line-height: 1.6;
+            display: block;  /* Au lieu de inline */
+            white-space: normal;  /* Permettre le retour à la ligne */
+            word-wrap: break-word;
         }
         
         .alert-banner-btn {
@@ -1143,7 +1134,19 @@
             align-items: center;
             justify-content: center;
             z-index: 3000;
-            padding: 20px;
+            padding: 10px;  /* ✨ RÉDUIT de 20px à 10px */
+            padding-top: max(env(safe-area-inset-top), 15px);  /* ✨ AJUSTÉ */
+            padding-bottom: max(env(safe-area-inset-bottom), 10px);  /* ✨ AJOUTÉ pour le bas */
+        }
+
+        .shopping-list-content {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 600px;
+            height: 96vh;  /* ✨ CHANGÉ : height au lieu de max-height */
+            display: flex;
+            flex-direction: column;
         }
         
         .shopping-list-modal.active {
@@ -1218,6 +1221,7 @@
             flex: 1;
             overflow-y: auto;
             padding: 20px;
+            min-height: 0;  /* ✨ IMPORTANT pour le flex scroll */
         }
         
         .shopping-item {
@@ -1293,6 +1297,7 @@
             justify-content: center;
             z-index: 3000;
             padding: 20px;
+            padding-top: max(env(safe-area-inset-top), 25px);  /* ✨ AJOUTÉ */
         }
         
         .recipes-modal.active {
@@ -1605,10 +1610,14 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.8);
             display: none;
+            align-items: flex-start;  /* ✅ En haut */
+            justify-content: center;
             z-index: 5000;
-            overflow-y: auto;
+            padding: 10px;
+            padding-top: max(40px, env(safe-area-inset-top) + 20px);  /* ✅ Plus d'espace en haut */
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
         }
         
         .create-recipe-modal.active {
@@ -1617,7 +1626,12 @@
         
         .create-recipe-content {
             background: white;
-            min-height: 100%;
+            border-radius: 20px;
+            width: calc(100vw - 20px);
+            max-width: 95vw;
+            max-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 40px);            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
         
         .create-recipe-header {
@@ -1634,7 +1648,7 @@
         
         .create-recipe-header h2 {
             margin: 0;
-            font-size: 1.5em;
+            font-size: 1.3em;
         }
         
         .btn-close-create-recipe {
@@ -1652,9 +1666,10 @@
         }
         
         .create-recipe-body {
-            padding: 30px 20px;
-            max-width: 800px;
-            margin: 0 auto;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;  /* ✅ Ajouter */
+            padding: 15px;
         }
         
         .form-group {
@@ -1763,15 +1778,13 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="header-top">
-                <button class="language-selector" onclick="toggleLanguage()" id="langBtn">
-                    <span id="langFlag">🇫🇷</span>
-                    <span id="langCode">FR</span>
-                </button>
-                <h1 data-i18n="app.title">🧊 Frigo Manager</h1>
-                <button class="settings-btn" onclick="toggleSettings()">⚙️</button>
-            </div>
-            <p data-i18n="app.subtitle">Scanner de code-barres</p>
+            <button class="language-selector" onclick="toggleLanguage()" id="langBtn">
+                <span id="langFlag">🇫🇷</span>
+                <span id="langCode">FR</span>
+            </button>
+            <h1 data-i18n="app.title">🧊 Frigo Manager</h1>
+            <p data-i18n="app.subtitle">Scanner de code-barres intelligent</p>
+            <button class="settings-btn" onclick="toggleSettings()">⚙️</button>
         </div>
 
         <div id="settingsMenu" class="settings-menu">
@@ -2212,7 +2225,7 @@
         
         <!-- Modal Changelog "Quoi de neuf" -->
         <div id="changelogModal" class="settings-menu">
-            <div class="settings-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;" id="changelogContent">
+            <div class="settings-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto; padding-top: max(30px, env(safe-area-inset-top) + 20px);" id="changelogContent">
                 <!-- Le contenu sera généré dynamiquement par JavaScript -->
             </div>
         </div>
@@ -2271,6 +2284,7 @@
                     <button class="btn" onclick="exportRecipesCSV()" style="background: #10b981;">📤 Exporter recettes CSV</button>
                     <button class="btn" onclick="document.getElementById('importRecipesCSV').click()" style="background: #3b82f6;">📥 Importer recettes CSV</button>
                     <input type="file" id="importRecipesCSV" accept=".csv" style="display: none;" onchange="importRecipesCSV(event)">
+                    <!-- button class="btn" onclick="cleanRecipes()" style="background: #ef4444;">🗑️ Nettoyer doublons</button> -->
                     <button class="btn" onclick="closeRecipes()" style="background: #6b7280;">✕ Fermer</button>
                 </div>
             </div>
@@ -2385,11 +2399,14 @@
                 
                 <div class="shopping-list-actions">
                     <button class="btn" onclick="exportShoppingListText()" style="background: #10b981;">📋 Copier la liste</button>
+                    <button class="btn" onclick="exportToReminders()" style="background: #ef4444;">📲 Rappels</button>
                     <button class="btn" onclick="printShoppingList()" style="background: #3b82f6;">🖨️ Imprimer</button>
                     <button class="btn" onclick="closeShoppingList()" style="background: #6b7280;">✕ Fermer</button>
                 </div>
             </div>
         </div>
+        
+        
 
         <div id="scanner" class="scanner">
             <div class="scanner-instructions">
@@ -2818,9 +2835,22 @@
         var currentLang = localStorage.getItem('language') || 'fr';
         
         // === SYSTÈME DE VERSION ===
-        var APP_VERSION = '2.1.6';
-        var VERSION_DATE = '2026-02-13';
+        var APP_VERSION = '2.1.7';
+        var VERSION_DATE = '2026-02-25';
         var CHANGELOG = {
+            '2.1.7': {
+                date: '2026-02-25',
+                changes: {
+                    fr: [
+                         '⚡ Saisie numérique dans les nouvelles recettes',
+                         '⚡ Sauvegardes dans le dossier dans le dossier Frigo Manager'
+                    ],
+                    en: [
+                         '⚡ Numeric entry in the new recipes',
+                         '⚡ Backup in Frigo Manager folder'
+                    ]
+                }
+            },
             '2.1.6': {
                 date: '2026-02-13',
                 changes: {
@@ -3318,6 +3348,26 @@
             input.blur();
         }
         
+        // Afficher le bouton X pendant la saisie (compatible iOS)
+        (function() {
+            var searchInput = document.getElementById('searchInput');
+            var clearBtn = document.getElementById('clearSearch');
+            
+            if (searchInput && clearBtn) {
+                function updateClearButton() {
+                    var value = searchInput.value.trim();
+                    clearBtn.style.display = value ? 'flex' : 'none';
+                }
+                
+                // Écouter tous les événements possibles pour iOS
+                searchInput.addEventListener('input', updateClearButton);
+                searchInput.addEventListener('keyup', updateClearButton);
+                searchInput.addEventListener('change', updateClearButton);
+                searchInput.addEventListener('paste', updateClearButton);
+                searchInput.addEventListener('focus', updateClearButton);
+            }
+        })();
+
         function clearSearchNow() {
             var input = document.getElementById('searchInput');
             var clearBtn = document.getElementById('clearSearch');
@@ -3588,19 +3638,6 @@
             }
         }
         
-        function formatAlertMessages(messages) {
-            if (messages.length <= 2) {
-                // Si 2 messages ou moins, tout sur une ligne
-                return messages.join(' • ');
-            }
-            
-            // Séparer après le 2ème message
-            var firstLine = messages.slice(0, 2).join(' • ');
-            var secondLine = messages.slice(2).join(' • ');
-            
-            return firstLine + '<br>' + secondLine;
-        }
-        
         function showAlertBanner(today, tomorrow, twoDays, expired, outOfStock, toRenew) {
             var banner = document.getElementById('alertBanner');
             var messages = [];
@@ -3613,12 +3650,11 @@
             // Alertes de stock en premier (le plus important)
             if (outOfStock > 0) {
                 if (currentLang === 'fr') {
-                    messages.push('📦 ' + outOfStock + ' épuisé' + (outOfStock > 1 ? 's' : ''));
+                    messages.push('📦 ' + outOfStock + ' produit' + (outOfStock > 1 ? 's' : '') + ' ÉPUISÉ' + (outOfStock > 1 ? 'S' : ''));
                 } else {
-                    messages.push('📦 ' + outOfStock + ' out of stock' + (outOfStock > 1 ? 's' : ''));
+                    messages.push('📦 ' + outOfStock + ' product' + (outOfStock > 1 ? 's' : '') + ' OUT OF STOCK');
                 }
             }
-            
             if (toRenew > 0) {
                 messages.push('📝 ' + toRenew + ' ' + t('alerts.toRenew'));
             }
@@ -3626,16 +3662,16 @@
             // Alertes de date
             if (expired > 0) {
                 if (currentLang === 'fr') {
-                    messages.push('❌ ' + expired + ' périmé' + (expired > 1 ? 's' : ''));
+                    messages.push('❌ ' + expired + ' produit' + (expired > 1 ? 's périmés' : ' périmé'));
                 } else {
-                    messages.push('❌ ' + expired + ' expired' + (expired > 1 ? 's' : ''));
+                    messages.push('❌ ' + expired + ' product' + (expired > 1 ? 's' : '') + ' expired');
                 }
             }
             if (today > 0) {
                 if (currentLang === 'fr') {
-                    messages.push('🔴 ' + today + ' expire' + (today > 1 ? 'nt' : '') + ' aujourd\'hui');
+                    messages.push('🔴 ' + today + ' expire' + (today > 1 ? 'nt' : '') + ' AUJOURD\'HUI');
                 } else {
-                    messages.push('🔴 ' + today + ' expire' + (today > 1 ? 's' : '') + ' today');
+                    messages.push('🔴 ' + today + ' expire' + (today > 1 ? 's' : '') + ' TODAY');
                 }
             }
             if (tomorrow > 0) {
@@ -3653,20 +3689,22 @@
                 }
             }
             
-            // Séparer les messages en 2 lignes de largeur égale
-            var line1 = [];
-            var line2 = [];
+            // Séparer les messages en 2 colonnes
+            var stockMessages = [];
+            var dateMessages = [];
 
-            // Ligne 1 : Stock et À renouveler
-            if (outOfStock > 0) line1.push(messages.shift());
-            if (toRenew > 0) line1.push(messages.shift());
+            if (outOfStock > 0) stockMessages.push('📦 ' + outOfStock + ' épuisé' + (outOfStock > 1 ? 's' : ''));
+            if (toRenew > 0) stockMessages.push('📝 ' + toRenew + ' ' + t('alerts.toRenew'));
+            if (expired > 0) dateMessages.push('❌ ' + expired + (currentLang === 'fr' ? ' périmé' : ' expired') + (expired > 1 ? 's' : ''));
+            if (today > 0) dateMessages.push('🔴 ' + today + (currentLang === 'fr' ? ' aujourd\'hui' : ' today'));
+            if (tomorrow > 0) dateMessages.push('🟠 ' + tomorrow + (currentLang === 'fr' ? ' demain' : ' tomorrow'));
+            if (twoDays > 0) dateMessages.push('🟡 ' + twoDays + (currentLang === 'fr' ? ' dans 2 jours' : ' in 2 days'));
 
-            // Ligne 2 : Dates (périmés, aujourd'hui, demain, dans 2 jours)
-            line2 = messages; // Le reste des messages
+            var allMessages = stockMessages.concat(dateMessages);
 
             var html = '<div class="alert-banner-title">' + t('alerts.title') + '</div>' +
                        '<div class="alert-banner-grid">' +
-                       (line1.concat(line2)).map(function(m) {
+                       allMessages.map(function(m) {
                            return '<div class="alert-banner-item">' + m + '</div>';
                        }).join('') +
                        '</div>';
@@ -3800,7 +3838,10 @@
                             '<div class="item-name">' + highlightText(item.nom, currentSearchTerm) + '</div>';
                     if (item.barcode) {
                         html += '<div class="barcode-badge">📊 ' + highlightText(item.barcode, currentSearchTerm) + '</div>';
+                    } else {
+                        html += '<div class="barcode-badge">📊 ' + highlightText("0000000000000", currentSearchTerm) + '</div>';
                     }
+                    
                     if (item.emplacement) {
                         var empl = getEmplacementInfo(item.emplacement);
                         html += '<div class="emplacement-badge">' + empl.emoji + ' ' + empl.text + '</div>';
@@ -3841,29 +3882,37 @@
                         }
                         
                         html += '</div>';
+                    } else {
+                        html += '<div class="health-badges">';
+                        html += '<div class="barcode-badge" style="display:none;">📊 --------</div>';
+                        html += '<div class="health-badge health-badge-unknown">Nutri ?</div>';
+                        html += '<div class="health-badge health-badge-unknown">NOVA ?</div>';
+                        html += '<div class="health-badge health-badge-unknown">? additif</div>';
+                        html += '<div class="health-badge health-badge-unknown">Eco ?</div>';
+                        html += '</div>';
                     }
                     
                     // Afficher la quantité
                     var qty = getQuantity(item.quantite);
                     if (qty === 0) {
                         html += '<div class="stock-alert">⚠️ ' + (currentLang === 'fr' ? 'Stock épuisé' : 'Out of stock') + '</div>';
-                    } else {
-                        html += '<div class="quantity-badge">📦 ' + (currentLang === 'fr' ? 'Quantité: ' : 'Quantity: ') + qty + '</div>';
                     }
-                    
-                    // Afficher le badge "À renouveler" (cliquable)
-                    html += '<div class="renouveler-badge ' + (item.aRenouveler ? 'active' : '') + '" data-id="' + item.id + '">';
-                    html += item.aRenouveler ? '📝 À renouveler' : '☐ À renouveler';
-                    html += '</div>';
-                    
+
+                    // Ligne avec contrôles quantité + badge "À renouveler"
+                    html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin:10px 0;">' +
+                            '<div class="quantity-controls">' +
+                            '<button class="btn-qty-minus" data-id="' + item.id + '">−</button>' +
+                            '<span class="quantity-value">' + qty + '</span>' +
+                            '<button class="btn-qty-plus" data-id="' + item.id + '">+</button>' +
+                            '</div>' +
+                            '<div class="renouveler-badge ' + (item.aRenouveler ? 'active' : '') + '" data-id="' + item.id + '" style="margin:0;">' +
+                            (item.aRenouveler ? '📝 À renouveler' : '☐ À renouveler') +
+                            '</div>' +
+                            '</div>';
+
                     html += '<div class="item-info">📅 Ajouté: ' + new Date(item.dateAjout).toLocaleDateString('fr-FR') + '</div>' +
                             '<div class="item-info">⏰ Expire: ' + (item.datePeremption ? new Date(item.datePeremption).toLocaleDateString('fr-FR') : 'Non indiqué') + '</div>' +
                             '<div class="item-info" style="font-weight:bold;margin-top:10px;font-size:1.1em">' + s.text + '</div>' +
-                            '<div class="quantity-controls">' +
-                            '<button class="btn-qty-minus" data-id="' + item.id + '">−</button>' +
-                            '<span class="quantity-value">' + getQuantity(item.quantite) + '</span>' +
-                            '<button class="btn-qty-plus" data-id="' + item.id + '">+</button>' +
-                            '</div>' +
                             '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">' +
                             '<button class="btn btn-edit" data-id="' + item.id + '" style="background:#f59e0b;padding:12px">✏️ Modifier</button>' +
                             '<button class="btn btn-delete" data-id="' + item.id + '" style="background:#ef4444;padding:12px">🗑️ Supprimer</button>' +
@@ -4674,20 +4723,40 @@
             document.getElementById('changelogModal').classList.remove('active');
         }
         
+        function cleanRecipes() {
+            var userRecipes = JSON.parse(localStorage.getItem('userRecipes') || '[]');
+            var predefinedCount = userRecipes.filter(r => r.id < 1000).length;
+            
+            if (predefinedCount === 0) {
+                alert('ℹ️ Aucune recette prédéfinie à supprimer.');
+                return;
+            }
+            
+            if (!confirm('⚠️ Supprimer ' + predefinedCount + ' recette(s) prédéfinie(s) ?\n\nCette action est irréversible.')) {
+                return;
+            }
+            
+            var cleaned = userRecipes.filter(recipe => recipe.id >= 1000);
+            localStorage.setItem('userRecipes', JSON.stringify(cleaned));
+            
+            alert('✅ ' + predefinedCount + ' recette(s) prédéfinie(s) supprimée(s) !\n' +
+                  'Recettes personnalisées conservées : ' + cleaned.length);
+            
+            openRecipes();
+        }
+        
         // === FONCTIONS EXPORT/IMPORT RECETTES CSV ===
         
         function exportRecipesCSV() {
             try {
-                // Exporter seulement les recettes personnalisées
                 var userRecipes = JSON.parse(localStorage.getItem('userRecipes') || '[]');
                 var allRecipes = userRecipes;
-                
+                        
                 if (allRecipes.length === 0) {
                     alert('❌ Aucune recette à exporter');
                     return;
                 }
                 
-                // Créer le CSV
                 var csv = 'Nom,Icône,Temps,Difficulté,Portions,Ingrédients,Étapes\n';
                 
                 allRecipes.forEach(function(recipe) {
@@ -4696,29 +4765,51 @@
                     var time = '"' + recipe.time + '"';
                     var difficulty = '"' + recipe.difficulty + '"';
                     var servings = recipe.servings;
-                    
-                    // Joindre les ingrédients avec des points-virgules
                     var ingredients = '"' + recipe.ingredients.join(';').replace(/"/g, '""') + '"';
-                    
-                    // Joindre les étapes avec des points-virgules
                     var steps = '"' + recipe.steps.join(';').replace(/"/g, '""') + '"';
-                    
                     csv += name + ',' + icon + ',' + time + ',' + difficulty + ',' + servings + ',' + ingredients + ',' + steps + '\n';
                 });
                 
-                // Créer le fichier CSV
                 var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-                var url = URL.createObjectURL(blob);
-                var link = document.createElement('a');
-                link.href = url;
-                link.download = 'recettes-frigo-manager-' + new Date().toISOString().split('T')[0] + '.csv';
-                
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-                
-                alert(tm('messages.recipesExported', {count: allRecipes.length}));
+                var filename = 'recettes-frigo-manager-' + new Date().toISOString().split('T')[0] + '.csv';
+
+                if (Filesystem) {
+                    var reader = new FileReader();
+                    reader.onloadend = async function() {
+                        try {
+                            var base64Data = reader.result.split(',')[1];
+                            
+                            await Filesystem.writeFile({
+                                path: filename,
+                                data: base64Data,
+                                directory: 'DOCUMENTS'
+                            });
+
+                            // Toast de confirmation
+                            var toast = document.createElement('div');
+                            toast.textContent = '✅ ' + allRecipes.length + ' recettes exportées : ' + filename;
+                            toast.style.cssText = 'position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#4CAF50;color:white;padding:14px 22px;border-radius:12px;z-index:9999;font-size:14px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.3);';
+                            document.body.appendChild(toast);
+                            setTimeout(() => toast.remove(), 3000);
+
+                        } catch (err) {
+                            console.error('Erreur export:', err);
+                            alert('❌ Erreur : ' + err.message);
+                        }
+                    };
+                    reader.readAsDataURL(blob);
+                } else {
+                    // Fallback navigateur
+                    var url = URL.createObjectURL(blob);
+                    var link = document.createElement('a');
+                    link.href = url;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    alert(tm('messages.recipesExported', {count: allRecipes.length}));
+                }
             } catch (err) {
                 alert('❌ Erreur lors de l\'export : ' + err.message);
                 console.error(err);
@@ -4771,22 +4862,41 @@
                         throw new Error('Aucune recette valide trouvée dans le fichier');
                     }
                     
-                    // Demander confirmation
+                    // Demander d'abord si l'utilisateur veut vraiment importer
                     if (userRecipes.length > 0) {
-                        var confirm = window.confirm(
-                            '⚠️ ATTENTION\n\n' +
-                            'Vous avez actuellement ' + userRecipes.length + ' recettes personnalisées.\n' +
-                            'Le fichier CSV contient ' + importedRecipes.length + ' recettes.\n\n' +
-                            'Voulez-vous REMPLACER vos recettes actuelles ?\n\n' +
-                            '(Cliquez "Annuler" pour ajouter les recettes sans supprimer les actuelles)'
+                        var doImport = window.confirm(
+                            '📥 Import CSV\n\n' +
+                            'Le fichier contient ' + importedRecipes.length + ' recettes.\n' +
+                            'Vous avez actuellement ' + userRecipes.length + ' recettes personnalisées.\n\n' +
+                            'Voulez-vous continuer l\'import ?\n\n' +
+                            '(Cliquez "Annuler" pour ne rien importer)'
                         );
                         
-                        if (confirm) {
+                        if (!doImport) {
+                            alert('❌ Import annulé');
+                            return; // STOP ici, ne rien faire
+                        }
+                        
+                        // Si oui, demander comment importer
+                        var replace = window.confirm(
+                            '⚠️ Comment importer ?\n\n' +
+                            'OK = REMPLACER vos ' + userRecipes.length + ' recettes actuelles\n' +
+                            'Annuler = AJOUTER aux recettes existantes (sans doublons)'
+                        );
+                        
+                        if (replace) {
                             // Remplacer
                             userRecipes = importedRecipes;
                         } else {
-                            // Ajouter
-                            userRecipes = userRecipes.concat(importedRecipes);
+                            // Ajouter sans doublons
+                            importedRecipes.forEach(function(newRecipe) {
+                                var exists = userRecipes.some(function(existing) {
+                                    return existing.name.toLowerCase() === newRecipe.name.toLowerCase();
+                                });
+                                if (!exists) {
+                                    userRecipes.push(newRecipe);
+                                }
+                            });
                         }
                     } else {
                         // Pas de recettes actuelles, importer directement
@@ -4851,7 +4961,6 @@
                     return;
                 }
                 
-                // Préparer les données pour Excel
                 var excelData = items.map(function(item) {
                     return {
                         'Nom': item.nom || '',
@@ -4869,39 +4978,54 @@
                     };
                 });
                 
-                // Créer un nouveau workbook
                 var wb = XLSX.utils.book_new();
-                
-                // Convertir les données en worksheet
                 var ws = XLSX.utils.json_to_sheet(excelData);
-                
-                // Ajuster la largeur des colonnes
                 var wscols = [
-                    {wch: 25},  // Nom
-                    {wch: 15},  // Code-barres
-                    {wch: 12},  // Date d'ajout
-                    {wch: 15},  // Date d'expiration
-                    {wch: 15},  // Catégorie
-                    {wch: 15},  // Emplacement
-                    {wch: 10},  // Quantité
-                    {wch: 12},  // À renouveler
-                    {wch: 12},  // Nutri-Score
-                    {wch: 8},   // NOVA
-                    {wch: 10},  // Additifs
-                    {wch: 12}   // Eco-Score
+                    {wch: 25}, {wch: 15}, {wch: 12}, {wch: 15},
+                    {wch: 15}, {wch: 15}, {wch: 10}, {wch: 12},
+                    {wch: 12}, {wch: 8},  {wch: 10}, {wch: 12}
                 ];
                 ws['!cols'] = wscols;
-                
-                // Ajouter le worksheet au workbook
                 XLSX.utils.book_append_sheet(wb, ws, 'Produits');
                 
-                // Générer le fichier Excel
                 var filename = 'frigo-manager-' + new Date().toISOString().split('T')[0] + '.xlsx';
-                XLSX.writeFile(wb, filename);
-                
-                var message = tm('messages.exportExcelSuccess', {count: items.length, filename: filename});
-                alert(message);
-                toggleSettings();
+                var wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
+                var blob = new Blob([wbout], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+
+                if (Filesystem) {
+                    var reader = new FileReader();
+                    reader.onloadend = async function() {
+                        try {
+                            var base64Data = reader.result.split(',')[1];
+                            
+                            await Filesystem.writeFile({
+                                path: filename,
+                                data: base64Data,
+                                directory: 'DOCUMENTS'
+                            });
+
+                            // Toast de confirmation
+                            var toast = document.createElement('div');
+                            toast.textContent = '✅ ' + items.length + ' produits exportés : ' + filename;
+                            toast.style.cssText = 'position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#4CAF50;color:white;padding:14px 22px;border-radius:12px;z-index:9999;font-size:14px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.3);';
+                            document.body.appendChild(toast);
+                            setTimeout(() => toast.remove(), 3000);
+
+                            toggleSettings();
+
+                        } catch (error) {
+                            console.error('Erreur export:', error);
+                            alert('❌ Erreur lors de l\'export : ' + error.message);
+                        }
+                    };
+                    reader.readAsDataURL(blob);
+                } else {
+                    // Fallback navigateur
+                    XLSX.writeFile(wb, filename);
+                    alert(tm('messages.exportExcelSuccess', {count: items.length, filename: filename}));
+                    toggleSettings();
+                }
+
             } catch (err) {
                 alert(currentLang === 'fr' ? '❌ Erreur lors de l\'export Excel : ' + err.message : '❌ Excel export error: ' + err.message);
                 console.error(err);
@@ -4966,17 +5090,29 @@
                         };
                     });
                     
-                    // Demander confirmation
+                    // Demander d'abord si l'utilisateur veut vraiment importer
                     if (items.length > 0) {
-                        var confirm = window.confirm(
-                            '⚠️ ATTENTION\n\n' +
-                            'Vous avez actuellement ' + items.length + ' produits.\n' +
-                            'Le fichier Excel contient ' + importedItems.length + ' produits.\n\n' +
-                            'Voulez-vous REMPLACER vos données actuelles ?\n\n' +
-                            '(Cliquez "Annuler" pour ajouter les produits sans supprimer les actuels)'
+                        var doImport = window.confirm(
+                            '📥 Import Excel\n\n' +
+                            'Le fichier contient ' + importedItems.length + ' produits.\n' +
+                            'Vous avez actuellement ' + items.length + ' produits.\n\n' +
+                            'Voulez-vous continuer l\'import ?\n\n' +
+                            '(Cliquez "Annuler" pour ne rien importer)'
                         );
                         
-                        if (confirm) {
+                        if (!doImport) {
+                            alert('❌ Import annulé');
+                            return; // STOP ici, ne rien faire
+                        }
+                        
+                        // Si oui, demander comment importer
+                        var replace = window.confirm(
+                            '⚠️ Comment importer ?\n\n' +
+                            'OK = REMPLACER vos ' + items.length + ' produits actuels\n' +
+                            'Annuler = AJOUTER aux produits existants'
+                        );
+                        
+                        if (replace) {
                             // Remplacer
                             items = importedItems;
                         } else {
@@ -4987,12 +5123,12 @@
                         // Pas de données actuelles, importer directement
                         items = importedItems;
                     }
-                    
+
                     // Sauvegarder
                     saveItems();
                     renderAll();
                     toggleSettings();
-                    
+
                     var message = tm('messages.importExcelSuccess', {count: importedItems.length});
                     alert(message);
                 } catch (err) {
@@ -5014,7 +5150,8 @@
             // Filtrer les produits à acheter
             var toShop = items.filter(function(item) {
                 var qty = getQuantity(item.quantite);
-                return qty === 0 || item.aRenouveler;
+                //return qty === 0 || item.aRenouveler; mig
+                return item.aRenouveler;
             });
             
             // Afficher le modal
@@ -5028,16 +5165,21 @@
             if (toShop.length === 0) {
                 html = '<div style="text-align: center; padding: 40px; color: #666;">' +
                        '<div style="font-size: 3em; margin-bottom: 20px;">✅</div>' +
-                       '<h3>' + t('shopping.empty') + '</h3>' +
+                       //'<h3>' + t('shopping.empty') + '</h3>' + mig
                        '<p>' + t('shopping.emptyDesc') + '</p>' +
                        '</div>';
             } else {
                 toShop.forEach(function(item) {
                     var qty = getQuantity(item.quantite);
                     var reason = '';
-                    if (qty === 0) {
-                        reason = '📦 ' + t('shopping.exhausted');
-                    } else if (item.aRenouveler) {
+                    
+                    //if (qty === 0) {
+                    //    reason = '📦 ' + t('shopping.exhausted');
+                    //} else if (item.aRenouveler) {
+                    //    reason = '📝 ' + t('shopping.toRenew');
+                    //}
+                    
+                    if (item.aRenouveler) {
                         reason = '📝 ' + t('shopping.toRenew');
                     }
                     
@@ -5063,8 +5205,29 @@
         }
         
         function toggleShoppingItem(itemId) {
-            shoppingListState[itemId] = !shoppingListState[itemId];
-            openShoppingList(); // Re-render pour mettre à jour l'affichage
+            var item = items.find(function(i) { return i.id === itemId; });
+            
+            if (item) {
+                // Décocher "À renouveler"
+                item.aRenouveler = false;
+                
+                // Sauvegarder dans localStorage
+                localStorage.setItem('items', JSON.stringify(items));
+                
+                // Retirer du cache rappels ← AJOUT
+                var dejaExportes = JSON.parse(localStorage.getItem('rappels_exportes') || '[]');
+                var miseAJour = dejaExportes.filter(function(id) { return id !== itemId; });
+                localStorage.setItem('rappels_exportes', JSON.stringify(miseAJour));
+                
+                // Supprimer de l'état de la shopping list
+                delete shoppingListState[itemId];
+                
+                // Re-render la liste
+                openShoppingList();
+                
+                renderItems(); // ← AJOUT : met à jour les fiches produits
+
+            }
         }
         
         function exportShoppingListText() {
@@ -5111,9 +5274,67 @@
             }
         }
         
-        function showTextModal(text) {
-            var promptText = currentLang === 'fr' ? 'Copiez cette liste :' : 'Copy this list:';
-            var modal = prompt(promptText, text);
+        async function exportToReminders() {
+            const toRenewItems = items.filter(item => item.aRenouveler === true);
+            
+            if (toRenewItems.length === 0) {
+                alert(currentLang === 'fr' ? '❌ Aucun produit à renouveler' : '❌ No products to renew');
+                return;
+            }
+
+            // Récupérer les produits déjà exportés
+            const dejaExportes = JSON.parse(localStorage.getItem('rappels_exportes') || '[]');
+
+            // Filtrer uniquement les nouveaux
+            const nouveaux = toRenewItems.filter(item => !dejaExportes.includes(item.id));
+
+            if (nouveaux.length === 0) {
+                alert(currentLang === 'fr'
+                    ? '✅ Tous les produits sont déjà dans Rappels'
+                    : '✅ All products already in Reminders');
+                return;
+            }
+
+            const CalPlugin = window.Capacitor?.Plugins?.CapacitorCalendar;
+            if (!CalPlugin) return;
+
+            try {
+                const permission = await CalPlugin.requestPermission({ scope: 'writeReminders' });
+                if (permission.result !== 'granted') return;
+
+                const { result: defaultList } = await CalPlugin.getDefaultRemindersList();
+
+                for (const item of nouveaux) {
+                    await CalPlugin.createReminder({
+                        title: item.nom,
+                        listId: defaultList?.id,
+                        priority: 5,
+                        isCompleted: false
+                    });
+                    // Marquer comme exporté
+                    dejaExportes.push(item.id);
+                }
+
+                // Sauvegarder la liste mise à jour
+                localStorage.setItem('rappels_exportes', JSON.stringify(dejaExportes));
+
+                alert(currentLang === 'fr'
+                    ? `✅ ${nouveaux.length} nouveau(x) produit(s) ajouté(s) dans Rappels !`
+                    : `✅ ${nouveaux.length} new product(s) added to Reminders!`);
+
+            } catch (err) {
+                console.error('Erreur Rappels:', err);
+                alert('❌ Erreur : ' + err.message);
+            }
+        }
+        
+        function retirerDeRenouveler(itemId) {
+            // ... ta logique existante pour décocher aRenouveler ...
+
+            // Retirer aussi du cache rappels
+            const dejaExportes = JSON.parse(localStorage.getItem('rappels_exportes') || '[]');
+            const mise_a_jour = dejaExportes.filter(id => id !== itemId);
+            localStorage.setItem('rappels_exportes', JSON.stringify(mise_a_jour));
         }
         
         function printShoppingList() {
@@ -5183,10 +5404,6 @@
         
         function saveUserRecipes() {
             localStorage.setItem('userRecipes', JSON.stringify(userRecipes));
-        }
-        
-        function getAllRecipes() {
-            return recipesDatabase.concat(userRecipes);
         }
         
         var recipesDatabase = [
@@ -5364,11 +5581,14 @@
             }
         ];
         
+        function getAllRecipes() {
+            var userRecipes = JSON.parse(localStorage.getItem('userRecipes') || '[]');  // ✅ Chargé depuis localStorage
+            return recipesDatabase.concat(userRecipes);
+        }
+        
         function openRecipes() {
-            // Récupérer les produits disponibles
             var availableProducts = items.filter(function(item) {
                 var qty = getQuantity(item.quantite);
-                // Produit disponible si quantité > 0 et pas périmé
                 if (qty === 0) return false;
                 if (item.datePeremption) {
                     var daysLeft = Math.ceil((new Date(item.datePeremption) - new Date()) / (1000 * 60 * 60 * 24));
@@ -5377,15 +5597,12 @@
                 return true;
             });
             
-            // Extraire les noms de produits disponibles
             var availableIngredients = availableProducts.map(function(p) {
                 return p.nom.toLowerCase();
             });
             
-            // Utiliser toutes les recettes (défaut + utilisateur)
             var allRecipes = getAllRecipes();
             
-            // Calculer le match pour chaque recette
             var recipesWithMatch = allRecipes.map(function(recipe) {
                 var matchCount = 0;
                 var totalIngredients = recipe.ingredients.length;
@@ -5407,48 +5624,50 @@
                 };
             });
             
-            // Trier par pourcentage de match
             recipesWithMatch.sort(function(a, b) {
+                var aIsUser = a.recipe.id >= 1000 ? 1 : 0;
+                var bIsUser = b.recipe.id >= 1000 ? 1 : 0;
+                if (bIsUser !== aIsUser) return bIsUser - aIsUser;
                 return b.matchPercent - a.matchPercent;
             });
             
-            // Afficher le modal
             document.getElementById('recipesModal').classList.add('active');
             
-            // Générer la liste
             var html = '';
-            if (recipesWithMatch.length === 0 || recipesWithMatch[0].matchPercent === 0) {
+
+            recipesWithMatch.forEach(function(item) {
+                var isUserRecipe = item.recipe.id >= 1000;
+                
+                if (item.matchPercent > 0 || isUserRecipe) {
+                    var matchColor = item.matchPercent >= 80 ? '#10b981' :
+                                    item.matchPercent >= 50 ? '#f59e0b' : '#6b7280';
+                    
+                    var userBadge = isUserRecipe ? '<span class="user-recipe-badge">' + t('recipes.userRecipe') + '</span>' : '';
+                    
+                    html += '<div class="recipe-card" onclick="showRecipeDetail(' + item.recipe.id + ')">' +
+                           '<div class="recipe-card-header">' +
+                           '<div class="recipe-icon">' + item.recipe.icon + '</div>' +
+                           '<div class="recipe-card-title">' +
+                           '<div class="recipe-name">' + item.recipe.name + userBadge + '</div>' +
+                           '<div class="recipe-time">⏱️ ' + item.recipe.time + ' • ' + item.recipe.difficulty + '</div>' +
+                           '</div>' +
+                           '</div>' +
+                           '<div class="recipe-ingredients-preview">' +
+                           (currentLang === 'fr' ? 'Pour ' : 'For ') + item.recipe.servings + ' ' + (currentLang === 'fr' ? 'personne' + (item.recipe.servings > 1 ? 's' : '') : item.recipe.servings > 1 ? 'servings' : 'serving') +
+                           '</div>' +
+                           '<span class="recipe-match" style="background: ' + matchColor + ';">' +
+                           '✓ ' + item.matchCount + '/' + item.totalIngredients + ' ' + (currentLang === 'fr' ? 'ingrédients disponibles' : 'ingredients available') + ' (' + item.matchPercent + '%)' +
+                           '</span>' +
+                           '</div>';
+                }
+            });
+
+            if (html === '') {
                 html = '<div style="text-align: center; padding: 40px; color: #666;">' +
                        '<div style="font-size: 3em; margin-bottom: 20px;">🍳</div>' +
                        '<h3>' + (currentLang === 'fr' ? 'Aucune recette disponible' : 'No recipes available') + '</h3>' +
                        '<p>' + (currentLang === 'fr' ? 'Ajoutez des produits pour voir des suggestions de recettes !' : 'Add products to see recipe suggestions!') + '</p>' +
                        '</div>';
-            } else {
-                recipesWithMatch.forEach(function(item) {
-                    if (item.matchPercent > 0) {
-                        var matchColor = item.matchPercent >= 80 ? '#10b981' : 
-                                        item.matchPercent >= 50 ? '#f59e0b' : '#6b7280';
-                        
-                        var isUserRecipe = item.recipe.id >= 1000; // Les recettes utilisateur ont des IDs >= 1000
-                        var userBadge = isUserRecipe ? '<span class="user-recipe-badge">' + t('recipes.userRecipe') + '</span>' : '';
-                        
-                        html += '<div class="recipe-card" onclick="showRecipeDetail(' + item.recipe.id + ')">' +
-                               '<div class="recipe-card-header">' +
-                               '<div class="recipe-icon">' + item.recipe.icon + '</div>' +
-                               '<div class="recipe-card-title">' +
-                               '<div class="recipe-name">' + item.recipe.name + userBadge + '</div>' +
-                               '<div class="recipe-time">⏱️ ' + item.recipe.time + ' • ' + item.recipe.difficulty + '</div>' +
-                               '</div>' +
-                               '</div>' +
-                               '<div class="recipe-ingredients-preview">' +
-                               (currentLang === 'fr' ? 'Pour ' : 'For ') + item.recipe.servings + ' ' + (currentLang === 'fr' ? 'personne' + (item.recipe.servings > 1 ? 's' : '') : item.recipe.servings > 1 ? 'servings' : 'serving') +
-                               '</div>' +
-                               '<span class="recipe-match" style="background: ' + matchColor + ';">' +
-                               '✓ ' + item.matchCount + '/' + item.totalIngredients + ' ' + (currentLang === 'fr' ? 'ingrédients disponibles' : 'ingredients available') + ' (' + item.matchPercent + '%)' +
-                               '</span>' +
-                               '</div>';
-                    }
-                });
             }
             
             document.getElementById('recipesListItems').innerHTML = html;
@@ -5553,18 +5772,22 @@
             document.getElementById('recipeServingsInput').value = '2';
             document.getElementById('ingredientsList').innerHTML = '';
             document.getElementById('stepsList').innerHTML = '';
-            
-            // Ajouter 3 champs ingrédients par défaut
+
+            // Clavier numérique pour temps et portions
+            document.getElementById('recipeTimeInput').inputMode = 'numeric';
+            document.getElementById('recipeTimeInput').type = 'number';
+            document.getElementById('recipeTimeInput').min = '1';
+            document.getElementById('recipeServingsInput').inputMode = 'numeric';
+            document.getElementById('recipeServingsInput').type = 'number';
+            document.getElementById('recipeServingsInput').min = '1';
+
             addIngredientField();
             addIngredientField();
             addIngredientField();
-            
-            // Ajouter 3 champs étapes par défaut
             addStepField();
             addStepField();
             addStepField();
             
-            // Sélectionner tous les boutons emoji
             var emojiButtons = document.querySelectorAll('.emoji-btn');
             emojiButtons.forEach(function(btn) {
                 btn.classList.remove('selected');
@@ -5623,14 +5846,13 @@
         }
         
         function saveRecipe() {
-            // Récupérer les valeurs
             var name = document.getElementById('recipeNameInput').value.trim();
             var icon = document.getElementById('recipeIconInput').value;
             var time = document.getElementById('recipeTimeInput').value.trim();
+            time = time ? time + ' min' : '';
             var difficulty = document.getElementById('recipeDifficultyInput').value;
             var servings = parseInt(document.getElementById('recipeServingsInput').value);
             
-            // Validation
             if (!name) {
                 alert(currentLang === 'fr' ? '❌ Veuillez entrer un nom de recette' : '❌ Please enter a recipe name');
                 return;
@@ -5641,7 +5863,6 @@
                 return;
             }
             
-            // Récupérer les ingrédients
             var ingredientInputs = document.querySelectorAll('#ingredientsList input');
             var ingredients = [];
             ingredientInputs.forEach(function(input) {
@@ -5654,7 +5875,6 @@
                 return;
             }
             
-            // Récupérer les étapes
             var stepTextareas = document.querySelectorAll('#stepsList textarea');
             var steps = [];
             stepTextareas.forEach(function(textarea) {
@@ -5667,9 +5887,7 @@
                 return;
             }
             
-            // Créer ou modifier la recette
             if (currentEditingRecipeId) {
-                // Modification
                 var index = userRecipes.findIndex(function(r) { return r.id === currentEditingRecipeId; });
                 if (index !== -1) {
                     userRecipes[index] = {
@@ -5684,7 +5902,6 @@
                     };
                 }
             } else {
-                // Création
                 var newRecipe = {
                     id: 1000 + userRecipes.length + Math.floor(Math.random() * 1000),
                     name: name,
@@ -5700,12 +5917,18 @@
             
             // Sauvegarder
             saveUserRecipes();
+
+            var wasEditing = currentEditingRecipeId !== null;
+            currentEditingRecipeId = null;
+
             closeCreateRecipe();
-            openRecipes(); // Rafraîchir la liste
-            
-            var action = currentEditingRecipeId ? (currentLang === 'fr' ? 'modifiée' : 'updated') : (currentLang === 'fr' ? 'créée' : 'created');
-            var message = currentLang === 'fr' ? '✅ Recette ' + action + ' avec succès !' : '✅ Recipe ' + action + ' successfully!';
-            alert(message);
+
+            setTimeout(function() {
+                openRecipes();
+                var action = wasEditing ? (currentLang === 'fr' ? 'modifiée' : 'updated') : (currentLang === 'fr' ? 'créée' : 'created');
+                var message = currentLang === 'fr' ? '✅ Recette ' + action + ' avec succès !' : '✅ Recipe ' + action + ' successfully!';
+                alert(message);
+            }, 200);
         }
         
         function editRecipe(recipeId) {
@@ -6312,6 +6535,8 @@
             renderSearchHistory();
         }
         
+        
+        
         // Rendre les fonctions globales
         window.selectSearchHistory = selectSearchHistory;
         window.removeFromHistory = removeFromHistory;
@@ -6321,6 +6546,47 @@
         var searchBtn = document.getElementById('searchButton');
         var clearBtn = document.getElementById('clearSearch');
         var historyEl = document.getElementById('searchHistory');
+        
+        /* 
+        DÉSACTIVÉ - On utilise onclick HTML à la place
+        
+        // Test que les éléments existent
+        if (!searchInput) alert('❌ searchInput introuvable');
+        if (!searchBtn) alert('❌ searchBtn introuvable');
+        if (!clearBtn) alert('❌ clearBtn introuvable');
+        
+        // Fonction de recherche réutilisable
+        function handleSearch() {
+            alert('✅ handleSearch() appelée !');
+            
+            var value = searchInput.value.trim();
+            currentSearchTerm = value;
+            
+            alert('🔍 Valeur recherchée: "' + value + '"');
+            
+            // Afficher/cacher le bouton clear
+            clearBtn.style.display = value ? 'flex' : 'none';
+            
+            alert('📋 Appel de renderItems()...');
+            renderItems();
+            alert('✅ renderItems() terminé !');
+            
+            // Ajouter à l'historique si recherche non vide
+            if (value) {
+                addToSearchHistory(value);
+            }
+        }
+        
+        // BOUTON GO - Recherche manuelle (parfait pour iOS)
+        searchBtn.onclick = function() {
+            alert('🎯 Bouton GO cliqué !');
+            handleSearch();
+            searchInput.blur(); // Fermer le clavier sur mobile
+        };
+        */
+        
+        // AUCUN event listener - Seulement onclick HTML
+        // (Recherche déclenchée UNIQUEMENT par le bouton GO)
         
         // Raccourci clavier Ctrl+F / Cmd+F pour focus
         document.addEventListener('keydown', function(e) {
@@ -6371,32 +6637,6 @@
         
         // Afficher la version
         document.getElementById('versionDisplay').textContent = 'Version ' + APP_VERSION;
-    </script>
-    
-    <script>
-    // Afficher le bouton X pendant la saisie
-    (function() {
-        var searchInput = document.getElementById('searchInput');
-        var clearBtn = document.getElementById('clearSearch');
-        
-        if (searchInput && clearBtn) {
-            // Écouter plusieurs événements pour iOS
-            function updateClearButton() {
-                var value = searchInput.value.trim();
-                if (clearBtn) {
-                    clearBtn.style.display = value ? 'flex' : 'none';
-                }
-            }
-
-            searchInput.addEventListener('input', updateClearButton);
-            searchInput.addEventListener('keyup', updateClearButton);
-            searchInput.addEventListener('change', updateClearButton);
-            searchInput.addEventListener('paste', updateClearButton);
-
-            // Vérifier aussi au focus
-            searchInput.addEventListener('focus', updateClearButton);
-        }
-    })();
     </script>
 </body>
 </html>
