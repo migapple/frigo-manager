@@ -1,4 +1,4 @@
-# 🧊 Frigo Manager v2.17
+# 🧊 Frigo Manager v2.18
 
 <div align="center">
 
@@ -14,7 +14,8 @@
 
 ---
 
-## ✨ Nouveautés v2.17
+## ✨ Nouveautés v2.18
+- ✅ Optimisé pour la majorité des utilisateurs (mobile)
 
 ### 🛒 Liste de Courses
 - Saisie numérique dans les nouvelles recettes
