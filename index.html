@@ -22,13 +22,30 @@
             -webkit-tap-highlight-color: transparent;
         }
         
+        html {
+            min-height: 100%; /* Changé de height à min-height pour permettre le scroll */
+            overflow-y: auto; /* Permettre scroll vertical */
+            overflow-x: clip; /* Empêcher débordement horizontal */
+            -webkit-overflow-scrolling: touch; /* Scroll fluide iOS */
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 10px; /* Réduit pour grands iPhones */
             color: #333;
-            overflow-x: hidden;
+            overflow-y: auto; /* Force le scroll vertical */
+            overflow-x: clip; /* Permet le scroll vertical, bloque seulement horizontal */
+            -webkit-overflow-scrolling: touch; /* Scroll fluide sur iOS */
+            position: relative; /* Important pour le contexte de positionnement */
+        }
+        
+        /* Padding normal sur écrans plus grands */
+        @media (min-width: 600px) {
+            body {
+                padding: 20px;
+            }
         }
         
         .container {
@@ -40,9 +57,16 @@
         .header {
             text-align: center;
             color: white;
-            margin-bottom: 30px;
+            margin-bottom: 15px; /* Réduit pour mobile */
             position: relative;
             padding: 0 60px; /* Espace pour le bouton settings */
+        }
+        
+        /* Margin normal sur écrans plus grands */
+        @media (min-width: 600px) {
+            .header {
+                margin-bottom: 30px;
+            }
         }
         
         .header h1 {
@@ -69,7 +93,7 @@
         /* Mobile - iPhone et Android */
         @media (max-width: 599px) {
             body {
-                padding: max(20px, env(safe-area-inset-top)) 20px 20px 20px;
+                padding: max(10px, env(safe-area-inset-top)) 10px 10px 10px; /* Réduit pour grands iPhones */
             }
             .container {
                 padding: 0 5px;
@@ -237,16 +261,31 @@
         .stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 10px; /* Réduit pour mobile */
+            margin-bottom: 10px; /* Réduit pour mobile */
+        }
+        
+        /* Spacing normal sur écrans plus grands */
+        @media (min-width: 600px) {
+            .stats {
+                gap: 15px;
+                margin-bottom: 20px;
+            }
         }
         
         .stat-card {
             background: white;
-            padding: 20px;
+            padding: 12px; /* Réduit pour mobile */
             border-radius: 15px;
             text-align: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        /* Padding normal sur écrans plus grands */
+        @media (min-width: 600px) {
+            .stat-card {
+                padding: 20px;
+            }
         }
         
         .stat-card .number {
@@ -266,23 +305,40 @@
         
         .actions {
             background: white;
-            padding: 20px;
+            padding: 12px; /* Réduit pour mobile */
             border-radius: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 10px; /* Réduit pour mobile */
             display: grid;
-            gap: 15px;
+            gap: 10px; /* Réduit pour mobile */
+        }
+        
+        /* Spacing normal sur écrans plus grands */
+        @media (min-width: 600px) {
+            .actions {
+                padding: 20px;
+                margin-bottom: 20px;
+                gap: 15px;
+            }
         }
         
         .btn {
             width: 100%;
-            padding: 20px;
-            font-size: 1.2em;
+            padding: 15px; /* Réduit pour mobile */
+            font-size: 1.1em; /* Réduit pour mobile */
             font-weight: bold;
             border: none;
             border-radius: 12px;
             cursor: pointer;
             color: white;
             transition: transform 0.2s;
+        }
+        
+        /* Padding et font normal sur écrans plus grands */
+        @media (min-width: 600px) {
+            .btn {
+                padding: 20px;
+                font-size: 1.2em;
+            }
         }
         
         .btn:active {
@@ -2839,9 +2895,45 @@
         var currentLang = localStorage.getItem('language') || 'fr';
         
         // === SYSTÈME DE VERSION ===
-        var APP_VERSION = '2.1.7';
-        var VERSION_DATE = '2026-02-25';
+        var APP_VERSION = '2.1.9';
+        var VERSION_DATE = '2026-02-26';
         var CHANGELOG = {
+            '2.1.9': {
+                date: '2026-02-26',
+                changes: {
+                    fr: [
+                        '🐛 Correction du scroll bloqué sur simulateur iPhone',
+                        '✅ html: height: 100% → min-height: 100% (permet débordement)',
+                        '✅ body: overflow-y: auto ajouté explicitement',
+                        '✅ body: position: relative pour contexte correct',
+                        '✅ Conserve overflow-x: clip et -webkit-overflow-scrolling: touch'
+                    ],
+                    en: [
+                        '🐛 Fixed blocked scroll on iPhone simulator',
+                        '✅ html: height: 100% → min-height: 100% (allows overflow)',
+                        '✅ body: overflow-y: auto explicitly added',
+                        '✅ body: position: relative for correct context',
+                        '✅ Keeps overflow-x: clip and -webkit-overflow-scrolling: touch'
+                    ]
+                }
+            },
+            '2.1.8': {
+                date: '2026-02-26',
+                changes: {
+                    fr: [
+                        '📱 Optimisation affichage grands iPhones (XS Max, 11 Pro Max, 12/13/14/15 Pro Max)',
+                        '✨ Réduction espacements sur mobile : body 10px, stats 12px, actions 12px, boutons 15px',
+                        '🎨 Interface plus compacte sur petits écrans (~120px économisés)',
+                        '✅ Approche mobile-first avec restauration automatique sur desktop'
+                    ],
+                    en: [
+                        '📱 Optimized display for large iPhones (XS Max, 11 Pro Max, 12/13/14/15 Pro Max)',
+                        '✨ Reduced spacing on mobile: body 10px, stats 12px, actions 12px, buttons 15px',
+                        '🎨 More compact interface on small screens (~120px saved)',
+                        '✅ Mobile-first approach with automatic restoration on desktop'
+                    ]
+                }
+            },
             '2.1.7': {
                 date: '2026-02-25',
                 changes: {
