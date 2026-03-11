@@ -1,8 +1,8 @@
-# 🧊 Frigo Manager v2.18
+# 🧊 Frigo Manager v2.2.0
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-2.1.8-blue.svg)
+![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Language](https://img.shields.io/badge/language-JavaScript-yellow.svg)
 
@@ -14,6 +14,10 @@
 
 ---
 
+## ✨ Nouveautés v2.20
+- 🐛 Correction de la hauteur du notch
+- 🐛 Correction du scroll bloqué sous le notch'
+  
 ## ✨ Nouveautés v2.18
 - ✅ Optimisé pour la majorité des utilisateurs (mobile)
 
