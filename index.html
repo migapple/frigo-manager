@@ -33,7 +33,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 10px; /* Réduit pour grands iPhones */
+            padding: 20px; /* Réduit pour grands iPhones mig */
             color: #333;
             overflow-y: auto; /* Force le scroll vertical */
             overflow-x: clip; /* Permet le scroll vertical, bloque seulement horizontal */
@@ -41,12 +41,50 @@
             position: relative; /* Important pour le contexte de positionnement */
         }
         
-        /* Padding normal sur écrans plus grands */
-        @media (min-width: 600px) {
-            body {
-                padding: 20px;
+        /* Crée une barrière invisible en haut mig*/
+        body::before {
+            content: '';
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: calc(env(safe-area-inset-top, 0px) + 60px);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 999;
+            pointer-events: none; /* Ne bloque pas les clics */
+        }
+        
+        /* Fix formulaire saisie manuelle sous le notch mig */
+        #form {
+            padding-top: calc(env(safe-area-inset-top, 0px) + 40px) !important;
+        }
+
+        @media (max-width: 599px) {
+            #form {
+                padding-top: calc(env(safe-area-inset-top, 0px) + 50px) !important;
             }
         }
+        
+        
+        /* Fix overlay qui contient le formulaire mig*/
+        body > div[id],
+        body > div[style*="display"] {
+            padding-top: calc(env(safe-area-inset-top, 0px) + 40px) !important;
+        }
+        
+        
+        /* Padding normal sur écrans plus grands */
+        @media (max-width: 599px) {
+            body {
+                padding-top: calc(env(safe-area-inset-top, 0px) + 40px);
+                /* ↑ Notch + 20px supplémentaires */
+                padding-left: 10px;
+                padding-right: 10px;
+                padding-bottom: 10px;
+            }
+        }
+        
         
         .container {
             max-width: 800px;
@@ -57,7 +95,7 @@
         .header {
             text-align: center;
             color: white;
-            margin-bottom: 15px; /* Réduit pour mobile */
+            margin-bottom: 30px; /* Réduit pour mobile 15mig*/
             position: relative;
             padding: 0 60px; /* Espace pour le bouton settings */
         }
@@ -92,12 +130,7 @@
         
         /* Mobile - iPhone et Android */
         @media (max-width: 599px) {
-            body {
-                padding: max(10px, env(safe-area-inset-top)) 10px 10px 10px; /* Réduit pour grands iPhones */
-            }
-            .container {
-                padding: 0 5px;
-            }
+            
             .header {
                 padding: 0 70px; /* Plus d'espace pour les boutons */
             }
@@ -785,8 +818,18 @@
             background: white;
             padding: 20px;
             border-radius: 15px;
-            margin-bottom: 20px;
             display: none;
+            
+            /* AJOUTEZ CES LIGNES ↓ */
+            position: fixed !important;
+            top: calc(env(safe-area-inset-top, 0px) + 60px) !important;
+            left: 10px !important;
+            right: 10px !important;
+            bottom: 10px !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            z-index: 10000 !important;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
         }
         
         .form.active {
@@ -2895,9 +2938,22 @@
         var currentLang = localStorage.getItem('language') || 'fr';
         
         // === SYSTÈME DE VERSION ===
-        var APP_VERSION = '2.1.9';
-        var VERSION_DATE = '2026-02-26';
+        var APP_VERSION = '2.2.0';
+        var VERSION_DATE = '2026-03-11';
         var CHANGELOG = {
+            '2.2.0': {
+                date: '2026-03-11',
+                changes: {
+                    fr: [
+                        '🐛 Correction de la hauteur du notch',
+                        '🐛 Correction du scroll bloqué sous le notch'
+                    ],
+                    en: [
+                         '🐛 Correction of the notch hight',
+                         '🐛 Correction scroll blocked sur under notch'
+                    ]
+                }
+            },
             '2.1.9': {
                 date: '2026-02-26',
                 changes: {
@@ -6147,6 +6203,7 @@
         }
 
         function closeForm() {
+                
             document.getElementById('form').classList.remove('active');
             document.getElementById('form').innerHTML = '';
             document.getElementById('actions').style.display = 'grid';
@@ -6239,6 +6296,7 @@
             
             form.innerHTML = html;
             form.classList.add('active');
+            
             document.getElementById('actions').style.display = 'none';
             document.getElementById('stats').style.display = 'none';
             
@@ -6534,9 +6592,9 @@
             
             document.getElementById('btnCancel').onclick = closeForm;
             
-            setTimeout(function() {
-                document.getElementById('formNom').focus();
-            }, 100);
+            //setTimeout(function() {
+            //    document.getElementById('formNom').focus();
+            //}, 100);
         }
 
         // Filtres
@@ -6630,7 +6688,6 @@
             saveSearchHistory();
             renderSearchHistory();
         }
-        
         
         
         // Rendre les fonctions globales
@@ -6733,6 +6790,61 @@
         
         // Afficher la version
         document.getElementById('versionDisplay').textContent = 'Version ' + APP_VERSION;
+        
+        
+        // SOLUTION RADICALE - Forcer scroll top en permanence quand formulaire ouvert
+        (function() {
+            var blockScroll = false;
+            
+            // Quand le formulaire s'ouvre
+            var observer = new MutationObserver(function() {
+                var form = document.getElementById('form');
+                blockScroll = form && form.classList.contains('active');
+                
+                if (blockScroll) {
+                    // Bloquer body
+                    document.documentElement.style.overflow = 'hidden';
+                    document.documentElement.style.position = 'fixed';
+                    document.documentElement.style.width = '100%';
+                    document.body.style.overflow = 'hidden';
+                    document.body.style.position = 'fixed';
+                    document.body.style.width = '100%';
+                } else {
+                    // Débloquer
+                    document.documentElement.style.overflow = '';
+                    document.documentElement.style.position = '';
+                    document.documentElement.style.width = '';
+                    document.body.style.overflow = '';
+                    document.body.style.position = '';
+                    document.body.style.width = '';
+                }
+            });
+            
+            var form = document.getElementById('form');
+            if (form) {
+                observer.observe(form, { attributes: true, attributeFilter: ['class'] });
+            }
+            
+            // Bloquer TOUT scroll quand formulaire ouvert
+            window.addEventListener('scroll', function(e) {
+                if (blockScroll) {
+                    e.preventDefault();
+                    window.scrollTo(0, 0);
+                }
+            }, { passive: false });
+            
+            // Bloquer aussi sur touchmove
+            document.addEventListener('touchmove', function(e) {
+                if (blockScroll) {
+                    var target = e.target;
+                    var form = document.getElementById('form');
+                    // Autoriser scroll UNIQUEMENT dans le formulaire
+                    if (!form.contains(target)) {
+                        e.preventDefault();
+                    }
+                }
+            }, { passive: false });
+        })();
     </script>
 </body>
 </html>
