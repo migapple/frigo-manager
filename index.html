@@ -1567,10 +1567,18 @@
             background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
             color: white;
             padding: 15px 20px;
+            padding-top: calc(env(safe-area-inset-top, 0px) + 60px); /* FIX NOTCH mig*/
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 10;
+        }
+        
+        /* Sur mobile */
+        @media (max-width: 599px) {
+            .recipe-detail-header {
+                padding-top: calc(env(safe-area-inset-top, 0px) + 70px) !important;
+            }
         }
         
         .btn-back {
