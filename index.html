@@ -85,6 +85,36 @@
             }
         }
         
+        /* iPhone SE (1ère, 2ème, 3ème gen) et iPhone 6/7/8 */
+        @media (max-width: 414px) and (max-height: 736px) {
+            
+            /* Barrière réduite */
+            body::before {
+                height: 20px !important;
+            }
+            
+            /* Padding réduit */
+            @media (max-width: 599px) {
+                body {
+                    padding-top: 15px !important;
+                }
+            }
+            
+            /* Boutons en haut */
+            .language-selector {
+                top: 20px !important;
+            }
+            
+            .settings-btn {
+                top: 20px !important;
+            }
+            
+            /* Header */
+            .header h1 {
+                margin-top: 15px !important;
+            }
+        }
+        
         
         .container {
             max-width: 800px;
@@ -2946,9 +2976,31 @@
         var currentLang = localStorage.getItem('language') || 'fr';
         
         // === SYSTÈME DE VERSION ===
-        var APP_VERSION = '2.2.0';
-        var VERSION_DATE = '2026-03-11';
+        var APP_VERSION = '2.2.2';
+        var VERSION_DATE = '2026-03-14';
         var CHANGELOG = {
+            '2.2.2': {
+                date: '2026-03-14',
+                changes: {
+                    fr: [
+                        '🐛 ajout iPhone SE (1ère, 2ème, 3ème gen) et iPhone 6/7/8',
+                    ],
+                    en: [
+                         '🐛 adding iPhone SE (1ère, 2ème, 3ème gen) et iPhone 6/7/8',
+                    ]
+                }
+            },
+            '2.2.1': {
+                date: '2026-03-14',
+                changes: {
+                    fr: [
+                        '🐛 Correction de la hauteur du notch recipe-detail-header',
+                    ],
+                    en: [
+                         '🐛 Correction of the notch hight recipe-detail-header',
+                    ]
+                }
+            },
             '2.2.0': {
                 date: '2026-03-11',
                 changes: {
@@ -6800,17 +6852,43 @@
         document.getElementById('versionDisplay').textContent = 'Version ' + APP_VERSION;
         
         
-        // SOLUTION RADICALE - Forcer scroll top en permanence quand formulaire ouvert
+        // Fix scroll sous notch - UNIQUEMENT sur iPhone avec notch
         (function() {
             var blockScroll = false;
             
-            // Quand le formulaire s'ouvre
+            // Détecter si l'appareil a un notch
+            var hasNotch = (
+                window.CSS &&
+                CSS.supports('padding-top: env(safe-area-inset-top)') &&
+                parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-top') || 0) > 20
+            );
+            
+            // OU détection simple : si safe-area-inset-top > 20px = notch
+            var checkNotch = function() {
+                var div = document.createElement('div');
+                div.style.paddingTop = 'env(safe-area-inset-top)';
+                document.body.appendChild(div);
+                var computed = window.getComputedStyle(div).paddingTop;
+                document.body.removeChild(div);
+                return parseInt(computed) > 20; // iPhone X+ ont ~44px, iPhone 8- ont 20px
+            };
+            
+            hasNotch = checkNotch();
+            
+            // N'appliquer le fix QUE si notch détecté
+            if (!hasNotch) {
+                console.log('Pas de notch détecté - Fix scroll désactivé');
+                return; // Sortir, ne rien faire
+            }
+            
+            console.log('Notch détecté - Fix scroll activé');
+            
+            // Reste du code identique
             var observer = new MutationObserver(function() {
                 var form = document.getElementById('form');
                 blockScroll = form && form.classList.contains('active');
                 
                 if (blockScroll) {
-                    // Bloquer body
                     document.documentElement.style.overflow = 'hidden';
                     document.documentElement.style.position = 'fixed';
                     document.documentElement.style.width = '100%';
@@ -6818,7 +6896,6 @@
                     document.body.style.position = 'fixed';
                     document.body.style.width = '100%';
                 } else {
-                    // Débloquer
                     document.documentElement.style.overflow = '';
                     document.documentElement.style.position = '';
                     document.documentElement.style.width = '';
@@ -6833,7 +6910,6 @@
                 observer.observe(form, { attributes: true, attributeFilter: ['class'] });
             }
             
-            // Bloquer TOUT scroll quand formulaire ouvert
             window.addEventListener('scroll', function(e) {
                 if (blockScroll) {
                     e.preventDefault();
@@ -6841,18 +6917,15 @@
                 }
             }, { passive: false });
             
-            // Bloquer aussi sur touchmove
             document.addEventListener('touchmove', function(e) {
                 if (blockScroll) {
                     var target = e.target;
                     var form = document.getElementById('form');
-                    // Autoriser scroll UNIQUEMENT dans le formulaire
                     if (!form.contains(target)) {
                         e.preventDefault();
                     }
                 }
             }, { passive: false });
-        })();
-    </script>
+        })();    </script>
 </body>
 </html>
