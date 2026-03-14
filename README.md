@@ -1,8 +1,8 @@
-# 🧊 Frigo Manager v2.2.1
+# 🧊 Frigo Manager v2.2.2
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-2.2.1-blue.svg)
+![Version](https://img.shields.io/badge/version-2.2.2-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Language](https://img.shields.io/badge/language-JavaScript-yellow.svg)
 
@@ -13,6 +13,9 @@
 </div>
 
 ---
+## ✨ Nouveautés v2.22
+- 🐛 Ajout iPhone SE (1ère, 2ème, 3ème gen) et iPhone 6/7/8
+  
 ## ✨ Nouveautés v2.21
 - 🐛 Correction de la hauteur du notch recipe-detail-header
   
