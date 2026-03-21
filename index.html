@@ -41,18 +41,20 @@
             position: relative; /* Important pour le contexte de positionnement */
         }
         
-        /* Crée une barrière invisible en haut mig*/
-        body::before {
-            content: '';
-            display: block;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: calc(env(safe-area-inset-top, 0px) + 60px);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            z-index: 999;
-            pointer-events: none; /* Ne bloque pas les clics */
+        /* Barrière anti-notch - SEULEMENT sur mobile */
+        @media (max-width: 767px) {
+            body::before {
+                content: '';
+                display: block;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: calc(env(safe-area-inset-top, 0px) + 60px);
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                z-index: 999;
+                pointer-events: none;
+            }
         }
         
         /* Fix formulaire saisie manuelle sous le notch mig */
@@ -1976,6 +1978,60 @@
                     </div>
                 </div>
                 
+                <div class="settings-section" style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border: 2px solid #8b5cf6; padding: 15px;">
+                    <h4 style="color: #6d28d9; margin-bottom: 12px;">📱 Nos autres apps</h4>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <a href="https://apps.apple.com/fr/app/id6760126279" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:white;border-radius:10px;text-decoration:none;border:1px solid #e5e7eb;">
+                            <span style="font-size:24px;width:32px;text-align:center;">🍷</span>
+                            <div style="flex:1">
+                                <div style="font-weight:600;color:#1f2937;font-size:0.9em;">Cave Manager</div>
+                                <div style="font-size:0.75em;color:#6b7280;">Gérez votre cave à vin</div>
+                            </div>
+                            <span style="color:#8b5cf6;font-size:18px;">›</span>
+                        </a>
+                        <a href="https://apps.apple.com/fr/app/id6759870654" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:white;border-radius:10px;text-decoration:none;border:1px solid #e5e7eb;">
+                            <span style="font-size:24px;width:32px;text-align:center;">💊</span>
+                            <div style="flex:1">
+                                <div style="font-weight:600;color:#1f2937;font-size:0.9em;">MediManager</div>
+                                <div style="font-size:0.75em;color:#6b7280;">Suivi de vos médicaments</div>
+                            </div>
+                            <span style="color:#8b5cf6;font-size:18px;">›</span>
+                        </a>
+                        <a href="https://apps.apple.com/fr/app/id6760751055" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:white;border-radius:10px;text-decoration:none;border:1px solid #e5e7eb;">
+                            <span style="font-size:24px;width:32px;text-align:center;">🪦</span>
+                            <div style="flex:1">
+                                <div style="font-weight:600;color:#1f2937;font-size:0.9em;">Cimetières Paris</div>
+                                <div style="font-size:0.75em;color:#6b7280;">Père-Lachaise &amp; Montparnasse</div>
+                            </div>
+                            <span style="color:#8b5cf6;font-size:18px;">›</span>
+                        </a>
+                        <a href="https://apps.apple.com/fr/app/id6760890465" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:white;border-radius:10px;text-decoration:none;border:1px solid #e5e7eb;">
+                            <span style="font-size:24px;width:32px;text-align:center;">🏛</span>
+                            <div style="flex:1">
+                                <div style="font-weight:600;color:#1f2937;font-size:0.9em;">Musées Paris</div>
+                                <div style="font-size:0.75em;color:#6b7280;">Guide des Musées parisiens</div>
+                            </div>
+                            <span style="color:#8b5cf6;font-size:18px;">›</span>
+                        </a>
+                        <a href="https://apps.apple.com/fr/app/id6760929391" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:white;border-radius:10px;text-decoration:none;border:1px solid #e5e7eb;">
+                            <span style="font-size:24px;width:32px;text-align:center;">🎭</span>
+                            <div style="flex:1">
+                                <div style="font-weight:600;color:#1f2937;font-size:0.9em;">Théatres Paris</div>
+                                <div style="font-size:0.75em;color:#6b7280;">Guide des théatres parisiens</div>
+                            </div>
+                            <span style="color:#8b5cf6;font-size:18px;">›</span>
+                        </a>
+                        <a href="https://apps.apple.com/fr/app/id6760617965" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:white;border-radius:10px;text-decoration:none;border:1px solid #e5e7eb;">
+                            <span style="font-size:24px;width:32px;text-align:center;">🍽</span>
+                            <div style="flex:1">
+                                <div style="font-weight:600;color:#1f2937;font-size:0.9em;">MesRestaurants</div>
+                                <div style="font-size:0.75em;color:#6b7280;">Votre carnet de restaurants</div>
+                            </div>
+                            <span style="color:#8b5cf6;font-size:18px;">›</span>
+                        </a>
+                    </div>
+                </div>
+
                 <button class="btn" onclick="toggleSettings()" style="background: #ccc; color: #333; margin-top: 20px;">✕ Fermer</button>
             </div>
         </div>
@@ -2579,11 +2635,11 @@
 
         <div class="search-container">
             <div class="search-wrapper">
-                <input type="search" id="searchInput" class="search-input" 
-                       placeholder="🔍 Rechercher..." 
-                       autocomplete="off" 
-                       autocorrect="off" 
-                       autocapitalize="off" 
+                <input type="search" id="searchInput" class="search-input"
+                       placeholder="🔍 Rechercher..."
+                       autocomplete="off"
+                       autocorrect="off"
+                       autocapitalize="off"
                        spellcheck="false"
                        inputmode="search">
                 <button id="searchButton" class="search-btn" onclick="doSearch()">GO</button>
@@ -2976,9 +3032,20 @@
         var currentLang = localStorage.getItem('language') || 'fr';
         
         // === SYSTÈME DE VERSION ===
-        var APP_VERSION = '2.2.2';
-        var VERSION_DATE = '2026-03-14';
+        var APP_VERSION = '2.3.0';
+        var VERSION_DATE = '2026-03-21';
         var CHANGELOG = {
+            '2.3.0': {
+                date: '2026-03-21',
+                changes: {
+                    fr: [
+                        '🐛 ajout de nos autres Applications',
+                    ],
+                    en: [
+                         '🐛 adding our new Apllications',
+                    ]
+                }
+            },
             '2.2.2': {
                 date: '2026-03-14',
                 changes: {
@@ -3364,7 +3431,7 @@
             
             var recipeDifficultySelect = document.getElementById('recipeDifficultyInput');
             if (recipeDifficultySelect) {
-                var difficulties = currentLang === 'fr' 
+                var difficulties = currentLang === 'fr'
                     ? ['Très facile', 'Facile', 'Moyen', 'Difficile']
                     : ['Very easy', 'Easy', 'Medium', 'Hard'];
                 var currentValue = recipeDifficultySelect.value;
@@ -3507,7 +3574,7 @@
         
         // Fonction pour calculer la nouvelle date selon emplacement + catégorie
         function calculerNouvelleDate(categorie, emplacement) {
-            var duree = (dureeConservation[categorie] && dureeConservation[categorie][emplacement]) 
+            var duree = (dureeConservation[categorie] && dureeConservation[categorie][emplacement])
                        || dureeConservation['autre']['frigo']; // Valeur par défaut
             
             var nouvelleDate = new Date();
@@ -4187,7 +4254,7 @@
             var resultsInfo = document.getElementById('searchResults');
             if (currentSearchTerm && filtered.length > 0) {
                 var count = filtered.length;
-                var text = currentLang === 'fr' 
+                var text = currentLang === 'fr'
                     ? '✓ ' + count + ' produit' + (count > 1 ? 's' : '') + ' trouvé' + (count > 1 ? 's' : '')
                     : '✓ ' + count + ' product' + (count > 1 ? 's' : '') + ' found';
                 resultsInfo.textContent = text;
@@ -4276,7 +4343,7 @@
                     // Afficher un message d'erreur plus clair avec le bouton saisie manuelle
                     var scannerInstructions = document.querySelector('.scanner-instructions');
                     if (scannerInstructions) {
-                        scannerInstructions.innerHTML = 
+                        scannerInstructions.innerHTML =
                             '<div style="color: #ef4444; font-size: 1.2em; padding: 20px;">' +
                             '⚠️ Caméra non accessible<br>' +
                             '<span style="font-size: 0.9em;">Utilisez la saisie manuelle ci-dessous</span>' +
@@ -4630,7 +4697,7 @@
             var barcodeBadgeAdd = document.getElementById('barcodeBadgeAdd');
             if (barcodeBadgeAdd && productData.barcode) {
                 barcodeBadgeAdd.onclick = function() {
-                    var msg = currentLang === 'fr' ? 
+                    var msg = currentLang === 'fr' ?
                         'Récupérer les données depuis la base de données ?\n\n• Photo du produit\n• Scores de santé (Nutri-Score, NOVA, Additifs, Eco-Score)\n\n⏳ Patientez pendant le chargement...' :
                         'Retrieve data from database?\n\n• Product photo\n• Health scores (Nutri-Score, NOVA, Additives, Eco-Score)\n\n⏳ Please wait during loading...';
                     
@@ -4736,7 +4803,7 @@
                                     badge.style.animation = '';
                                     
                                     if (updates.length > 0) {
-                                        var successMsg = currentLang === 'fr' ? 
+                                        var successMsg = currentLang === 'fr' ?
                                             '✅ Données récupérées !\n\n' + updates.join('\n') + '\n\n💾 Cliquez sur "Ajouter" pour sauvegarder le produit.' :
                                             '✅ Data retrieved!\n\n' + updates.join('\n') + '\n\n💾 Click "Add" to save the product.';
                                         alert(successMsg);
@@ -6153,8 +6220,8 @@
             // Si c'est une recette par défaut, on va la dupliquer en recette utilisateur
             if (!isUserRecipe) {
                 // Informer l'utilisateur
-                var message = currentLang === 'fr' 
-                    ? '💡 Cette recette par défaut sera copiée.\n\nVos modifications créeront une nouvelle recette personnalisée.\n\nContinuer ?' 
+                var message = currentLang === 'fr'
+                    ? '💡 Cette recette par défaut sera copiée.\n\nVos modifications créeront une nouvelle recette personnalisée.\n\nContinuer ?'
                     : '💡 This default recipe will be copied.\n\nYour changes will create a new custom recipe.\n\nContinue?';
                 
                 if (!confirm(message)) {
@@ -6213,7 +6280,7 @@
             var recipe = userRecipes.find(function(r) { return r.id === recipeId; });
             if (!recipe) return;
             
-            var message = currentLang === 'fr' 
+            var message = currentLang === 'fr'
                 ? '⚠️ Supprimer la recette "' + recipe.name + '" ?\n\nCette action est irréversible.'
                 : '⚠️ Delete recipe "' + recipe.name + '"?\n\nThis action is irreversible.';
             
@@ -6229,7 +6296,7 @@
         }
         
         function confirmDeleteAll() {
-            var message1 = currentLang === 'fr' 
+            var message1 = currentLang === 'fr'
                 ? '⚠️ SUPPRIMER TOUTES LES DONNÉES ?\n\n' +
                   'Cette action supprimera définitivement tous vos ' + items.length + ' produits.\n\n' +
                   'Cette action est IRRÉVERSIBLE.\n\n' +
@@ -6760,7 +6827,7 @@
         var clearBtn = document.getElementById('clearSearch');
         var historyEl = document.getElementById('searchHistory');
         
-        /* 
+        /*
         DÉSACTIVÉ - On utilise onclick HTML à la place
         
         // Test que les éléments existent
@@ -6856,14 +6923,15 @@
         (function() {
             var blockScroll = false;
             
-            // Détecter si l'appareil a un notch
-            var hasNotch = (
-                window.CSS &&
-                CSS.supports('padding-top: env(safe-area-inset-top)') &&
-                parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-top') || 0) > 20
-            );
+            // 1. VÉRIFIER QUE C'EST BIEN iOS (pas Mac)
+            var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             
-            // OU détection simple : si safe-area-inset-top > 20px = notch
+            if (!isIOS) {
+                console.log('Pas iOS - Fix scroll désactivé');
+                return; // Sortir si pas iOS
+            }
+            
+            // 2. VÉRIFIER SI NOTCH PRÉSENT
             var checkNotch = function() {
                 var div = document.createElement('div');
                 div.style.paddingTop = 'env(safe-area-inset-top)';
@@ -6873,17 +6941,16 @@
                 return parseInt(computed) > 20; // iPhone X+ ont ~44px, iPhone 8- ont 20px
             };
             
-            hasNotch = checkNotch();
+            var hasNotch = checkNotch();
             
-            // N'appliquer le fix QUE si notch détecté
             if (!hasNotch) {
-                console.log('Pas de notch détecté - Fix scroll désactivé');
-                return; // Sortir, ne rien faire
+                console.log('iOS détecté mais pas de notch - Fix scroll désactivé');
+                return; // Sortir si pas de notch
             }
             
-            console.log('Notch détecté - Fix scroll activé');
+            console.log('iPhone avec notch détecté - Fix scroll activé');
             
-            // Reste du code identique
+            // Reste du code identique...
             var observer = new MutationObserver(function() {
                 var form = document.getElementById('form');
                 blockScroll = form && form.classList.contains('active');
@@ -6926,6 +6993,7 @@
                     }
                 }
             }, { passive: false });
-        })();    </script>
+        })();
+    </script>
 </body>
 </html>
