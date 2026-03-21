@@ -13,6 +13,9 @@
 </div>
 
 ---
+## ✨ Nouveautés v2.30
+- 🐛 Ajout de nos autres Applications.
+  
 ## ✨ Nouveautés v2.22
 - 🐛 Ajout iPhone SE (1ère, 2ème, 3ème gen) et iPhone 6/7/8
   
