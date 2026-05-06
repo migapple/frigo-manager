@@ -19,6 +19,7 @@
 - 🐛 Ajout des notifications locales quotidiennes pour vous alerter des produits expirés et urgents, configurables depuis les paramètres
 - 🐛 Ajout de nos autres Applications en fenetre mosaique
 - 🐛 Traduction complète de toutes les fenêtres en français et en anglais
+- 🐛 Corrections diverses et améliorations de stabilité.
 
 ## ✨ Nouveautés v2.30
 - 🐛 Ajout de nos autres Applications.
