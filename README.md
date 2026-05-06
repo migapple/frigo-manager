@@ -1,8 +1,8 @@
-# 🧊 Frigo Manager v2.2.2
+# 🧊 FreshFood Manager v3.0
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-2.2.2-blue.svg)
+![Version](https://img.shields.io/badge/version-3.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Language](https://img.shields.io/badge/language-JavaScript-yellow.svg)
 
@@ -13,6 +13,13 @@
 </div>
 
 ---
+## ✨ Nouveautés v3.0
+- 🐛 L'application change de nom pour être plus compréhensible par les Anglophones
+- 🐛 Nouvel Icone
+- 🐛 Ajout des notifications locales quotidiennes pour vous alerter des produits expirés et urgents, configurables depuis les paramètres
+- 🐛 Ajout de nos autres Applications en fenetre mosaique
+- 🐛 Traduction complète de toutes les fenêtres en français et en anglais
+
 ## ✨ Nouveautés v2.30
 - 🐛 Ajout de nos autres Applications.
   
